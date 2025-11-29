@@ -194,6 +194,17 @@ model UserRef {
   avatarUrl?: string;
 }
 
+model CollaboratorRef {
+  /// 参与者ID Collaborator id
+  id: string;
+  /// 展示名 Display name
+  displayName: string;
+  /// 邮箱 Email
+  email?: string;
+  /// 头像 Avatar URL
+  avatarUrl?: string;
+}
+
 model RelationRef {
   /// 目标文档类型 Target document type
   @doc("被关联的文档类型。\nTarget document type.")
@@ -219,7 +230,7 @@ union Value {
   multi_select: SelectOption[],
   attachment: Attachment[],
   user: UserRef,
-  collaborator: UserRef,
+  collaborator: CollaboratorRef,
   relation: RelationRef[],
   rating: int32,
   duration: int64
