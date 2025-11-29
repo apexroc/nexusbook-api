@@ -101,67 +101,65 @@ model UserInfo {
   tenants?: string[];
 }
 
-@route("/authorize")
 @tag("Auth")
-@get
-@summary("授权请求")
-@doc("""
-授权码流程的授权端点。
+interface AuthApi {
+  @route("/authorize")
+  @get
+  @summary("授权请求")
+  @doc("""
+  授权码流程的授权端点。
 
-Authorization endpoint for authorization code flow.
-""")
-/// 授权请求（授权码流程）
-/// Authorization request (authorization code flow)
-op authorize(): void;
+  Authorization endpoint for authorization code flow.
+  """
+  )
+  op authorize(): void;
 
-@route("/token")
-@tag("Auth")
-@post
-@summary("令牌颁发")
-@doc("""
-颁发访问令牌与刷新令牌。
+  @route("/token")
+  @post
+  @summary("令牌颁发")
+  @doc("""
+  颁发访问令牌与刷新令牌。
 
-Issue access and refresh tokens.
-""")
-/// 令牌颁发
-/// Token issuance
-op token(): NexusBook.Common.ApiResponse<TokenResponse>;
+  Issue access and refresh tokens.
 
-@route("/userinfo")
-@tag("Auth")
-@get
-@summary("用户信息")
-@doc("""
-返回登录用户的信息声明。
+  示例（cURL）:
+  ```bash
+  curl -X POST 'https://auth.nexusbook.com/token' -H 'Content-Type: application/x-www-form-urlencoded' -d 'grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&scope=doc:read data:read'
+  ```
+  """
+  )
+  op token(): NexusBook.Common.ApiResponse<TokenResponse>;
 
-Return user info claims.
-""")
-/// 用户信息
-/// User info
-op userinfo(): NexusBook.Common.ApiResponse<UserInfo>;
+  @route("/userinfo")
+  @get
+  @summary("用户信息")
+  @doc("""
+  返回登录用户的信息声明。
 
-@route("/.well-known/openid-configuration")
-@tag("Auth")
-@get
-@summary("OIDC元数据")
-@doc("""
-返回 OIDC 提供方的标准发现文档。
+  Return user info claims.
+  """
+  )
+  op userinfo(): NexusBook.Common.ApiResponse<UserInfo>;
 
-Return OIDC provider discovery document.
-""")
-/// OIDC 提供方元数据
-/// OIDC provider metadata
-op openidConfiguration(): ProviderMetadata;
+  @route("/.well-known/openid-configuration")
+  @get
+  @summary("OIDC元数据")
+  @doc("""
+  返回 OIDC 提供方的标准发现文档。
 
-@route("/jwks.json")
-@tag("Auth")
-@get
-@summary("JWKS 公钥")
-@doc("""
-返回 JSON Web Key Set 公钥集合。
+  Return OIDC provider discovery document.
+  """
+  )
+  op openidConfiguration(): ProviderMetadata;
 
-Return JSON Web Key Set public keys.
-""")
-/// JSON Web Key Set（公开密钥）
-/// JSON Web Key Set (public keys)
-op jwks(): { keys: JWK[] };
+  @route("/jwks.json")
+  @get
+  @summary("JWKS 公钥")
+  @doc("""
+  返回 JSON Web Key Set 公钥集合。
+
+  Return JSON Web Key Set public keys.
+  """
+  )
+  op jwks(): { keys: JWK[] };
+}

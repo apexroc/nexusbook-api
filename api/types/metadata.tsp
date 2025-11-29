@@ -5,7 +5,7 @@ import "@typespec/openapi3";
 using TypeSpec.Http;
 using OpenAPI;
 
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /// 字段类型（覆盖多维表格常见类型）
 /// Field types aligned with multi-dimensional table SaaS
@@ -104,28 +104,24 @@ model Metadata {
 
 @route("/doc/{docType}/{docId}/metadata")
 @tag("Document")
-@get
-@summary("获取文档元数据")
-@doc("""
-返回字段定义与显示配置，供渲染与校验使用。
+interface MetadataApi {
+  @get
+  @summary("获取文档元数据")
+  @doc("""
+  返回字段定义与显示配置，供渲染与校验使用。
 
-Returns field definitions and display settings for rendering and validation.
-"""
-)
-/// 获取文档元数据（中文名：获取文档元数据）
-/// Get document metadata (fields and display settings)
-op getMetadata(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<Metadata>;
+  Returns field definitions and display settings for rendering and validation.
+  """
+  )
+  op getMetadata(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<Metadata>;
 
-@route("/doc/{docType}/{docId}/metadata")
-@tag("Document")
-@put
-@summary("更新文档元数据")
-@doc("""
-更新字段与显示配置，需具备管理权限。
+  @put
+  @summary("更新文档元数据")
+  @doc("""
+  更新字段与显示配置，需具备管理权限。
 
-Update fields and display settings, requires manage permission.
-"""
-)
-/// 更新文档元数据（中文名：更新文档元数据）
-/// Update document metadata (fields and display settings)
-op putMetadata(@path docType: string, @path docId: string, @body body: Metadata): NexusBook.Common.ApiResponse<Metadata>;
+  Update fields and display settings, requires manage permission.
+  """
+  )
+  op putMetadata(@path docType: string, @path docId: string, @body body: Metadata): NexusBook.Common.ApiResponse<Metadata>;
+}

@@ -6,7 +6,7 @@ import "../types/requests.tsp";
 using TypeSpec.Http;
 using OpenAPI;
 
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /// 数据行（包含字段值与审计信息）
 /// Data row with field values and audit info
@@ -61,125 +61,118 @@ model QueryRequest {
 
 @route("/doc/{docType}/{docId}/data")
 @tag("Document")
-@get
-@summary("列出数据")
-@doc("""
-以分页返回数据行，支持简单 DSL 查询参数（`page/pageSize/sort/filter/group/cursor`）。
+interface DataApi {
+  @get
+  @summary("列出数据")
+  @doc("""
+  以分页返回数据行，支持简单 DSL 查询参数（`page/pageSize/sort/filter/group/cursor`）。
 
-List rows with pagination, supports simple DSL query parameters (`page/pageSize/sort/filter/group/cursor`).
-""")
-/// 列出数据（中文名：列出数据）
-/// List data with pagination and query parameters DSL
-op listRows(
-  @path docType: string,
-  @path docId: string,
-  @query page?: int32,
-  @query pageSize?: int32,
-  @query sort?: string,
-  @query filter?: string,
-  @query group?: string,
-  @query cursor?: string
-): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
+  List rows with pagination, supports simple DSL query parameters (`page/pageSize/sort/filter/group/cursor`).
+  """
+  )
+  op listRows(
+    @path docType: string,
+    @path docId: string,
+    @query page?: int32,
+    @query pageSize?: int32,
+    @query sort?: string,
+    @query filter?: string,
+    @query group?: string,
+    @query cursor?: string
+  ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
 
-@route("/doc/{docType}/{docId}/data/query")
-@tag("Document")
-@post
-@summary("结构化查询数据")
-@doc("""
-以结构化体进行复杂查询（嵌套过滤、排序、分组与聚合）。
+  @route("/query")
+  @post
+  @summary("结构化查询数据")
+  @doc("""
+  以结构化体进行复杂查询（嵌套过滤、排序、分组与聚合）。
 
-Perform complex query with structured body (nested filters, sorts, group/aggregations).
-""")
-/// 结构化查询端点（中文名：结构化查询数据）
-/// Structured query endpoint (nested filters, sorts and group/aggregations)
-op queryRows(
-  @path docType: string,
-  @path docId: string,
-  @body body: QueryRequest
-): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
+  Perform complex query with structured body (nested filters, sorts, group/aggregations).
+  """
+  )
+  op queryRows(
+    @path docType: string,
+    @path docId: string,
+    @body body: QueryRequest
+  ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
 
-@route("/doc/{docType}/{docId}/data")
-@tag("Document")
-@post
-@summary("创建数据行")
-@doc("""
-默认生成合并请求，可用 `apply=true` 直接应用。
+  @post
+  @summary("创建数据行")
+  @doc("""
+  默认生成合并请求，可用 `apply=true` 直接应用。
 
-Generates a merge-request by default, use `apply=true` to apply directly.
-""")
-/// 创建数据行（中文名：创建数据行）默认生成合并请求，可用 apply 直接应用
-/// Create a row (MR by default, apply to bypass)
-op createRow(
-  @path docType: string,
-  @path docId: string,
-  @body body: Row,
-  @query apply?: boolean
-): NexusBook.Common.ApiResponse<Request>;
+  Generates a merge-request by default, use `apply=true` to apply directly.
 
-@route("/doc/{docType}/{docId}/data/bulk")
-@tag("Document")
-@post
-@summary("批量操作数据")
-@doc("""
-批量创建/更新/删除，默认生成合并请求，可用 `apply=true` 直接应用。
+  示例（cURL）:
+  ```bash
+  curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true' -H 'Authorization: Bearer TOKEN' -H 'Content-Type: application/json' -d '{"id":"row-1","values":[{"fieldId":"name","value":{"text":"新产品"}}]}'
+  ```
+  """
+  )
+  op createRow(
+    @path docType: string,
+    @path docId: string,
+    @body body: Row,
+    @query apply?: boolean
+  ): NexusBook.Common.ApiResponse<Request>;
 
-Bulk create/update/delete, MR by default, use `apply=true` to apply directly.
-""")
-/// 批量操作（中文名：批量操作数据）默认生成合并请求，可用 apply 直接应用
-/// Bulk operations (MR by default, apply to bypass)
-op bulkRows(
-  @path docType: string,
-  @path docId: string,
-  @body body: Row[],
-  @query apply?: boolean
-): NexusBook.Common.ApiResponse<Request>;
+  @route("/bulk")
+  @post
+  @summary("批量操作数据")
+  @doc("""
+  批量创建/更新/删除，默认生成合并请求，可用 `apply=true` 直接应用。
 
-@route("/doc/{docType}/{docId}/data/{rowId}")
-@tag("Document")
-@get
-@summary("获取单行详情")
-@doc("""
-返回单条数据行详情。
+  Bulk create/update/delete, MR by default, use `apply=true` to apply directly.
+  """
+  )
+  op bulkRows(
+    @path docType: string,
+    @path docId: string,
+    @body body: Row[],
+    @query apply?: boolean
+  ): NexusBook.Common.ApiResponse<Request>;
 
-Return single row detail.
-""")
-/// 获取单行详情（中文名：获取单行详情）
-/// Get row detail
-op getRow(@path docType: string, @path docId: string, @path rowId: string): NexusBook.Common.ApiResponse<Row>;
+  @route("/{rowId}")
+  @get
+  @summary("获取单行详情")
+  @doc("""
+  返回单条数据行详情。
 
-@route("/doc/{docType}/{docId}/data/{rowId}")
-@tag("Document")
-@put
-@summary("更新数据行")
-@doc("""
-默认生成合并请求，可用 `apply=true` 直接应用。
+  Return single row detail.
+  """
+  )
+  op getRow(@path docType: string, @path docId: string, @path rowId: string): NexusBook.Common.ApiResponse<Row>;
 
-Generates a merge-request by default, use `apply=true` to apply directly.
-""")
-/// 更新数据行（中文名：更新数据行）默认生成合并请求，可用 apply 直接应用
-/// Update a row (MR by default, apply to bypass)
-op updateRow(
-  @path docType: string,
-  @path docId: string,
-  @path rowId: string,
-  @body body: Row,
-  @query apply?: boolean
-): NexusBook.Common.ApiResponse<Request>;
+  @route("/{rowId}")
+  @put
+  @summary("更新数据行")
+  @doc("""
+  默认生成合并请求，可用 `apply=true` 直接应用。
 
-@route("/doc/{docType}/{docId}/data/{rowId}")
-@tag("Document")
-@delete
-@summary("删除数据行")
-@doc("""
-默认生成合并请求，可用 `apply=true` 直接应用。
+  Generates a merge-request by default, use `apply=true` to apply directly.
+  """
+  )
+  op updateRow(
+    @path docType: string,
+    @path docId: string,
+    @path rowId: string,
+    @body body: Row,
+    @query apply?: boolean
+  ): NexusBook.Common.ApiResponse<Request>;
 
-Generates a merge-request by default, use `apply=true` to apply directly.
-""")
-/// 删除数据行（中文名：删除数据行）默认生成合并请求，可用 apply 直接应用
-/// Delete a row (MR by default, apply to bypass)
-op deleteRow(
-  @path docType: string,
-  @path docId: string,
-  @path rowId: string,
-  @query apply?: boolean
-): NexusBook.Common.ApiResponse<Request>;
+  @route("/{rowId}")
+  @delete
+  @summary("删除数据行")
+  @doc("""
+  默认生成合并请求，可用 `apply=true` 直接应用。
+
+  Generates a merge-request by default, use `apply=true` to apply directly.
+  """
+  )
+  op deleteRow(
+    @path docType: string,
+    @path docId: string,
+    @path rowId: string,
+    @query apply?: boolean
+  ): NexusBook.Common.ApiResponse<Request>;
+}

@@ -5,7 +5,7 @@ import "../types/common.tsp";
 using TypeSpec.Http;
 using OpenAPI;
 
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 model ApprovalInstance {
   /// 审批实例ID Approval instance id
@@ -43,52 +43,50 @@ enum ApprovalDecision {
 
 @route("/doc/{docType}/{docId}/approval")
 @tag("Document")
-@get
-@summary("获取审批")
-@doc("""
-获取审批流程定义或实例概览。
+interface ApprovalApi {
+  @get
+  @summary("获取审批")
+  @doc("""
+  获取审批流程定义或实例概览。
 
-Get approval flow definition or instance overview.
-""")
-/// 获取审批流程定义或实例概览（中文名：获取审批）
-/// Get approval flow definition or instance overview
-op getApproval(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<unknown>;
+  Get approval flow definition or instance overview.
+  """
+  )
+  op getApproval(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<unknown>;
 
-@route("/doc/{docType}/{docId}/approval/start")
-@tag("Document")
-@post
-@summary("发起审批")
-@doc("""
-在文档上发起审批流程。
+  @route("/start")
+  @post
+  @summary("发起审批")
+  @doc("""
+  在文档上发起审批流程。
 
-Start approval flow on the document.
-""")
-/// 发起审批（中文名：发起审批）
-/// Start approval
-op startApproval(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<ApprovalInstance>;
+  Start approval flow on the document.
+  """
+  )
+  op startApproval(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<ApprovalInstance>;
+}
 
 @route("/doc/{docType}/{docId}/approval/{instanceId}")
 @tag("Document")
-@get
-@summary("审批详情")
-@doc("""
-获取审批实例详情。
+interface ApprovalInstanceApi {
+  @get
+  @summary("审批详情")
+  @doc("""
+  获取审批实例详情。
 
-Get approval instance detail.
-""")
-/// 获取审批实例详情（中文名：审批详情）
-/// Get approval instance detail
-op getApprovalInstance(@path docType: string, @path docId: string, @path instanceId: string): NexusBook.Common.ApiResponse<ApprovalInstance>;
+  Get approval instance detail.
+  """
+  )
+  op getApprovalInstance(@path docType: string, @path docId: string, @path instanceId: string): NexusBook.Common.ApiResponse<ApprovalInstance>;
 
-@route("/doc/{docType}/{docId}/approval/{instanceId}/decision")
-@tag("Document")
-@post
-@summary("审批决策")
-@doc("""
-对审批实例进行通过或拒绝的决策。
+  @route("/decision")
+  @post
+  @summary("审批决策")
+  @doc("""
+  对审批实例进行通过或拒绝的决策。
 
-Decide approval (approve or reject).
-""")
-/// 决策审批（中文名：审批决策）通过/拒绝
-/// Decide approval (approved/rejected)
-op decideApproval(@path docType: string, @path docId: string, @path instanceId: string, @query result: ApprovalDecision): NexusBook.Common.ApiResponse<ApprovalInstance>;
+  Decide approval (approve or reject).
+  """
+  )
+  op decideApproval(@path docType: string, @path docId: string, @path instanceId: string, @query result: ApprovalDecision): NexusBook.Common.ApiResponse<ApprovalInstance>;
+}

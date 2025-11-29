@@ -5,7 +5,7 @@ import "../types/common.tsp";
 using TypeSpec.Http;
 using OpenAPI;
 
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 enum ViewType {
   grid,
@@ -52,78 +52,68 @@ model View {
 
 @route("/doc/{docType}/{docId}/views")
 @tag("Document")
-@get
-@summary("列出视图")
-@doc("""
-返回指定文档的视图列表。
+interface ViewsApi {
+  @get
+  @summary("列出视图")
+  @doc("""
+  返回指定文档的视图列表。
 
-List all views of the document.
-""")
-/// 列出视图（中文名：列出视图）
-/// List views
-op listViews(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<View[]>;
+  List all views of the document.
+  """
+  )
+  op listViews(@path docType: string, @path docId: string): NexusBook.Common.ApiResponse<View[]>;
 
-@route("/doc/{docType}/{docId}/views")
-@tag("Document")
-@post
-@summary("创建视图")
-@doc("""
-创建新的视图定义。
+  @post
+  @summary("创建视图")
+  @doc("""
+  创建新的视图定义。
 
-Create a new view.
-""")
-/// 创建视图（中文名：创建视图）
-/// Create a view
-op createView(@path docType: string, @path docId: string, @body body: View): NexusBook.Common.ApiResponse<View>;
+  Create a new view.
+  """
+  )
+  op createView(@path docType: string, @path docId: string, @body body: View): NexusBook.Common.ApiResponse<View>;
 
-@route("/doc/{docType}/{docId}/views/{viewId}")
-@tag("Document")
-@get
-@summary("获取视图详情")
-@doc("""
-获取视图配置与定义。
+  @route("/{viewId}")
+  @get
+  @summary("获取视图详情")
+  @doc("""
+  获取视图配置与定义。
 
-Get view definition and configuration.
-""")
-/// 获取视图详情（中文名：获取视图详情）
-/// Get view detail
-op getView(@path docType: string, @path docId: string, @path viewId: string): NexusBook.Common.ApiResponse<View>;
+  Get view definition and configuration.
+  """
+  )
+  op getView(@path docType: string, @path docId: string, @path viewId: string): NexusBook.Common.ApiResponse<View>;
 
-@route("/doc/{docType}/{docId}/views/{viewId}")
-@tag("Document")
-@put
-@summary("更新视图")
-@doc("""
-更新视图定义与配置。
+  @route("/{viewId}")
+  @put
+  @summary("更新视图")
+  @doc("""
+  更新视图定义与配置。
 
-Update view definition and configuration.
-""")
-/// 更新视图（中文名：更新视图）
-/// Update a view
-op updateView(@path docType: string, @path docId: string, @path viewId: string, @body body: View): NexusBook.Common.ApiResponse<View>;
+  Update view definition and configuration.
+  """
+  )
+  op updateView(@path docType: string, @path docId: string, @path viewId: string, @body body: View): NexusBook.Common.ApiResponse<View>;
 
-@route("/doc/{docType}/{docId}/views/{viewId}")
-@tag("Document")
-@delete
-@summary("删除视图")
-@doc("""
-删除指定视图。
+  @route("/{viewId}")
+  @delete
+  @summary("删除视图")
+  @doc("""
+  删除指定视图。
 
-Delete specified view.
-""")
-/// 删除视图（中文名：删除视图）
-/// Delete a view
-op deleteView(@path docType: string, @path docId: string, @path viewId: string): NexusBook.Common.ApiResponse<unknown>;
+  Delete specified view.
+  """
+  )
+  op deleteView(@path docType: string, @path docId: string, @path viewId: string): NexusBook.Common.ApiResponse<unknown>;
 
-@route("/doc/{docType}/{docId}/views/{viewId}/default")
-@tag("Document")
-@post
-@summary("设为默认视图")
-@doc("""
-将指定视图设为默认视图。
+  @route("/{viewId}/default")
+  @post
+  @summary("设为默认视图")
+  @doc("""
+  将指定视图设为默认视图。
 
-Set specified view as default.
-""")
-/// 设为默认视图（中文名：设为默认视图）
-/// Set view as default
-op setDefaultView(@path docType: string, @path docId: string, @path viewId: string): NexusBook.Common.ApiResponse<unknown>;
+  Set specified view as default.
+  """
+  )
+  op setDefaultView(@path docType: string, @path docId: string, @path viewId: string): NexusBook.Common.ApiResponse<unknown>;
+}
