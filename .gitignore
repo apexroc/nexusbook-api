@@ -2,3 +2,6 @@ node_modules/
 dist/
 tsp-output/
 .DS_Store
+
+# 生成的文档（不提交，只提交源文件 docs-src/）
+docs/
