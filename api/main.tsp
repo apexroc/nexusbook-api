@@ -4,6 +4,7 @@ import "@typespec/openapi3";
 import "./shared/index.tsp";
 import "./auth/index.tsp";
 import "./document/index.tsp";
+import "./extensions/index.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;
@@ -30,6 +31,12 @@ using OpenAPI;
  * - OIDC 身份提供商集成
  * - JWT 令牌管理
  * - 用户信息和权限
+ *
+ * ### 3. 扩展功能 (`/webhooks`)
+ * - **Webhooks** - 事件驱动的通知机制
+ * - 支持 Request、Approval、Comment、Metadata、View 等事件
+ * - 自动重试和签名验证
+ * - 投递历史和统计
  *
  * ## API 调用示例
  *

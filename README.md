@@ -37,6 +37,7 @@ NexusBook API 是一个功能完整的文档管理和数据协作平台，提供
 - **强大的数据管理** - 25+ 种字段类型，支持公式、查找、汇总等计算字段
 - **灵活的视图系统** - 表格、看板、日历、图表等 8 种视图类型
 - **完整的协作功能** - 评论、修订、审批、变更请求等
+- **事件驱动通知** - Webhook 支持 20+ 种事件类型，自动推送变更通知
 - **标准的认证授权** - OAuth2 & OIDC 兼容
 
 ### 基本信息
@@ -373,6 +374,75 @@ graph LR
 
 </details>
 
+### 5. 🔔 Webhooks 事件通知
+
+<details>
+<summary><b>事件驱动的通知机制</b></summary>
+
+支持 20+ 种事件类型，自动推送变更通知到您的服务器。
+
+**Request 相关事件：**
+- `request_created` - 创建变更请求
+- `request_merged` - 请求已合并
+- `request_closed` - 请求已关闭
+- `request_reopened` - 请求重新打开
+
+**Approval 相关事件：**
+- `approval_started` - 审批流程开始
+- `approval_approved` - 审批通过
+- `approval_rejected` - 审批拒绝
+- `approval_canceled` - 审批取消
+- `approval_node_completed` - 审批节点完成
+
+**Comment 相关事件：**
+- `comment_created` - 创建评论
+- `comment_updated` - 更新评论
+- `comment_deleted` - 删除评论
+- `comment_resolved` - 评论已解决
+- `comment_mentioned` - 用户被 @提及
+
+**Metadata 相关事件：**
+- `metadata_updated` - 元数据更新
+- `metadata_field_added` - 添加字段
+- `metadata_field_updated` - 更新字段
+- `metadata_field_deleted` - 删除字段
+
+**View 相关事件：**
+- `view_created` - 创建视图
+- `view_updated` - 更新视图
+- `view_deleted` - 删除视图
+- `view_default_changed` - 默认视图变更
+
+**Data & Revision 事件：**
+- `data_row_created/updated/deleted` - 数据行变更
+- `data_bulk_operation` - 批量操作
+- `revision_created` - 创建修订
+- `revision_reverted` - 修订回滚
+
+**Webhook 特性：**
+- 🔒 HMAC-SHA256 签名验证
+- 🔄 自动重试机制（可配置）
+- 🎯 灵活的事件过滤（文档类型、用户、自定义条件）
+- 📊 投递历史和统计
+- 🧪 测试端点
+
+**快速示例：**
+```bash
+# 创建 Webhook
+curl -X POST 'https://open.nexusbook.com/api/v1/webhooks' \
+  -H 'Authorization: Bearer TOKEN' \
+  -d '{
+    "name": "产品变更通知",
+    "url": "https://your-domain.com/webhooks",
+    "events": ["request_merged", "approval_approved"],
+    "filters": {"docTypes": ["product"]}
+  }'
+```
+
+详细文档：[Webhook 使用指南](api/extensions/webhooks/WEBHOOK_GUIDE.md)
+
+</details>
+
 
 ---
 
@@ -651,6 +721,31 @@ POST /auth/token
 GET  /auth/userinfo
 GET  /auth/.well-known/openid-configuration
 GET  /auth/jwks.json
+```
+
+#### 12. Webhooks
+
+```http
+# Webhook 管理
+GET    /api/v1/webhooks
+POST   /api/v1/webhooks
+GET    /api/v1/webhooks/{webhook-id}
+PUT    /api/v1/webhooks/{webhook-id}
+DELETE /api/v1/webhooks/{webhook-id}
+
+# Webhook 操作
+POST   /api/v1/webhooks/{webhook-id}/pause
+POST   /api/v1/webhooks/{webhook-id}/resume
+POST   /api/v1/webhooks/{webhook-id}/test
+POST   /api/v1/webhooks/{webhook-id}/regenerate-secret
+
+# 投递管理
+GET    /api/v1/webhooks/{webhook-id}/deliveries
+GET    /api/v1/webhooks/{webhook-id}/deliveries/{delivery-id}
+POST   /api/v1/webhooks/{webhook-id}/deliveries/{delivery-id}/redeliver
+
+# 统计信息
+GET    /api/v1/webhooks/{webhook-id}/stats
 ```
 
 ### 错误码
