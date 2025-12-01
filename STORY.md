@@ -58,13 +58,15 @@
     "success": false,
     "code": "BAD_USER_NAME",
     "message": {
-        "zh": "错误消息",
-        "en": "error message"
+        "zh": "用户名错误",
+        "en": "Invalid username",
+        "ja": "ユーザー名が無効です",
+        "es": "Nombre de usuario inválido"
     },
     "payload": null
 }
 ```
-message 是一个多语言的错误消息，可以支持更多的语言，一般来说是根据 code 在后台翻译
+message 是一个灵活的多语言消息对象，使用 ISO 639-1 语言代码作为键（如 zh, en, ja, ko, es, fr, de, pt, ru, ar 等），支持任意语言扩展。一般来说是根据 code 在后台翻译成对应的语言。
 
 
 payload 可以是实际业务的任何结构，对象、数组、数字、字符串等

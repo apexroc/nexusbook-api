@@ -34,21 +34,43 @@ using TypeSpec.Http;
 namespace NexusBook.Common;
 
 /**
- * 多语言消息（中英文）
- * Message with Chinese and English
+ * 多语言消息
+ * Multi-language message
+ *
+ * 使用语言代码作为键的动态对象，支持任意语言。
+ * Dynamic object using language codes as keys, supporting any language.
+ *
+ * 常用语言代码示例 (Common language codes):
+ * - zh: 中文 (Chinese)
+ * - en: English
+ * - ja: 日本語 (Japanese)
+ * - ko: 한국어 (Korean)
+ * - es: Español (Spanish)
+ * - fr: Français (French)
+ * - de: Deutsch (German)
+ * - pt: Português (Portuguese)
+ * - ru: Русский (Russian)
+ * - ar: العربية (Arabic)
+ *
+ * 示例 (Example):
+ * ```json
+ * {
+ *   "zh": "用户未找到",
+ *   "en": "User not found",
+ *   "ja": "ユーザーが見つかりません",
+ *   "es": "Usuario no encontrado"
+ * }
+ * ```
  */
 model Message {
     /**
-     * 中文消息
-     * Chinese message
+     * 语言代码到消息文本的映射
+     * Mapping from language code to message text
+     *
+     * 键为 ISO 639-1 语言代码（如 zh, en, ja 等）。
+     * Keys are ISO 639-1 language codes (e.g., zh, en, ja).
      */
-    zh: string;
-
-    /**
-     * 英文消息
-     * English message
-     */
-    en: string;
+    ...Record<string>;
 }
 
 enum ErrorCode {

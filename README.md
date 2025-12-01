@@ -555,13 +555,24 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
 {
   success: boolean,           // 是否成功
   code?: ErrorCode,          // 错误码（失败时）
-  message?: {                // 多语言消息
-    zh: string,
-    en: string
-  },
+  message?: Record<string, string>,  // 多语言消息（灵活的语言代码映射）
   payload?: T | null         // 实际数据载荷
 }
 ```
+
+**多语言消息说明：**
+
+`message` 字段使用 ISO 639-1 语言代码作为键，支持任意语言扩展。常用语言代码：
+- `zh`: 中文
+- `en`: English
+- `ja`: 日本語
+- `ko`: 한국어
+- `es`: Español
+- `fr`: Français
+- `de`: Deutsch
+- `pt`: Português
+- `ru`: Русский
+- `ar`: العربية
 
 **示例：**
 
@@ -571,7 +582,8 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
   "code": "DOC_NOT_FOUND",
   "message": {
     "zh": "文档不存在",
-    "en": "Document not found"
+    "en": "Document not found",
+    "ja": "ドキュメントが見つかりません"
   },
   "payload": null
 }
