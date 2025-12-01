@@ -1,8 +1,1 @@
-referenceDocs:
-  tagGroups:
-    - name: Document
-      tags:
-        - Document
-    - name: Auth
-      tags:
-        - Auth
+{}
