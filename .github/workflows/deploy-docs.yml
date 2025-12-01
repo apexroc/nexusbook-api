@@ -43,6 +43,15 @@ jobs:
         run: |
           make docs
 
+      - name: Verify .nojekyll file
+        run: |
+          if [ ! -f docs/.nojekyll ]; then
+            echo "Creating .nojekyll file"
+            touch docs/.nojekyll
+          fi
+          echo "Contents of docs directory:"
+          ls -la docs/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
