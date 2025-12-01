@@ -3,6 +3,7 @@ import "@typespec/openapi3";
 
 import "./shared/index.tsp";
 import "./auth/index.tsp";
+import "./tenant/index.tsp";
 import "./document/index.tsp";
 import "./extensions/index.tsp";
 

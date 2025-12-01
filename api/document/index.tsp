@@ -8,12 +8,15 @@
  * - content/ - 内容协作（评论）
  * - workflow/ - 工作流管理（审批、变更请求、修订历史）
  * - aggregate/ - 聚合查询
+ * - tenant-document.tsp - 组织和工作区级文档支持
  *
  * 依赖关系：
  * - shared/index.tsp - 基础共享类型
  * - auth/index.tsp - 认证模型（可选）
+ * - tenant/index.tsp - 租户模型
  */
 import "./core/index.tsp";
 import "./content/index.tsp";
 import "./workflow/index.tsp";
 import "./aggregate/index.tsp";
+import "./tenant-document.tsp";

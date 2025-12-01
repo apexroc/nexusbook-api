@@ -88,6 +88,24 @@ model DocumentProperties {
     docType: string;
 
     /**
+     * 所属组织ID
+     * Organization ID
+     *
+     * 文档所属的组织（可选，用于多租户隔离）。
+     * Organization that owns this document (optional, for multi-tenancy isolation).
+     */
+    organizationId?: string;
+
+    /**
+     * 所属工作区ID
+     * Workspace ID
+     *
+     * 文档所属的工作区（可选，为空表示组织级文档）。
+     * Workspace that owns this document (optional, empty means organization-level document).
+     */
+    workspaceId?: string;
+
+    /**
      * 属性集合
      * Properties
      *
