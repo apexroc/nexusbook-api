@@ -87,6 +87,15 @@ model Request {
   reviewers?: string[];
 
   /**
+   * 贡献者
+   * Contributors
+   *
+   * 对该请求添加或修改变更的所有用户。
+   * All users who added or modified changes in this request.
+   */
+  contributors?: string[];
+
+  /**
    * 变更集
    * Changes
    *
@@ -94,6 +103,15 @@ model Request {
    * Contains changes to be merged.
    */
   changes?: unknown[];
+
+  /**
+   * 生成的修订ID
+   * Generated revision id
+   *
+   * 当请求合并后，系统生成的修订ID。
+   * Revision id generated when the request is merged.
+   */
+  generatedRevisionId?: string;
 
   /**
    * 创建时间
@@ -112,6 +130,24 @@ model Request {
    * Updated timestamp.
    */
   updatedAt?: string;
+
+  /**
+   * 合并时间
+   * Merged at
+   *
+   * 请求被合并的时间戳。
+   * Timestamp when the request was merged.
+   */
+  mergedAt?: string;
+
+  /**
+   * 合并者
+   * Merged by
+   *
+   * 执行合并操作的用户。
+   * User who performed the merge.
+   */
+  mergedBy?: string;
 }
 
 enum RequestStatus {
@@ -163,9 +199,45 @@ interface RequestsApi {
   ): NexusBook.Common.ApiResponse<Request>;
 
   /**
-   * 将合并请求的变更应用到文档。
+   * 将合并请求的变更应用到文档并生成修订。
    *
-   * Apply merge request changes to the document.
+   * Apply merge request changes to the document and generate revision.
+   *
+   * 当请求被合并时：
+   * 1. 系统冻结该请求中的所有变更
+   * 2. 应用变更到文档
+   * 3. 创建新的修订记录整个变更历史
+   * 4. 记录所有贡献者（对请求做过修改的人）
+   * 5. 返回生成的修订ID
+   *
+   * When request is merged:
+   * 1. System freezes all changes in the request
+   * 2. Apply changes to document
+   * 3. Create new revision recording the entire change history
+   * 4. Record all contributors (users who modified the request)
+   * 5. Return generated revision id
+   *
+   * 请求体支持以下选项:
+   * - `squash` - 是否合并为单一变更（true/false）
+   * - `message` - 合并消息
+   * - `deleteBranch` - 合并后是否删除关联分支
+   *
+   * Request body supports:
+   * - `squash` - Whether to squash into single change
+   * - `message` - Merge message
+   * - `deleteBranch` - Delete associated branch after merge
+   *
+   * 响应包含:
+   * - `revisionId` - 生成的修订ID
+   * - `version` - 修订版本号
+   * - `changesApplied` - 应用的变更数量
+   * - `contributors` - 所有贡献者列表
+   *
+   * Response includes:
+   * - `revisionId` - Generated revision id
+   * - `version` - Revision version number
+   * - `changesApplied` - Number of applied changes
+   * - `contributors` - List of all contributors
    */
   @route("/{reqId}/merge")
   @post
@@ -174,7 +246,62 @@ interface RequestsApi {
     @path docType: string,
     @path docId: string,
     @path reqId: string,
-  ): NexusBook.Common.ApiResponse<unknown>;
+    @body body?: {
+      /**
+       * 合并消息
+       * Merge message
+       */
+      message?: string;
+
+      /**
+       * 是否合并为单一变更
+       * Squash into single change
+       */
+      squash?: boolean;
+
+      /**
+       * 合并后是否删除关联分支
+       * Delete branch after merge
+       */
+      deleteBranch?: boolean;
+    },
+  ): NexusBook.Common.ApiResponse<{
+    /**
+     * 生成的修订ID
+     * Generated revision id
+     */
+    revisionId: string;
+
+    /**
+     * 修订版本号
+     * Revision version number
+     */
+    version: int64;
+
+    /**
+     * 应用的变更数量
+     * Number of changes applied
+     */
+    changesApplied: int32;
+
+    /**
+     * 所有贡献者
+     * All contributors
+     */
+    contributors: string[];
+
+    /**
+     * 合并时间
+     * Merge timestamp
+     */
+    mergedAt: string;
+
+    /**
+     * 合并者
+     * User who merged
+     */
+    mergedBy: string;
+  }>;
 
   /**
    * 关闭指定合并请求。
