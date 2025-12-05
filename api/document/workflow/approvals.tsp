@@ -94,7 +94,7 @@ model ApprovalInstance {
 }
 
 @route("/doc/{docType}/{docId}/approval")
-@tag("Document")
+@tag("Document - Workflow")
 interface ApprovalApi {
     /**
      * 获取审批流程定义或实例概述。
@@ -123,7 +123,7 @@ interface ApprovalApi {
 }
 
 @route("/doc/{docType}/{docId}/approval/{instanceId}")
-@tag("Document")
+@tag("Document - Workflow")
 interface ApprovalInstanceApi {
     /**
      * 获取审批实例详情。

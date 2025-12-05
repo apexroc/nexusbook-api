@@ -321,7 +321,7 @@ model Revision {
  * View, compare, and manage document revision history.
  */
 @route("/doc/{docType}/{docId}/revisions")
-@tag("Document")
+@tag("Document - Workflow")
 interface RevisionsApi {
     /**
      * 列出文档的修订历史

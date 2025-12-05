@@ -155,7 +155,7 @@ model Metadata {
 }
 
 @route("/doc/{docType}/{docId}/metadata")
-@tag("Document")
+@tag("Document - Core")
 interface MetadataApi {
     /**
      * 返回字段定义与显示配置，供渲染与校验使用。

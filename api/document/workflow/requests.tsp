@@ -151,7 +151,7 @@ model Request {
 }
 
 @route("/doc/{docType}/{docId}/requests")
-@tag("Document")
+@tag("Document - Workflow")
 interface RequestsApi {
     /**
      * 列出文档的未生效变更请求。

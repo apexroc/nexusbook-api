@@ -174,7 +174,7 @@ model QueryRequest {
 }
 
 @route("/doc/{docType}/{docId}/data")
-@tag("Document")
+@tag("Document - Data")
 interface DataApi {
     /**
      * 以分页返回数据行，支持简单 DSL 查询参数（`page/pageSize/sort/filter/group/cursor`）。

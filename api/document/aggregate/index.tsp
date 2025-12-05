@@ -92,7 +92,7 @@ model DocBundle {
 /** 获取聚合文档包（支持 include 选择与分页）
  * Fetch aggregated doc bundle (supports include selection and pagination) */
 @route("/doc/{docType}/{docId}")
-@tag("Document")
+@tag("Document - Core")
 interface DocumentAggregateApi {
     /**
      * 获取聚合文档包（支持 include 选择与分页）

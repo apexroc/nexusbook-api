@@ -19,12 +19,12 @@ async function main() {
   // 判断是合并文件还是单个文件
   const isJoinedFile = OPENAPI_FILE.includes('openapi.yaml');
 
-  // 定义 tag groups
+  // 定义 tag groups - 方案 A：功能领域分组
   if (isJoinedFile) {
-    // 合并文件：使用更简洁的结构
+    // 合并文件：使用功能领域分组（10个子分组）
     openapi['x-tagGroups'] = [
       {
-        name: 'Base (基础)',
+        name: 'Foundation (基础)',
         tags: [
           'Users',
           'Organizations',
@@ -34,62 +34,18 @@ async function main() {
         ]
       },
       {
-        name: 'Document - Core (核心)',
+        name: 'Document (文档)',
         tags: [
           'Document - Core',
           'Document - Data',
+          'Document - Views',
           'Document - Properties',
-          'Document - Settings',
-          'Organization Documents',
-          'Workspace Documents'
-        ]
-      },
-      {
-        name: 'Document - Views (视图)',
-        tags: [
-          'Document - Views'
-        ]
-      },
-      {
-        name: 'Document - Relations (关联)',
-        tags: [
-          'Document - Relations'
-        ]
-      },
-      {
-        name: 'Document - Attachments (附件)',
-        tags: [
-          'Document - Attachments'
-        ]
-      },
-      {
-        name: 'Document - Sync (同步)',
-        tags: [
-          'Document - Sync'
-        ]
-      },
-      {
-        name: 'Document - Realtime (实时协作)',
-        tags: [
-          'Document - Realtime'
-        ]
-      },
-      {
-        name: 'Document - Content (内容)',
-        tags: [
-          'Document - Content'
-        ]
-      },
-      {
-        name: 'Document - Workflow (工作流)',
-        tags: [
-          'Document - Workflow'
-        ]
-      },
-      {
-        name: 'Document - Aggregate (聚合)',
-        tags: [
-          'Document - Aggregate'
+          'Document - Relations',
+          'Document - Attachments',
+          'Document - Sync',
+          'Document - Collaboration',
+          'Document - Workflow',
+          'Document - Tenancy'
         ]
       },
       {
@@ -103,11 +59,7 @@ async function main() {
     // 单个文件：保留原有结构
     openapi['x-tagGroups'] = [
       {
-        name: 'Auth (认证)',
-        tags: []
-      },
-      {
-        name: 'Base (基础)',
+        name: 'Foundation (基础)',
         tags: [
           'Users',
           'Organizations',
@@ -119,21 +71,22 @@ async function main() {
       {
         name: 'Document (文档)',
         tags: [
-          'Document',
           'Document - Core',
-          'Document - Views',
           'Document - Data',
+          'Document - Views',
           'Document - Properties',
-          'Document - Settings',
           'Document - Relations',
           'Document - Attachments',
           'Document - Sync',
-          'Document - Realtime',
-          'Document - Content',
+          'Document - Collaboration',
           'Document - Workflow',
-          'Document - Aggregate',
-          'Organization Documents',
-          'Workspace Documents'
+          'Document - Tenancy'
+        ]
+      },
+      {
+        name: 'Auth (认证)',
+        tags: [
+          'Auth'
         ]
       }
     ];
@@ -146,23 +99,17 @@ async function main() {
     'Workspaces': '工作区管理',
     'Invitations': '邀请管理',
     'Join Requests': '加入申请',
-    'Document': '文档核心',
-    'Document - Core': '核心数据模型（元数据、数据行、属性、视图、设置）',
-    'Document - Views': '视图管理',
+    'Auth': '认证授权',
+    'Document - Core': '核心功能（聚合查询、元数据、设置）',
     'Document - Data': '数据行管理',
+    'Document - Views': '视图管理',
     'Document - Properties': '文档属性',
-    'Document - Settings': '文档设置',
     'Document - Relations': '文档关联',
     'Document - Attachments': '附件管理',
     'Document - Sync': '数据同步',
-    'Document - Realtime': '实时协作',
-    'Document - Content': '内容协作（评论）',
+    'Document - Collaboration': '协作功能（评论、实时）',
     'Document - Workflow': '工作流（审批、变更请求、修订）',
-    'Document - Aggregate': '聚合查询',
-    'Attachments': '附件管理',
-    'Realtime': '实时协作',
-    'Organization Documents': '组织级文档',
-    'Workspace Documents': '工作区级文档'
+    'Document - Tenancy': '多租户（组织/工作区级文档）'
   };
 
   // 更新 tags
@@ -187,11 +134,13 @@ async function main() {
     }
   });
 
-  // 重新映射某些 tags
+  // 重新映射某些 tags（方案 A）
   const tagMapping = {
-    'Document': 'Document - Core',
-    'Attachments': 'Document - Attachments',
-    'Realtime': 'Document - Realtime'
+    'Document': 'Document - Core',              // 聚合查询映射到 Core
+    'Attachments': 'Document - Attachments',     // 附件管理
+    'Realtime': 'Document - Collaboration',      // 实时协作合并到协作
+    'Organization Documents': 'Document - Tenancy',  // 组织文档合并到租户
+    'Workspace Documents': 'Document - Tenancy'      // 工作区文档合并到租户
   };
 
   // 遍历所有路径，更新 tags

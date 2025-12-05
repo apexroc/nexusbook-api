@@ -558,7 +558,7 @@ model SyncConflict {
 }
 
 @route("/doc/{docType}/{docId}/sync")
-@tag("Document")
+@tag("Document - Sync")
 interface SyncApi {
     /**
      * 列出同步配置

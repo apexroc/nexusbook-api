@@ -84,7 +84,7 @@ model Settings {
 }
 
 @route("/doc/{docType}/{docId}/settings")
-@tag("Document")
+@tag("Document - Core")
 interface DocSettingsApi {
     /**
      * 获取文档级设置。
@@ -113,7 +113,7 @@ interface DocSettingsApi {
 }
 
 @route("/doc/{docType}/setting")
-@tag("Document")
+@tag("Document - Core")
 interface TypeSettingsApi {
     /**
      * 获取文档类型公共设置。

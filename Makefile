@@ -22,7 +22,7 @@ build-docs: openapi
 	if [ $$COUNT -eq 1 ]; then \
 		npx redocly build-docs $$FILES --output dist/redoc/index.html; \
 	else \
-		npx redocly join $$FILES -o dist/openapi/openapi.yaml && \
+		npx redocly join $$FILES --without-x-tag-groups -o dist/openapi/openapi.yaml && \
 		node scripts/add-tag-groups.js dist/openapi/openapi.yaml && \
 		npx redocly build-docs dist/openapi/openapi.yaml --output dist/redoc/index.html; \
 	fi
@@ -39,7 +39,7 @@ generate-go: openapi deps
 	if [ -n "$$DOC_SPEC" ]; then \
 		oapi-codegen -generate types,gin -package apigen -o server/apigen/apigen.gen.go $$DOC_SPEC; \
 	else \
-		npx redocly join $$FILES -o $$TARGET && \
+		npx redocly join $$FILES --without-x-tag-groups -o $$TARGET && \
 		oapi-codegen -generate types,gin -package apigen -o server/apigen/apigen.gen.go $$TARGET; \
 	fi
 

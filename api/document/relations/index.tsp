@@ -278,7 +278,7 @@ model RelationWithDetails {
 }
 
 @route("/doc/{docType}/{docId}/relations")
-@tag("Document")
+@tag("Document - Relations")
 interface RelationsApi {
     /**
      * 获取文档的关联配置

@@ -244,7 +244,7 @@ model Comment {
  * Supports commenting at any location in document. Specify location via target object.
  */
 @route("/doc/{docType}/{docId}/comments")
-@tag("Document")
+@tag("Document - Collaboration")
 interface CommentsApi {
     /**
      * 列出指定位置的评论

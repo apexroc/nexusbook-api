@@ -84,7 +84,7 @@ model View {
 }
 
 @route("/doc/{docType}/{docId}/views")
-@tag("Document")
+@tag("Document - Views")
 interface ViewsApi {
     /**
      * 返回指定文档的视图列表。

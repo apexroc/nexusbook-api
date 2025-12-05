@@ -184,7 +184,7 @@ model DocumentProperties {
 }
 
 @route("/doc/{docType}/{docId}/properties")
-@tag("Document")
+@tag("Document - Properties")
 interface DocumentPropertiesApi {
     /**
      * 获取文档属性
