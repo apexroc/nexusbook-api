@@ -202,48 +202,65 @@ model Row {
 #### API 端点
 ```
 GET    /doc/{docType}/{docId}/rows                          # 查询行（分页）
-POST   /doc/{docType}/{docId}/rows                          # 创建行
-PUT    /doc/{docType}/{docId}/rows/{rowId}                  # 更新行
-DELETE /doc/{docType}/{docId}/rows/{rowId}                  # 删除行
+POST   /doc/{docType}/{docId}/rows                          # 创建行（需 requestId）
+PUT    /doc/{docType}/{docId}/rows/{rowId}                  # 更新行（需 requestId）
+DELETE /doc/{docType}/{docId}/rows/{rowId}                  # 删除行（需 requestId）
 
-POST   /doc/{docType}/{docId}/rows/batch-create             # 批量创建
-POST   /doc/{docType}/{docId}/rows/batch-update             # 批量更新
-POST   /doc/{docType}/{docId}/rows/batch-delete             # 批量删除
+# 下列批量端点中，批量创建（batch-create）已废弃，统一使用批量更新（batch-update，BulkUpdate 格式）
+# 所有写操作都必须携带 requestId
+POST   /doc/{docType}/{docId}/rows/batch-update             # 批量更新（BulkUpdate）
+POST   /doc/{docType}/{docId}/rows/batch-delete             # 批量删除（需 requestId）
 ```
+
+#### 批量更新（BulkUpdate）格式
+
+- 使用灵活的 `target` + 原始 `value` 结构；服务端根据 `metadata` 自动解析。
+- `value` 可以是单值或对象，亦可为数组；可以同时更新数据行或文档属性。
+
+```json
+[
+  {"target": {"row": "row-1", "field": "price"}, "value": 99.99},
+  {"target": {"row": "row-2"}, "value": {"productName": "iPhone 15", "quantity": 50}},
+  {"target": {"rows": ["row-3", "row-4"], "field": "status"}, "value": "active"},
+  {"target": {"property": "amount"}, "value": 5000.00},
+  {"target": {"properties": true}, "value": {"amount": 5000, "quantity": 100}}
+]
+```
+
+#### 写操作的 requestId 工作流
+
+- 所有写操作（创建/更新/删除/批量更新）都必须携带 `requestId`。
+- 客户端通过同一个 `requestId` 协同编辑；审批通过后才写入生效版本；不支持直接 `apply`。
+- 示例：`POST /doc/{docType}/{docId}/rows?requestId=req-1` 或在请求体中包含 `{"requestId":"req-1"}`。
+
 
 #### 示例
 ```bash
-# 创建一行数据
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows' \
+# 创建一行数据（携带 requestId）
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
+  -H 'Content-Type: application/json' \
   -d '{
     "values": [
-      {
-        "fieldId": "productName",
-        "value": { "text": "iPhone 15" }
-      },
-      {
-        "fieldId": "quantity",
-        "value": { "number": 10 }
-      },
-      {
-        "fieldId": "price",
-        "value": { "number": 799.99 }
-      }
+      { "fieldId": "productName", "value": { "text": "iPhone 15" } },
+      { "fieldId": "quantity",    "value": { "number": 10 } },
+      { "fieldId": "price",       "value": { "number": 799.99 } }
     ]
   }'
 
-# 批量创建100条数据
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows/batch-create' \
+# 批量更新（BulkUpdate，统一格式；服务端根据 metadata 解析）
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows/batch-update?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
-  -d '{
-    "rows": [
-      { "values": [...] },
-      { "values": [...] },
-      ...
-    ]
-  }'
+  -H 'Content-Type: application/json' \
+  -d '[
+    {"target": {"row": "row-1", "field": "price"}, "value": 99.99},
+    {"target": {"row": "row-2"}, "value": {"productName": "iPhone 15", "quantity": 50}},
+    {"target": {"rows": ["row-3","row-4"], "field": "status"}, "value": "active"}
+  ]'
 ```
+
+> 注：批量创建（`batch-create`）已废弃，请使用批量更新（`batch-update` + BulkUpdate 结构）来进行多行数据的写入与修改；最终写入需通过审批合并。
+
 
 ### 4. Views（视图）- 展示层
 

@@ -186,7 +186,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/project/456/views' \
   }'
 ```
 
-### 5. 数据
+# 数据
 
 数据行的 CRUD 操作，支持简单查询和结构化查询。
 
@@ -197,26 +197,24 @@ GET /api/v1/doc/{doc-type}/{doc-id}/data?page=1&pageSize=20&sort=name:asc
 # 结构化查询
 POST /api/v1/doc/{doc-type}/{doc-id}/data/query
 
-# 创建数据行
-POST /api/v1/doc/{doc-type}/{doc-id}/data?apply=true
+# 创建数据行（所有写操作需携带 requestId）
+POST /api/v1/doc/{doc-type}/{doc-id}/data?requestId={request-id}
 
-# 批量创建
-POST /api/v1/doc/{doc-type}/{doc-id}/data/bulk?apply=true
+# 批量更新（target/value）
+POST /api/v1/doc/{doc-type}/{doc-id}/data/bulk?requestId={request-id}
 
 # 获取单行
 GET /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}
 
 # 更新数据行
-PUT /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?apply=true
+PUT /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?requestId={request-id}
 
 # 删除数据行
-DELETE /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?apply=true
+DELETE /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?requestId={request-id}
 ```
 
-**查询参数：**
-- `apply=true` - 直接应用变更（否则生成合并请求）
-- `page`, `pageSize` - 分页参数
-- `sort` - 排序（格式：`fieldName:asc` 或 `fieldName:desc`）
+
+**说明：** 所有写操作统一通过 `requestId` 进入变更请求工作流，`apply` 参数已废弃。
 
 **示例 - 简单查询：**
 
@@ -339,7 +337,27 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/comments' \
   }'
 ```
 
-### 7. 修订历史
+### 8. 实时协同（Realtime）
+
+- 获取连接信息：`GET /realtime/doc/{docType}/{docId}/connect`（返回 `wsUrl/wsHost/wsPath/port/protocols/sseUrl` 与 `token`）
+- 在线用户：`GET /realtime/doc/{docType}/{docId}/users`
+- 锁定/解锁/锁列表：`POST /lock`、`DELETE /unlock/{lockId}`、`GET /locks`
+- Yjs 快照：`GET/POST /snapshot`、`GET /snapshots`
+- 更新（后备）：`POST /apply-update`、`POST /awareness`
+- 事件历史：`GET /events`
+- 断开所有会话：`POST /disconnect-all`
+- 消息结构：`GET /realtime/messages/schema`
+- SSE 流：`GET /realtime/doc/{docType}/{docId}/events/stream`（`text/event-stream`）
+
+**握手示例（WebSocket）**
+```json
+{
+  "kind": "auth",
+  "seq": 1,
+  "payload": { "token": "Bearer {ACCESS_TOKEN}" }
+}
+```
+
 
 完整的版本控制和变更追踪。
 

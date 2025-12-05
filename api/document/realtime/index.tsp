@@ -1,9 +1,11 @@
 import "@typespec/http";
 import "@typespec/openapi3";
 import "../../shared/index.tsp";
+import "./messages.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;
+
 
 /**
  * 实时协作模块 (Realtime Collaboration)
@@ -451,6 +453,36 @@ interface RealtimeApi {
         wsUrl: string;
 
         /**
+         * WebSocket 主机（单独端口）
+         * WebSocket host (dedicated port)
+         */
+        wsHost?: string;
+
+        /**
+         * WebSocket 路径
+         * WebSocket path
+         */
+        wsPath?: string;
+
+        /**
+         * 端口号
+         * Port
+         */
+        port?: int32;
+
+        /**
+         * 支持的协议（例如：['websocket']）
+         * Supported protocols
+         */
+        protocols?: string[];
+
+        /**
+         * SSE 流地址（只读）
+         * Readonly SSE stream URL
+         */
+        sseUrl?: string;
+
+        /**
          * 连接令牌
          * Connection token
          */
@@ -749,4 +781,40 @@ interface RealtimeApi {
          */
         disconnectedCount: int32;
     }>;
+
+    /**
+     * 获取 WebSocket 消息格式
+     * Get WebSocket message schema
+     *
+     * 返回客户端与服务端的消息帧模型以及可用的消息类型枚举。
+     * Return client/server message frames and available message kinds.
+     */
+    @route("/messages/schema")
+    @get
+    @summary("获取 WebSocket 消息格式")
+    getMessageSchema(): NexusBook.Common.ApiResponse<{
+        /** 客户端 → 服务端 消息帧 */
+        clientMessage: RealtimeClientMessage,
+        /** 服务端 → 客户端 消息帧 */
+        serverMessage: RealtimeServerMessage,
+        /** 可用消息类型 */
+        kinds: RealtimeMessageKind[]
+    }>;
+
+    /**
+     * 事件流（SSE）
+     * Server-Sent Events stream
+     *
+     * Content-Type: text/event-stream
+     * 用于只读的实时事件推送（替代 WebSocket 的只读场景）。
+     */
+    @route("/doc/{docType}/{docId}/events/stream")
+    @get
+    @summary("SSE 事件流")
+    sseEvents(
+        @path docType: string,
+        @path docId: string,
+        @query since?: string,
+        @query types?: string,
+    ): string;
 }

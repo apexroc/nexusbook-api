@@ -3,11 +3,13 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { marked } = require('marked');
+const yaml = require('js-yaml');
 
 const DOCS_DIR = path.join(__dirname, '../docs');
 const DOCS_SRC_DIR = path.join(__dirname, '../docs-src');
 const API_DIR = path.join(__dirname, '../api');
 const README_PATH = path.join(__dirname, '../README.md');
+const REDOCLY_CONFIG_PATH = path.join(__dirname, '../redocly.yaml');
 
 // 配置 marked
 marked.setOptions({
@@ -17,6 +19,57 @@ marked.setOptions({
   mangle: false
 });
 
+// 读取 sidebars 配置
+let sidebarConfig = [];
+try {
+  const redoclyConfig = yaml.load(fs.readFileSync(REDOCLY_CONFIG_PATH, 'utf8'));
+  if (redoclyConfig.sidebars && redoclyConfig.sidebars.main) {
+    sidebarConfig = redoclyConfig.sidebars.main;
+  }
+} catch (error) {
+  console.warn('⚠ 无法读取 sidebars 配置，使用默认配置');
+}
+
+// 生成侧边栏 HTML
+function generateSidebarHTML(currentPath = '') {
+  if (!sidebarConfig || sidebarConfig.length === 0) {
+    return '';
+  }
+
+  let html = '<nav class="sidebar">\n';
+  html += '<div class="sidebar-header">\n';
+  html += '<a href="/index.html" class="sidebar-logo">NexusBook API</a>\n';
+  html += '</div>\n';
+  html += '<div class="sidebar-content">\n';
+
+  sidebarConfig.forEach(group => {
+    const expanded = group.expanded !== false;
+    html += `<div class="sidebar-group ${expanded ? 'expanded' : ''}">\n`;
+    html += `<div class="sidebar-group-title">${group.group || 'Group'}</div>\n`;
+    html += '<ul class="sidebar-items">\n';
+
+    if (group.pages) {
+      group.pages.forEach(item => {
+        const pagePath = item.page || '';
+        const label = item.label || 'Page';
+        const isActive = currentPath.includes(pagePath.replace('.md', '.html'));
+        const href = '/' + pagePath.replace('.md', '.html');
+        html += `<li class="sidebar-item ${isActive ? 'active' : ''}">\n`;
+        html += `<a href="${href}">${label}</a>\n`;
+        html += '</li>\n';
+      });
+    }
+
+    html += '</ul>\n';
+    html += '</div>\n';
+  });
+
+  html += '</div>\n';
+  html += '</nav>\n';
+
+  return html;
+}
+
 // 生成文档主页
 async function generateHomePage() {
   const indexHtml = `<!DOCTYPE html>
@@ -25,7 +78,7 @@ async function generateHomePage() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexusBook API 文档</title>
-    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/main.css?v=${Date.now()}">
 </head>
 <body>
     <header class="header">
@@ -185,46 +238,58 @@ async function generateHomePage() {
 }
 
 // 生成页面模板
-function generatePageTemplate(title, content, activeNav = '') {
+function generatePageTemplate(title, content, activeNav = '', currentPath = '') {
+  const sidebar = generateSidebarHTML(currentPath);
+  const hasSidebar = sidebar !== '';
+  
   return `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} - NexusBook API 文档</title>
-    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>
       mermaid.initialize({ startOnLoad: true, theme: 'default' });
     </script>
 </head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1 class="logo"><a href="../index.html">NexusBook API</a></h1>
-            <nav class="nav">
-                <a href="../index.html">首页</a>
-                <a href="../api/index.html" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
-                <a href="../guides/getting-started.html" ${activeNav === 'guides' ? 'class="active"' : ''}>开发指南</a>
-                <a href="../references/error-codes.html" ${activeNav === 'references' ? 'class="active"' : ''}>参考文档</a>
-                <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
-            </nav>
-        </div>
-    </header>
+<body ${hasSidebar ? 'class="has-sidebar"' : ''}>
+    ${sidebar}
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="../index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="../index.html">首页</a>
+                    <a href="../api/index.html" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
+                    <a href="../guides/getting-started.html" ${activeNav === 'guides' ? 'class="active"' : ''}>开发指南</a>
+                    <a href="../references/error-codes.html" ${activeNav === 'references' ? 'class="active"' : ''}>参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
 
-    <main class="main content-page">
-        <div class="container">
-            <article class="content">
-                ${content}
-            </article>
-        </div>
-    </main>
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    ${content}
+                </article>
+            </div>
+        </main>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
-        </div>
-    </footer>
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
 </body>
 </html>`;
 }
@@ -307,7 +372,8 @@ async function build() {
       { file: 'best-practices', title: '最佳实践' },
       { file: 'examples', title: '完整示例' },
       { file: 'architecture', title: '架构设计' },
-      { file: 'development', title: '开发指南' }
+      { file: 'development', title: '开发指南' },
+      { file: 'realtime-collaboration', title: '实时协同开发指南' }
     ];
 
     for (const guide of guides) {

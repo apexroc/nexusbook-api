@@ -349,7 +349,46 @@ scope=doc:read data:read data:write
 scope=doc:read doc:write data:read data:write views:manage comments:write approvals:manage requests:manage
 ```
 
-## 安全最佳实践
+## API Keys 管理
+
+API 密钥用于服务集成与自动化任务，支持最小权限与可撤销。
+
+### 创建 API Key
+```bash
+curl -X POST 'https://auth.nexusbook.com/api-keys' \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "CI Pipeline",
+    "scopes": ["doc:read", "data:read"],
+    "expiresAt": "2026-01-01T00:00:00Z"
+  }'
+```
+
+### 吊销 API Key
+```bash
+curl -X POST 'https://auth.nexusbook.com/api-keys/{keyId}/revoke' \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
+```
+
+### 最佳实践
+- 使用最小权限的 scopes
+- 配置过期时间与 IP 白名单
+- 开启使用日志与速率限制
+
+## 两步验证（2FA/MFA）
+
+支持 TOTP（Authenticator）、短信、邮件与备用码。
+- 开启：`POST /auth/2fa/enable`（返回二维码与密钥）
+- 验证：`POST /auth/2fa/verify`
+- 禁用：`POST /auth/2fa/disable`
+
+## 会话管理
+
+- 列出会话：`GET /auth/sessions`
+- 关闭会话：`DELETE /auth/sessions/{sessionId}`
+- 强制退出所有：`POST /auth/sessions/logout-all`
+
 
 ### 1. 使用 HTTPS
 
@@ -380,24 +419,7 @@ scope: 'doc:read doc:write data:read data:write'
 - ❌ 不要提交到代码仓库
 - ❌ 不要在客户端代码中使用
 
-### 4. 验证 Token
-
-服务端应验证 Token 的有效性：
-```javascript
-const jwt = require('jsonwebtoken');
-const jwksClient = require('jwks-rsa');
-
-const client = jwksClient({
-  jwksUri: 'https://auth.nexusbook.com/jwks.json'
-});
-
-function getKey(header, callback) {
-  client.getSigningKey(header.kid, function(err, key) {
-    const signingKey = key.publicKey || key.rsaPublicKey;
-    callback(null, signingKey);
-  });
-}
-
+## 安全最佳实践
 function verifyToken(token) {
   return new Promise((resolve, reject) => {
     jwt.verify(token, getKey, {

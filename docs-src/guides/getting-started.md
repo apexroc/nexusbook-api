@@ -169,7 +169,7 @@ curl -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
 向产品文档中添加新产品：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true' \
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -183,8 +183,8 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true'
 ```
 
 **参数说明：**
-- `apply=true`: 直接应用变更（立即创建）
-- `apply=false` 或不提供：创建变更请求，需要审核后合并
+- `requestId=req-1`: 所有写操作需携带 `requestId`，变更进入对应的 Request，审批后生效
+- `apply` 参数已废弃：请使用 `requestId` 工作流
 
 ### 示例 3：查询数据
 
@@ -236,7 +236,21 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=
   }'
 ```
 
-## 常见问题
+## 批量更新（灵活 target/value）
+
+通过统一接口实现数据与属性的混合更新：
+
+```bash
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1' \
+  -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '[
+    {"target": {"row": "row-1", "field": "price"}, "value": 99.99},
+    {"target": {"property": "amount"}, "value": 5000.00}
+  ]'
+```
+
+说明：客户端只需提供原始值，类型推断与校验由服务端根据 `metadata` 完成。
 
 ### 1. 如何处理认证错误？
 

@@ -416,6 +416,109 @@ body {
   font-weight: normal;
 }
 
+/* ==================== 侧边栏布局 ==================== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  overflow-y: auto;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  z-index: 900;
+}
+
+.main-wrapper {
+  margin-left: 280px;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+}
+
+.sidebar-logo {
+  font-weight: 700;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.sidebar-content {
+  padding: var(--spacing-md);
+}
+
+.sidebar-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.sidebar-group-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.sidebar-items {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sidebar-item {
+  margin: 4px 0;
+}
+
+.sidebar-item a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.sidebar-item a:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.sidebar-item.active a {
+  background-color: rgba(25, 118, 210, 0.12);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* 有侧边栏的页面整体布局调整 */
+body.has-sidebar {
+  /* 为侧边栏留出空间，避免内容被遮挡 */
+}
+
+/* 响应式：窄屏下将侧边栏置顶展现 */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .main-wrapper {
+    margin-left: 0;
+  }
+  .sidebar-header {
+    height: auto;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+}
+
 /* ==================== 内容页样式 ==================== */
 .content-page {
   padding: var(--spacing-lg) 0;

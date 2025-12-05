@@ -7,6 +7,8 @@ theme:
     disableSearch: false
     hideDownloadButton: false
     expandResponses: '200,201'
+    jsonSampleExpandLevel: 2
+    hideSchemaPattern: false
     generateCodeSamples:
       languages:
         - lang: 'curl'
@@ -22,3 +24,62 @@ theme:
 apis:
   openapi:
     root: dist/openapi/openapi.yaml
+
+# 侧边栏导航配置
+sidebars:
+  main:
+    - group: 开始使用
+      expanded: true
+      pages:
+        - label: 概览
+          page: index.md
+        - label: 快速开始
+          page: guides/getting-started.md
+        - label: 认证授权
+          page: guides/authentication.md
+    
+    - group: 核心概念
+      expanded: true
+      pages:
+        - label: 文档模型
+          page: guides/document-model.md
+        - label: 数据操作
+          page: guides/data-operations.md
+        - label: Webhook 事件
+          page: guides/webhooks.md
+        - label: 实时协同
+          page: guides/realtime-collaboration.md
+    
+    - group: API 参考
+      expanded: true
+      pages:
+        - label: API 端点
+          page: api/index.html
+        - label: 字段类型
+          page: references/field-types.md
+        - label: 错误码
+          page: references/error-codes.md
+    
+    - group: 开发指南
+      expanded: false
+      pages:
+        - label: 开发环境
+          page: guides/development.md
+        - label: 架构设计
+          page: guides/architecture.md
+        - label: 最佳实践
+          page: guides/best-practices.md
+        - label: 完整示例
+          page: guides/examples.md
+    
+    - group: 其他资源
+      expanded: false
+      pages:
+        - label: 国际化
+          page: references/i18n.md
+        - label: 更新日志
+          page: references/changelog.md
+        - label: 贡献指南
+          page: CONTRIBUTING.md
+        - label: 问题排查
+          page: TROUBLESHOOTING.md

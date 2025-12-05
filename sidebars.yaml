@@ -1,0 +1,58 @@
+# NexusBook API 文档侧边栏配置
+# 定义文档导航结构
+
+- group: 开始使用
+  expanded: true
+  pages:
+    - page: docs-src/README.md
+      label: 概览
+    - page: docs-src/guides/getting-started.md
+      label: 快速开始
+    - page: docs-src/guides/authentication.md
+      label: 认证授权
+
+- group: 核心概念
+  expanded: true
+  pages:
+    - page: docs-src/guides/document-model.md
+      label: 文档模型
+    - page: docs-src/guides/data-operations.md
+      label: 数据操作
+    - page: docs-src/guides/webhooks.md
+      label: Webhook 事件
+
+- group: API 参考
+  expanded: false
+  pages:
+    - page: api/openapi.yaml
+      label: OpenAPI 规范
+    - page: docs-src/references/api-reference.md
+      label: API 端点
+    - page: docs-src/references/field-types.md
+      label: 字段类型
+    - page: docs-src/references/error-codes.md
+      label: 错误码
+
+- group: 开发指南
+  expanded: false
+  pages:
+    - page: docs-src/guides/development.md
+      label: 开发环境
+    - page: docs-src/guides/architecture.md
+      label: 架构设计
+    - page: docs-src/guides/best-practices.md
+      label: 最佳实践
+    - page: docs-src/guides/examples.md
+      label: 完整示例
+
+- group: 其他
+  expanded: false
+  pages:
+    - page: docs-src/references/i18n.md
+      label: 国际化
+    - page: docs-src/references/changelog.md
+      label: 更新日志
+    - page: docs-src/CONTRIBUTING.md
+      label: 贡献指南
+    - page: docs-src/TROUBLESHOOTING.md
+      label: 问题排查

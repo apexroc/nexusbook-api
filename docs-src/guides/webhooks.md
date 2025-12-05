@@ -619,3 +619,58 @@ function handleAnyEvent(event) {
   });
 }
 ```
+
+## 与 SSE 事件流的对比与选择
+
+- **Webhook（推送）**：由服务器向你配置的 URL 主动发送 HTTP POST；适合触发下游流程、跨系统集成、离线处理；支持失败重试与投递历史。
+- **SSE（拉取只读流）**：客户端与 `GET /doc/{docType}/{docId}/events/stream` 建立长连接，持续接收只读事件流；适合看板/仪表盘的近实时更新；由客户端维护连接与断线重连。
+- **选择建议**：
+  - **服务端到服务端集成**、需可靠投递与重试 → 优先 Webhook。
+  - **前端实时展示** 或 **轻量监听** → 优先 SSE。
+  - 二者可同时使用：Webhook 驱动流程，SSE 提供页面实时状态。
+
+## 签名验证细节与防重放
+
+- **签名算法**：`HMAC-SHA256(secret, timestamp + '.' + rawPayload)`；HTTP 头：`X-Webhook-Signature`、`X-Webhook-Timestamp`（毫秒）。
+- **防重放**：校验 `timestamp` 与当前时间的偏差（建议 ≤ 300 秒）；签名必须使用**原始请求体**（raw body），避免 JSON 重排导致验签失败。
+
+```javascript
+const crypto = require('crypto');
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+
+function safeEqual(a, b) {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+function verifyWebhook(req) {
+  const signature = req.headers['x-webhook-signature'];
+  const timestamp = req.headers['x-webhook-timestamp'];
+  const raw = req.rawBody || JSON.stringify(req.body); // 确保使用原始载荷
+
+  const base = `${timestamp}.${raw}`;
+  const expected = 'sha256=' + crypto.createHmac('sha256', WEBHOOK_SECRET).update(base).digest('hex');
+
+  // 防重放窗口（5分钟）
+  const skew = Math.abs(Date.now() - Number(timestamp));
+  if (skew > 300000) return false;
+
+  return safeEqual(expected, signature);
+}
+```
+
+## 重试策略建议
+
+- **指数退避 + 抖动**：在 `retryInterval` 基础上引入指数退避（如 60s → 120s → 240s）并加入随机抖动，避免突发拥塞；最大重试次数由 `maxRetries` 控制。
+- **幂等性**：以 `deliveryId` 为幂等键，使用持久化存储（DB/Redis）记录已处理投递，确保“至多一次”。
+- **响应约定**：
+  - 业务可重试错误返回非 2xx（如 429/503）以触发重试；
+  - 业务逻辑错误但不需重试，返回 200 并记录错误日志。
+
+## 事件过滤最佳实践
+
+- 尽量精确：限定 `docTypes`、`docIds` 与 `userIds`，减少无关流量。
+- 使用条件匹配：通过 `filters.conditions` 对载荷进行路径匹配与范围判断，降低下游处理压力。
+- 在 URL 层级进行隔离：为不同事件类别使用不同的 Webhook 接收端点，方便权限与速率限制。

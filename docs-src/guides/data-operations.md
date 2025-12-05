@@ -40,7 +40,7 @@
 **单行创建**：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true' \
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -129,7 +129,7 @@ curl -X PUT 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?appl
 **部分更新**：
 
 ```bash
-curl -X PATCH 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?apply=true' \
+curl -X PATCH 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -145,7 +145,7 @@ curl -X PATCH 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?ap
 **单行删除**：
 
 ```bash
-curl -X DELETE 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?apply=true' \
+curl -X DELETE 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
@@ -159,6 +159,27 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=
     "delete": ["row-001", "row-002", "row-003"]
   }'
 ```
+
+## 批量更新（灵活 target/value）
+
+- 统一接口：`POST /api/v1/doc/{docType}/{docId}/data/bulk?requestId=req-1`
+- 模型：`BulkUpdate[]`，其中 `target: {}` 为灵活结构，`value: unknown`
+
+示例：
+
+```json
+[
+  {"target": {"row": "row-1", "field": "price"}, "value": 99.99},
+  {"target": {"row": "row-2"}, "value": {"name": "iPhone 15", "stock": 50}},
+  {"target": {"rows": ["row-3","row-4"], "field": "status"}, "value": "active"},
+  {"target": {"property": "amount"}, "value": 5000.00},
+  {"target": {"properties": true}, "value": {"amount": 5000, "quantity": 100}}
+]
+```
+
+说明：
+- 客户端只需提供原始值（数字/字符串/布尔/对象/数组），服务端根据 `metadata` 自动解析与校验。
+- 支持数据与属性在一次请求中混合更新。
 
 ## 字段值类型映射
 
@@ -176,11 +197,26 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=
 
 完整的字段类型参考见：[字段类型参考](../references/field-types.html)
 
-## apply 参数说明
+## 变更请求工作流（requestId）
+
+所有写操作（创建/更新/删除/批量更新）必须携带 `requestId` 参数，系统会将变更写入对应的变更请求（Request）。多人协同在同一个 Request 上进行，审批通过后变更才生效。
+
+### 为什么需要 requestId
+- 保障数据可审计与可回滚
+- 支持协同编辑与冲突解决
+- 与修订历史、审批流程联动
+
+### 默认 Request 与协作
+- 如果未显式提供 `requestId`，系统可创建默认的临时 Request（实现依赖服务端策略）
+- 建议客户端明确传入 `requestId` 以便协作追踪
+
 
 `apply` 参数控制变更如何应用：
 
-### apply=true（直接应用）
+### （已废弃）apply 参数
+
+> 说明：`apply` 参数已不再支持，统一使用 `requestId` 工作流。
+
 
 变更立即生效，直接修改数据：
 
@@ -195,7 +231,15 @@ curl -X POST '.../data?apply=true' \
 - 不需要审批的简单变更
 - 系统自动化操作
 
-### apply=false 或不提供（创建变更请求）
+### 工作流示例
+
+```bash
+# 在 Request req-1 中创建数据
+curl -X POST '.../data?requestId=req-1' -d '{...}'
+
+# 审批通过后，变更进入主文档
+```
+
 
 创建变更请求（Request），需要审核后合并：
 
