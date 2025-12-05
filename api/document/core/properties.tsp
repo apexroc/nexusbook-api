@@ -122,6 +122,10 @@ model DocumentProperties {
      * - `priority` - 优先级
      * - `department` - 部门
      * - `project` - 项目
+     * - `coverImage` - 封面图（附件ID）
+     * - `logo` - Logo（附件ID）
+     * - `documents` - 相关文档（附件ID数组）
+     * - `attachments` - 通用附件（附件ID数组）
      * - 等等...
      *
      * Common properties:
@@ -134,6 +138,10 @@ model DocumentProperties {
      * - `priority` - Priority
      * - `department` - Department
      * - `project` - Project
+     * - `coverImage` - Cover image (attachment id)
+     * - `logo` - Logo (attachment id)
+     * - `documents` - Related documents (attachment id array)
+     * - `attachments` - General attachments (attachment id array)
      * - etc...
      */
     properties?: unknown;
