@@ -90,7 +90,7 @@ async function generateHomePage() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexusBook API 文档</title>
-    <link rel="stylesheet" href="styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="${resolvePath('styles/main.css?v=${Date.now()}')}">
 </head>
 <body>
     <header class="header">
@@ -98,7 +98,7 @@ async function generateHomePage() {
             <h1 class="logo">NexusBook API</h1>
             <nav class="nav">
                 <a href="${resolvePath('index.html')}">首页</a>
-                <a href="${resolvePath('api/index.html')}">API 参考</a>
+                <a href="${resolvePath('references/api-reference.html')}">API 参考</a>
                 <a href="${resolvePath('guides/getting-started.html')}">开发指南</a>
                 <a href="${resolvePath('references/error-codes.html')}">参考文档</a>
                 <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
@@ -116,7 +116,7 @@ async function generateHomePage() {
                 </p>
                 <div class="hero-actions">
                     <a href="${resolvePath('guides/getting-started.html')}" class="btn btn-primary">快速开始</a>
-                    <a href="${resolvePath('api/index.html')}" class="btn btn-secondary">查看 API 文档</a>
+                    <a href="${resolvePath('references/api-reference.html')}" class="btn btn-secondary">查看 API 文档</a>
                 </div>
             </div>
         </section>
@@ -260,7 +260,7 @@ function generatePageTemplate(title, content, activeNav = '', currentPath = '') 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} - NexusBook API 文档</title>
-    <link rel="stylesheet" href="../styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="${resolvePath('styles/main.css?v=${Date.now()}')}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
     <script>
