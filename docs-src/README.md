@@ -163,7 +163,7 @@ docs/
 - **文档生成**：Redocly CLI
 - **Markdown 转换**：marked.js
 - **样式**：原生 CSS（支持 CSS 变量和深色模式）
-- **Web 服务器**：Python http.server
+- **Web 服务器**：http-server (Node.js)
 
 ## 部署
 

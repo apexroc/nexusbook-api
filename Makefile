@@ -26,7 +26,7 @@ build-docs: openapi
 	fi
 
 serve-docs: build-docs
-	python3 -m http.server $(PORT) -d dist/redoc || python3 -m http.server 8092 -d dist/redoc
+	npx http-server dist/redoc -p $(PORT) -o
 
 clean:
 	rm -rf dist tsp-output
@@ -50,7 +50,7 @@ docs: build-docs
 serve: docs
 	@echo "Starting documentation server on port $(DOCS_PORT)..."
 	@echo "Visit: http://localhost:$(DOCS_PORT)"
-	@python3 -m http.server $(DOCS_PORT) -d $(DOCS_DIR) || python -m http.server $(DOCS_PORT) -d $(DOCS_DIR)
+	@npx http-server $(DOCS_DIR) -p $(DOCS_PORT) -o
 
 # 清理文档（仅删除生成的 HTML，保留 Markdown 源文件）
 clean-docs:

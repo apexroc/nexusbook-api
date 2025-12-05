@@ -8,8 +8,6 @@
 
 - **Node.js**: 16+ 版本
 - **Make**: 构建工具
-- **Node.js**: 16+ 版本
-- **Python 3**: 用于本地文档服务器（macOS 和大多数 Linux 发行版已预装）
 
 ### 检查环境
 
@@ -19,9 +17,6 @@ node --version  # 应该 >= 16
 
 # 检查 Make
 make --version
-
-# 检查 Python
-python3 --version
 ```
 
 ## 安装依赖
