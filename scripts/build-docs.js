@@ -98,7 +98,7 @@ async function generateHomePage() {
             <h1 class="logo">NexusBook API</h1>
             <nav class="nav">
                 <a href="${resolvePath('index.html')}">首页</a>
-                <a href="${resolvePath('api/index.html')}">API 参考</a>
+                <a href="${resolvePath('api/')}">API 参考</a>
                 <a href="${resolvePath('guides/getting-started.html')}">开发指南</a>
                 <a href="${resolvePath('references/error-codes.html')}">参考文档</a>
                 <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
@@ -116,7 +116,7 @@ async function generateHomePage() {
                 </p>
                 <div class="hero-actions">
                     <a href="${resolvePath('guides/getting-started.html')}" class="btn btn-primary">快速开始</a>
-                    <a href="${resolvePath('api/index.html')}" class="btn btn-secondary">查看 API 文档</a>
+                    <a href="${resolvePath('api/')}" class="btn btn-secondary">查看 API 文档</a>
                 </div>
             </div>
         </section>
@@ -280,7 +280,7 @@ function generatePageTemplate(title, content, activeNav = '', currentPath = '') 
                 <h1 class="logo"><a href="${resolvePath('index.html')}">NexusBook API</a></h1>
                 <nav class="nav">
                     <a href="${resolvePath('index.html')}">首页</a>
-                    <a href="${resolvePath('api/index.html')}" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
+                    <a href="${resolvePath('api/')}" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
                     <a href="${resolvePath('guides/getting-started.html')}" ${activeNav === 'guides' ? 'class="active"' : ''}>开发指南</a>
                     <a href="${resolvePath('references/error-codes.html')}" ${activeNav === 'references' ? 'class="active"' : ''}>参考文档</a>
                     <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
@@ -378,6 +378,12 @@ async function build() {
 
     // 生成主页
     await generateHomePage();
+
+    // 生成 /api 的重定向（兼容不带斜杠的路径）
+    const apiRedirectPath = path.join(DOCS_DIR, 'api.html');
+    const apiRedirectHtml = `<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=${resolvePath('api/')}" /></head><body></body></html>`;
+    await fs.writeFile(apiRedirectPath, apiRedirectHtml, 'utf-8');
+    console.log('✓ 生成 api.html 重定向');
 
     // 转换指南文档
     const guides = [
