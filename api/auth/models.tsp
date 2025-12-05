@@ -271,7 +271,7 @@ namespace NexusBook.Auth {
         tenants?: string[];
     }
 
-    @tag("Auth")
+    @tag("OAuth")
     interface AuthApi {
         /**
          * 授权码流程的授权端点。

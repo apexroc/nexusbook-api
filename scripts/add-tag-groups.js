@@ -51,7 +51,9 @@ async function main() {
       {
         name: 'Auth (认证)',
         tags: [
-          'Auth'
+          'OAuth',
+          'Authentication',
+          'API Keys'
         ]
       }
     ];
@@ -86,7 +88,9 @@ async function main() {
       {
         name: 'Auth (认证)',
         tags: [
-          'Auth'
+          'OAuth',
+          'Authentication',
+          'API Keys'
         ]
       }
     ];
@@ -99,7 +103,9 @@ async function main() {
     'Workspaces': '工作区管理',
     'Invitations': '邀请管理',
     'Join Requests': '加入申请',
-    'Auth': '认证授权',
+    'OAuth': 'OAuth2/OIDC 认证',
+    'Authentication': '用户注册与登录',
+    'API Keys': 'API 密钥管理',
     'Document - Core': '核心功能（聚合查询、元数据、设置）',
     'Document - Data': '数据行管理',
     'Document - Views': '视图管理',
