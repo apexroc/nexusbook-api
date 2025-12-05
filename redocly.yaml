@@ -1,1 +1,109 @@
-{}
+# Redocly 配置 - Apple Design 风格
+# https://redocly.com/docs/api-reference-docs/configuration/
+
+theme:
+  openapi:
+    # 使用现代化主题
+    theme:
+      colors:
+        primary:
+          main: '#007AFF'  # Apple 蓝色
+        success:
+          main: '#34C759'  # Apple 绿色
+        warning:
+          main: '#FF9500'  # Apple 橙色
+        error:
+          main: '#FF3B30'  # Apple 红色
+        text:
+          primary: '#1d1d1f'  # Apple 主文本色
+          secondary: '#86868b'  # Apple 次要文本色
+        background:
+          main: '#ffffff'
+          secondary: '#f5f5f7'  # Apple 浅灰背景
+      
+      # Typography - 使用系统字体栈（类似 Apple）
+      typography:
+        fontSize: '16px'
+        lineHeight: '1.6'
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+        headings:
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+          fontWeight: '600'
+        code:
+          fontSize: '14px'
+          fontFamily: 'SF Mono, Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace'
+      
+      # Sidebar 配置
+      sidebar:
+        backgroundColor: '#f5f5f7'
+        textColor: '#1d1d1f'
+        activeTextColor: '#007AFF'
+        width: '280px'
+        borderRadius: '12px'
+      
+      # 右侧内容面板
+      rightPanel:
+        backgroundColor: '#1d1d1f'
+        textColor: '#f5f5f7'
+      
+      # 代码块样式
+      codeBlock:
+        backgroundColor: '#f5f5f7'
+      
+    # 功能配置
+    showExtensions: true
+    disableSearch: false
+    hideDownloadButton: false
+    
+    # 启用侧边栏导航
+    sortPropsAlphabetically: false
+    sortEnumValuesAlphabetically: false
+    sortOperationsAlphabetically: false
+    
+    # 侧边栏行为
+    scrollYOffset: 0
+    hideHostname: false
+    expandResponses: '200,201'
+    expandDefaultServerVariables: true
+    
+    # 菜单分组配置（配合 x-tagGroups 使用）
+    menuGrouping: 'tag'
+    hideLoading: false
+    nativeScrollbars: false
+    pathInMiddlePanel: false
+    requiredPropsFirst: true
+    
+    # 响应式设计
+    unstable_ignoreMimeParameters: false
+    
+    # 标签配置
+    hideSchemaPattern: false
+    generateCodeSamples:
+      languages:
+        - lang: 'curl'
+          label: 'cURL'
+        - lang: 'javascript'
+          label: 'JavaScript'
+        - lang: 'python'
+          label: 'Python'
+        - lang: 'java'
+          label: 'Java'
+
+# API 规范配置
+apis:
+  openapi:
+    root: dist/openapi/openapi.yaml
+
+# 样式增强 - 自定义 CSS（可选）
+# customCSS: |
+#   .menu-content {
+#     border-radius: 12px;
+#     backdrop-filter: blur(20px);
+#   }
+#   .api-content h1, .api-content h2 {
+#     font-weight: 600;
+#     letter-spacing: -0.02em;
+#   }
+#   .operation-type {
+#     border-radius: 6px;
+#   }
