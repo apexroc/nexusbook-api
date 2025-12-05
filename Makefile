@@ -20,18 +20,15 @@ build-docs: openapi
 	if [ $$COUNT -eq 1 ]; then \
 		npx @redocly/cli build-docs $$FILES \
 			--config=redocly.yaml \
-			--output dist/redoc/index.html \
-			--theme.openapi.theme.colors.primary.main='#007AFF'; \
+			--output dist/redoc/index.html; \
 	else \
 		npx redocly join $$FILES --without-x-tag-groups -o dist/openapi/openapi.yaml && \
 		node scripts/add-tag-groups.js dist/openapi/openapi.yaml && \
 		npx @redocly/cli build-docs dist/openapi/openapi.yaml \
 			--config=redocly.yaml \
-			--output dist/redoc/index.html \
-			--theme.openapi.theme.colors.primary.main='#007AFF'; \
+			--output dist/redoc/index.html; \
 	fi
-	@echo "✅ API 文档已生成，使用 Apple Design 风格"
-	@node scripts/inject-apple-styles.js
+	@echo "✅ API 文档已生成"
 
 serve-docs: build-docs
 	npx http-server dist/redoc -p $(PORT) -o
