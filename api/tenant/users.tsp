@@ -5,20 +5,25 @@ import "./models.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;
-using NexusBook.Tenant;
+using NexusBook.Api.Tenant;
 
 /**
- * 用户管理模块
+ * NexusBook Tenant Management - User APIs
+ * NexusBook 租户管理 - 用户 API
  *
  * 提供用户信息查询、更新、OAuth 绑定等功能。
+ * Provides user info retrieval, updates, OAuth binding and other features.
  *
- * 主要接口：
- * - 获取当前用户信息
- * - 更新用户信息
- * - 绑定/解绑 OAuth 提供商
- * - 列出用户加入的组织
+ * Route Base: /api/v1/users
+ *
+ * 主要接口 / Main Endpoints:
+ * - GET /me - 获取当前用户信息 Get current user info
+ * - PATCH /me - 更新用户信息 Update user info
+ * - POST /me/oauth/{provider} - 绑定 OAuth Bind OAuth provider
+ * - DELETE /me/oauth/{provider} - 解绑 OAuth Unbind OAuth provider
+ * - GET /me/organizations - 列出加入的组织 List joined organizations
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Tenant;
 
 // ==================== 请求/响应模型 ====================
 
@@ -128,7 +133,7 @@ interface UserApi {
     @get
     @route("/me")
     @summary("获取当前用户信息")
-    getCurrentUser(): NexusBook.Common.ApiResponse<User>;
+    getCurrentUser(): NexusBook.Api.Common.ApiResponse<User>;
 
     /**
      * 更新当前用户信息
@@ -152,7 +157,7 @@ interface UserApi {
     @patch
     @route("/me")
     @summary("更新当前用户信息")
-    updateCurrentUser(@body request: UpdateUserRequest): NexusBook.Common.ApiResponse<User>;
+    updateCurrentUser(@body request: UpdateUserRequest): NexusBook.Api.Common.ApiResponse<User>;
 
     /**
      * 绑定 OAuth 提供商
@@ -186,7 +191,7 @@ interface UserApi {
          * Bind request
          */
         @body request: BindOAuthRequest
-    ): NexusBook.Common.ApiResponse<OAuthConnection>;
+    ): NexusBook.Api.Common.ApiResponse<OAuthConnection>;
 
     /**
      * 解绑 OAuth 提供商
@@ -210,7 +215,7 @@ interface UserApi {
          * OAuth provider name
          */
         @path provider: OAuthProvider
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 列出当前用户的 OAuth 连接
@@ -228,7 +233,7 @@ interface UserApi {
     @get
     @route("/me/oauth")
     @summary("列出 OAuth 连接")
-    listOAuthConnections(): NexusBook.Common.ApiResponse<OAuthConnection[]>;
+    listOAuthConnections(): NexusBook.Api.Common.ApiResponse<OAuthConnection[]>;
 
     /**
      * 列出用户加入的组织
@@ -258,5 +263,5 @@ interface UserApi {
          * Page size
          */
         @query pageSize?: int32 = 20
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<UserOrganizationMembership>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<UserOrganizationMembership>>;
 }

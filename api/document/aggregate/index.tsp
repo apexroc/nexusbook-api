@@ -30,7 +30,7 @@ using OpenAPI;
  * GET /doc/product/123?include=data&page=1&pageSize=50
  * GET /doc/product/123?include=comments,revisions&commentsLimit=10&revisionsLimit=5
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 文档标识（类型与ID）
@@ -50,43 +50,43 @@ model DocBundle {
      * 文档属性（订单时间、门店、金额、数量等）
      * Document properties (order time, store, amount, quantity, etc)
      */
-    properties?: NexusBook.Api.DocumentProperties;
+    properties?: DocumentProperties;
 
     /**
      * 文档元数据（字段/显示配置）
      * Document metadata (fields/display settings)
      */
-    metadata?: NexusBook.Api.Metadata;
+    metadata?: Metadata;
 
     /**
      * 视图列表
      * List of views
      */
-    views?: NexusBook.Api.View[];
+    views?: View[];
 
     /**
      * 数据分页结果
      * Paginated data
      */
-    data?: NexusBook.Common.Page<NexusBook.Api.Row>;
+    data?: NexusBook.Api.Common.Page<Row>;
 
     /**
      * 评论集合
      * Comments list
      */
-    comments?: NexusBook.Api.Comment[];
+    comments?: Comment[];
 
     /**
      * 修订记录
      * Revision entries
      */
-    revisions?: NexusBook.Api.Revision[];
+    revisions?: Revision[];
 
     /**
      * 文档设置
      * Document settings
      */
-    settings?: NexusBook.Api.Settings;
+    settings?: Settings;
 }
 
 /** 获取聚合文档包（支持 include 选择与分页）
@@ -122,5 +122,5 @@ interface DocumentAggregateApi {
         @query pageSize?: int32,
         @query commentsLimit?: int32,
         @query revisionsLimit?: int32,
-    ): NexusBook.Common.ApiResponse<DocBundle>;
+    ): NexusBook.Api.Common.ApiResponse<DocBundle>;
 }

@@ -28,7 +28,7 @@ using OpenAPI;
  * 为该类型的所有文档提供默认配置
  * GET/PUT /doc/{docType}/setting
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 model Settings {
     /**
@@ -96,7 +96,7 @@ interface DocSettingsApi {
     getDocSettings(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<Settings>;
+    ): NexusBook.Api.Common.ApiResponse<Settings>;
 
     /**
      * 更新文档级设置。
@@ -109,7 +109,7 @@ interface DocSettingsApi {
         @path docType: string,
         @path docId: string,
         @body body: Settings,
-    ): NexusBook.Common.ApiResponse<Settings>;
+    ): NexusBook.Api.Common.ApiResponse<Settings>;
 }
 
 @route("/doc/{docType}/setting")
@@ -124,7 +124,7 @@ interface TypeSettingsApi {
     @summary("类型设置")
     getTypeSetting(
         @path docType: string,
-    ): NexusBook.Common.ApiResponse<Settings>;
+    ): NexusBook.Api.Common.ApiResponse<Settings>;
 
     /**
      * 更新文档类型公共设置。
@@ -136,5 +136,5 @@ interface TypeSettingsApi {
     putTypeSetting(
         @path docType: string,
         @body body: Settings,
-    ): NexusBook.Common.ApiResponse<Settings>;
+    ): NexusBook.Api.Common.ApiResponse<Settings>;
 }

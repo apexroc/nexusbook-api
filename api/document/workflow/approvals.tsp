@@ -35,7 +35,7 @@ using OpenAPI;
  * - 流程规范 - 确保操作合规
  * - 责任追踪 - 记录谁批准了什么
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 model ApprovalInstance {
     /**
@@ -48,7 +48,7 @@ model ApprovalInstance {
      * 审批状态
      * Approval status
      */
-    status: NexusBook.Common.ApprovalStatus;
+    status: NexusBook.Api.Common.ApprovalStatus;
 
     /**
      * 当前节点
@@ -77,7 +77,7 @@ model ApprovalInstance {
          * 决策
          * Decision
          */
-        decision?: NexusBook.Common.ApprovalDecision;
+        decision?: NexusBook.Api.Common.ApprovalDecision;
 
         /**
          * 备注
@@ -106,7 +106,7 @@ interface ApprovalApi {
     getApproval(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 在文档上发起审批流程。
@@ -119,7 +119,7 @@ interface ApprovalApi {
     startApproval(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<ApprovalInstance>;
+    ): NexusBook.Api.Common.ApiResponse<ApprovalInstance>;
 }
 
 @route("/doc/{docType}/{docId}/approval/{instanceId}")
@@ -136,7 +136,7 @@ interface ApprovalInstanceApi {
         @path docType: string,
         @path docId: string,
         @path instanceId: string,
-    ): NexusBook.Common.ApiResponse<ApprovalInstance>;
+    ): NexusBook.Api.Common.ApiResponse<ApprovalInstance>;
 
     /**
      * 对审批实例进行通过或拒绝的决策。
@@ -150,6 +150,6 @@ interface ApprovalInstanceApi {
         @path docType: string,
         @path docId: string,
         @path instanceId: string,
-        @query result: NexusBook.Common.ApprovalDecision,
-    ): NexusBook.Common.ApiResponse<ApprovalInstance>;
+        @query result: NexusBook.Api.Common.ApprovalDecision,
+    ): NexusBook.Api.Common.ApiResponse<ApprovalInstance>;
 }

@@ -39,7 +39,7 @@ using OpenAPI;
  * - `metadata-update` - 元数据更新
  * - `settings-update` - 设置更新
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 变更操作记录
@@ -352,7 +352,7 @@ interface RevisionsApi {
         @query pageSize?: int32,
         @query contributor?: string,
         @query search?: string,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Revision>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Revision>>;
 
     /**
      * 获取指定修订的完整详情
@@ -369,7 +369,7 @@ interface RevisionsApi {
         @path docType: string,
         @path docId: string,
         @path revId: string,
-    ): NexusBook.Common.ApiResponse<Revision>;
+    ): NexusBook.Api.Common.ApiResponse<Revision>;
 
     /**
      * 查看修订的变更操作列表
@@ -390,7 +390,7 @@ interface RevisionsApi {
         @query targetKind?: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<ChangeOperation>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<ChangeOperation>>;
 
     /**
      * 比较两个修订之间的差异
@@ -416,7 +416,7 @@ interface RevisionsApi {
         @path revId: string,
         @query base?: string,
         @query targetKind?: string,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 源修订ID
          * Base revision id
@@ -471,7 +471,7 @@ interface RevisionsApi {
         @query fieldId?: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<ChangeOperation>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<ChangeOperation>>;
 
     /**
      * 回滚到指定修订
@@ -507,7 +507,7 @@ interface RevisionsApi {
              */
             selectiveTypes?: string[];
         },
-    ): NexusBook.Common.ApiResponse<Revision>;
+    ): NexusBook.Api.Common.ApiResponse<Revision>;
 
     /**
      * 获取修订的源请求
@@ -524,7 +524,7 @@ interface RevisionsApi {
         @path docType: string,
         @path docId: string,
         @path revId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 导出修订数据

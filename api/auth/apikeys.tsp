@@ -26,7 +26,7 @@ using OpenAPI;
  * - Regenerate API Keys
  * - Usage logs and audit
  */
-namespace NexusBook.Auth;
+namespace NexusBook.Api.Auth;
 
 // ==================== 枚举和常量 ====================
 
@@ -530,7 +530,7 @@ interface ApiKeyApi {
      */
     @post
     @summary("创建 API Key")
-    createApiKey(@body request: CreateApiKeyRequest): NexusBook.Common.ApiResponse<ApiKey>;
+    createApiKey(@body request: CreateApiKeyRequest): NexusBook.Api.Common.ApiResponse<ApiKey>;
 
     /**
      * 列出 API Keys
@@ -577,7 +577,7 @@ interface ApiKeyApi {
          * Filter by workspace ID
          */
         @query workspaceId?: string
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<ApiKey>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<ApiKey>>;
 
     /**
      * 获取 API Key 详情
@@ -589,7 +589,7 @@ interface ApiKeyApi {
     @get
     @route("/{apiKeyId}")
     @summary("获取 API Key 详情")
-    getApiKey(@path apiKeyId: string): NexusBook.Common.ApiResponse<ApiKey>;
+    getApiKey(@path apiKeyId: string): NexusBook.Api.Common.ApiResponse<ApiKey>;
 
     /**
      * 更新 API Key
@@ -616,7 +616,7 @@ interface ApiKeyApi {
     updateApiKey(
         @path apiKeyId: string,
         @body request: UpdateApiKeyRequest
-    ): NexusBook.Common.ApiResponse<ApiKey>;
+    ): NexusBook.Api.Common.ApiResponse<ApiKey>;
 
     /**
      * 吊销 API Key
@@ -634,7 +634,7 @@ interface ApiKeyApi {
     @post
     @route("/{apiKeyId}/revoke")
     @summary("吊销 API Key")
-    revokeApiKey(@path apiKeyId: string): NexusBook.Common.ApiResponse<{}>;
+    revokeApiKey(@path apiKeyId: string): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 重新生成 API Key
@@ -652,7 +652,7 @@ interface ApiKeyApi {
     @post
     @route("/{apiKeyId}/regenerate")
     @summary("重新生成 API Key")
-    regenerateApiKey(@path apiKeyId: string): NexusBook.Common.ApiResponse<ApiKey>;
+    regenerateApiKey(@path apiKeyId: string): NexusBook.Api.Common.ApiResponse<ApiKey>;
 
     /**
      * 删除 API Key
@@ -670,7 +670,7 @@ interface ApiKeyApi {
     @delete
     @route("/{apiKeyId}")
     @summary("删除 API Key")
-    deleteApiKey(@path apiKeyId: string): NexusBook.Common.ApiResponse<{}>;
+    deleteApiKey(@path apiKeyId: string): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 获取 API Key 使用记录
@@ -732,7 +732,7 @@ interface ApiKeyApi {
          * Filter by status code
          */
         @query statusCode?: int32
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<ApiKeyUsageLog>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<ApiKeyUsageLog>>;
 
     /**
      * 获取 API Key 使用统计
@@ -758,7 +758,7 @@ interface ApiKeyApi {
          * Statistics period (1h, 24h, 7d, 30d, 90d)
          */
         @query period?: string = "7d"
-    ): NexusBook.Common.ApiResponse<ApiKeyUsageStats>;
+    ): NexusBook.Api.Common.ApiResponse<ApiKeyUsageStats>;
 
     /**
      * 批量吊销 API Keys
@@ -786,7 +786,7 @@ interface ApiKeyApi {
          * API Key ID list
          */
         apiKeyIds: string[];
-    }): NexusBook.Common.ApiResponse<{
+    }): NexusBook.Api.Common.ApiResponse<{
         /**
          * 成功吊销的数量
          * Successfully revoked count

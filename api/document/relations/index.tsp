@@ -41,7 +41,7 @@ using OpenAPI;
  *   }'
  * ```
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 关联关系配置
@@ -294,7 +294,7 @@ interface RelationsApi {
     getRelationConfigs(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<RelationConfig[]>;
+    ): NexusBook.Api.Common.ApiResponse<RelationConfig[]>;
 
     /**
      * 创建或更新关联配置
@@ -311,7 +311,7 @@ interface RelationsApi {
         @path docType: string,
         @path docId: string,
         @body body: RelationConfig,
-    ): NexusBook.Common.ApiResponse<RelationConfig>;
+    ): NexusBook.Api.Common.ApiResponse<RelationConfig>;
 
     /**
      * 列出所有关联关系
@@ -332,7 +332,7 @@ interface RelationsApi {
         @query includeDetails?: boolean,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<RelationWithDetails>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<RelationWithDetails>>;
 
     /**
      * 创建关联关系
@@ -398,7 +398,7 @@ interface RelationsApi {
              */
             metadata?: unknown;
         },
-    ): NexusBook.Common.ApiResponse<Relation>;
+    ): NexusBook.Api.Common.ApiResponse<Relation>;
 
     /**
      * 批量创建关联
@@ -422,7 +422,7 @@ interface RelationsApi {
             targetRowId: string;
             metadata?: unknown;
         }[],
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 创建的关联数量
          * Number of created relations
@@ -460,7 +460,7 @@ interface RelationsApi {
         @path docType: string,
         @path docId: string,
         @path relationId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 批量删除关联
@@ -480,7 +480,7 @@ interface RelationsApi {
         @query fieldId?: string,
         @query targetDocType?: string,
         @query targetRowId?: string,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 删除的关联数量
          * Number of deleted relations
@@ -509,7 +509,7 @@ interface RelationsApi {
             targetDocId: string;
             targetRowId: string;
         },
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 是否存在循环
          * Has circular

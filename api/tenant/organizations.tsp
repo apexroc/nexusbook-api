@@ -5,19 +5,29 @@ import "./models.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;
-using NexusBook.Tenant;
+using NexusBook.Api.Tenant;
 
 /**
- * 组织管理模块
+ * NexusBook Tenant Management - Organization APIs
+ * NexusBook 租户管理 - 组织 API
  *
  * 提供组织创建、管理、成员管理等功能。
+ * Provides organization creation, management, member management and other features.
  *
- * 主要接口：
- * - 创建和管理组织
- * - 组织成员管理（添加、移除、角色变更）
- * - 用户离开组织
+ * Route Base: /api/v1/organizations
+ *
+ * 主要接口 / Main Endpoints:
+ * - POST / - 创建组织 Create organization
+ * - GET /{organizationId} - 获取组织详情 Get organization detail
+ * - PATCH /{organizationId} - 更新组织 Update organization
+ * - DELETE /{organizationId} - 删除组织 Delete organization
+ * - GET /{organizationId}/members - 列出成员 List members
+ * - POST /{organizationId}/members - 添加成员 Add member
+ * - PATCH /{organizationId}/members/{userId} - 更新成员 Update member
+ * - DELETE /{organizationId}/members/{userId} - 移除成员 Remove member
+ * - POST /{organizationId}/leave - 离开组织 Leave organization
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Tenant;
 
 // ==================== 请求/响应模型 ====================
 
@@ -187,7 +197,7 @@ interface OrganizationApi {
      */
     @post
     @summary("创建组织")
-    create(@body request: CreateOrganizationRequest): NexusBook.Common.ApiResponse<Organization>;
+    create(@body request: CreateOrganizationRequest): NexusBook.Api.Common.ApiResponse<Organization>;
 
     /**
      * 获取组织详情
@@ -211,7 +221,7 @@ interface OrganizationApi {
          * Organization ID
          */
         @path organizationId: string
-    ): NexusBook.Common.ApiResponse<OrganizationDetail>;
+    ): NexusBook.Api.Common.ApiResponse<OrganizationDetail>;
 
     /**
      * 更新组织信息
@@ -246,7 +256,7 @@ interface OrganizationApi {
          * Update request
          */
         @body request: UpdateOrganizationRequest
-    ): NexusBook.Common.ApiResponse<Organization>;
+    ): NexusBook.Api.Common.ApiResponse<Organization>;
 
     /**
      * 删除组织
@@ -270,7 +280,7 @@ interface OrganizationApi {
          * Organization ID
          */
         @path organizationId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 列出组织成员
@@ -324,7 +334,7 @@ interface OrganizationApi {
          * Search members (name, email)
          */
         @query search?: string
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<OrganizationMember>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<OrganizationMember>>;
 
     /**
      * 添加组织成员（直接添加）
@@ -359,7 +369,7 @@ interface OrganizationApi {
          * Add member request
          */
         @body request: AddOrganizationMemberRequest
-    ): NexusBook.Common.ApiResponse<OrganizationMember>;
+    ): NexusBook.Api.Common.ApiResponse<OrganizationMember>;
 
     /**
      * 获取组织成员详情
@@ -389,7 +399,7 @@ interface OrganizationApi {
          * Member ID
          */
         @path memberId: string
-    ): NexusBook.Common.ApiResponse<OrganizationMember>;
+    ): NexusBook.Api.Common.ApiResponse<OrganizationMember>;
 
     /**
      * 更新成员角色
@@ -429,7 +439,7 @@ interface OrganizationApi {
          * Update request
          */
         @body request: UpdateOrganizationMemberRequest
-    ): NexusBook.Common.ApiResponse<OrganizationMember>;
+    ): NexusBook.Api.Common.ApiResponse<OrganizationMember>;
 
     /**
      * 移除组织成员
@@ -459,7 +469,7 @@ interface OrganizationApi {
          * Member ID
          */
         @path memberId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 离开组织（用户主动）
@@ -483,5 +493,5 @@ interface OrganizationApi {
          * Organization ID
          */
         @path organizationId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 }

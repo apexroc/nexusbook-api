@@ -10,7 +10,7 @@ using OpenAPI;
  * 说明：这些模型用于文档化 WebSocket 传输层的消息帧结构，帮助前端与服务端在实时协同中达成一致。
  * OpenAPI 不直接描述 WebSocket，但我们在 TypeSpec 中记录消息格式以生成可读文档。
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 消息类型（客户端与服务端通用）

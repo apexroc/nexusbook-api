@@ -24,7 +24,7 @@ using OpenAPI;
  * - Two-factor authentication (2FA/MFA)
  * - Session management
  */
-namespace NexusBook.Auth;
+namespace NexusBook.Api.Auth;
 
 // ==================== 枚举和常量 ====================
 
@@ -489,7 +489,7 @@ interface AuthenticationApi {
     @post
     @route("/register")
     @summary("用户注册")
-    register(@body request: RegisterRequest): NexusBook.Common.ApiResponse<LoginResponse>;
+    register(@body request: RegisterRequest): NexusBook.Api.Common.ApiResponse<LoginResponse>;
 
     /**
      * 用户登录
@@ -512,7 +512,7 @@ interface AuthenticationApi {
     @post
     @route("/login")
     @summary("用户登录")
-    login(@body request: LoginRequest): NexusBook.Common.ApiResponse<LoginResponse>;
+    login(@body request: LoginRequest): NexusBook.Api.Common.ApiResponse<LoginResponse>;
 
     /**
      * 退出登录
@@ -524,7 +524,7 @@ interface AuthenticationApi {
     @post
     @route("/logout")
     @summary("退出登录")
-    logout(): NexusBook.Common.ApiResponse<{}>;
+    logout(): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 刷新令牌
@@ -542,7 +542,7 @@ interface AuthenticationApi {
          * Refresh token
          */
         refreshToken: string;
-    }): NexusBook.Common.ApiResponse<{
+    }): NexusBook.Api.Common.ApiResponse<{
         accessToken: string;
         refreshToken: string;
         expiresIn: int32;
@@ -560,7 +560,7 @@ interface AuthenticationApi {
     @summary("发送验证码")
     sendVerificationCode(
         @body request: SendVerificationCodeRequest
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 发送成功
          * Send success
@@ -590,7 +590,7 @@ interface AuthenticationApi {
          * Email or phone number
          */
         target: string;
-    }): NexusBook.Common.ApiResponse<{
+    }): NexusBook.Api.Common.ApiResponse<{
         sent: boolean;
         expiresIn: int32;
     }>;
@@ -605,7 +605,7 @@ interface AuthenticationApi {
     @post
     @route("/reset-password")
     @summary("重置密码")
-    resetPassword(@body request: ResetPasswordRequest): NexusBook.Common.ApiResponse<{}>;
+    resetPassword(@body request: ResetPasswordRequest): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 修改密码
@@ -617,7 +617,7 @@ interface AuthenticationApi {
     @post
     @route("/change-password")
     @summary("修改密码")
-    changePassword(@body request: ChangePasswordRequest): NexusBook.Common.ApiResponse<{}>;
+    changePassword(@body request: ChangePasswordRequest): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 设置两步验证
@@ -635,7 +635,7 @@ interface AuthenticationApi {
          * Two-factor method
          */
         method: TwoFactorMethod;
-    }): NexusBook.Common.ApiResponse<TwoFactorSetupResponse>;
+    }): NexusBook.Api.Common.ApiResponse<TwoFactorSetupResponse>;
 
     /**
      * 启用两步验证
@@ -647,7 +647,7 @@ interface AuthenticationApi {
     @post
     @route("/two-factor/enable")
     @summary("启用两步验证")
-    enableTwoFactor(@body request: EnableTwoFactorRequest): NexusBook.Common.ApiResponse<{
+    enableTwoFactor(@body request: EnableTwoFactorRequest): NexusBook.Api.Common.ApiResponse<{
         enabled: boolean;
         backupCodes?: string[];
     }>;
@@ -668,7 +668,7 @@ interface AuthenticationApi {
          * Current password or verification code
          */
         password: string;
-    }): NexusBook.Common.ApiResponse<{}>;
+    }): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 列出活跃会话
@@ -680,7 +680,7 @@ interface AuthenticationApi {
     @get
     @route("/sessions")
     @summary("列出会话")
-    listSessions(): NexusBook.Common.ApiResponse<Session[]>;
+    listSessions(): NexusBook.Api.Common.ApiResponse<Session[]>;
 
     /**
      * 吊销会话
@@ -692,7 +692,7 @@ interface AuthenticationApi {
     @delete
     @route("/sessions/{sessionId}")
     @summary("吊销会话")
-    revokeSession(@path sessionId: string): NexusBook.Common.ApiResponse<{}>;
+    revokeSession(@path sessionId: string): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 吊销所有其他会话
@@ -704,7 +704,7 @@ interface AuthenticationApi {
     @post
     @route("/sessions/revoke-all")
     @summary("吊销所有其他会话")
-    revokeAllOtherSessions(): NexusBook.Common.ApiResponse<{
+    revokeAllOtherSessions(): NexusBook.Api.Common.ApiResponse<{
         revokedCount: int32;
     }>;
 }

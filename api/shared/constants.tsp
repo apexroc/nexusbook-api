@@ -4,7 +4,7 @@
  *
  * 集中定义所有模块共用的枚举类型。
  */
-namespace NexusBook.Common;
+namespace NexusBook.Api.Common;
 
 /**
  * 请求状态

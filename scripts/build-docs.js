@@ -11,6 +11,18 @@ const API_DIR = path.join(__dirname, '../api');
 const README_PATH = path.join(__dirname, '../README.md');
 const REDOCLY_CONFIG_PATH = path.join(__dirname, '../redocly.yaml');
 
+// 支持 GitHub Pages 子路径部署
+// 本地开发时使用 '/', GitHub Pages 时使用 '/nexusbook-api/'
+const BASE_PATH = process.env.BASE_PATH || '/';
+
+// 辅助函数：生成正确的路径
+function resolvePath(relativePath) {
+  if (BASE_PATH === '/') {
+    return '/' + relativePath.replace(/^\//, '');
+  }
+  return BASE_PATH.replace(/\/$/, '') + '/' + relativePath.replace(/^\//, '');
+}
+
 // 配置 marked
 marked.setOptions({
   gfm: true,
@@ -38,7 +50,7 @@ function generateSidebarHTML(currentPath = '') {
 
   let html = '<nav class="sidebar">\n';
   html += '<div class="sidebar-header">\n';
-  html += '<a href="/index.html" class="sidebar-logo">NexusBook API</a>\n';
+  html += `<a href="${resolvePath('index.html')}" class="sidebar-logo">NexusBook API</a>\n`;
   html += '</div>\n';
   html += '<div class="sidebar-content">\n';
 
@@ -53,7 +65,7 @@ function generateSidebarHTML(currentPath = '') {
         const pagePath = item.page || '';
         const label = item.label || 'Page';
         const isActive = currentPath.includes(pagePath.replace('.md', '.html'));
-        const href = '/' + pagePath.replace('.md', '.html');
+        const href = resolvePath(pagePath.replace('.md', '.html'));
         html += `<li class="sidebar-item ${isActive ? 'active' : ''}">\n`;
         html += `<a href="${href}">${label}</a>\n`;
         html += '</li>\n';
@@ -85,10 +97,10 @@ async function generateHomePage() {
         <div class="container">
             <h1 class="logo">NexusBook API</h1>
             <nav class="nav">
-                <a href="index.html">首页</a>
-                <a href="api/index.html">API 参考</a>
-                <a href="guides/getting-started.html">开发指南</a>
-                <a href="references/error-codes.html">参考文档</a>
+                <a href="${resolvePath('index.html')}">首页</a>
+                <a href="${resolvePath('api/index.html')}">API 参考</a>
+                <a href="${resolvePath('guides/getting-started.html')}">开发指南</a>
+                <a href="${resolvePath('references/error-codes.html')}">参考文档</a>
                 <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
             </nav>
         </div>
@@ -103,8 +115,8 @@ async function generateHomePage() {
                     支持统一的文档抽象、多种视图类型、完整的协作功能和事件驱动通知。
                 </p>
                 <div class="hero-actions">
-                    <a href="guides/getting-started.html" class="btn btn-primary">快速开始</a>
-                    <a href="api/index.html" class="btn btn-secondary">查看 API 文档</a>
+                    <a href="${resolvePath('guides/getting-started.html')}" class="btn btn-primary">快速开始</a>
+                    <a href="${resolvePath('api/index.html')}" class="btn btn-secondary">查看 API 文档</a>
                 </div>
             </div>
         </section>
@@ -116,28 +128,28 @@ async function generateHomePage() {
                         <div class="feature-icon">📚</div>
                         <h3>OpenAPI 文档</h3>
                         <p>完整的 API 接口参考，包含所有端点的详细说明、请求/响应示例。</p>
-                        <a href="api/index.html" class="feature-link">查看文档 →</a>
+                        <a href="${resolvePath('api/index.html')}" class="feature-link">查看文档 →</a>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🚀</div>
                         <h3>开发指南</h3>
                         <p>从快速开始到高级用法，涵盖认证授权、文档模型、数据操作等核心功能。</p>
-                        <a href="guides/getting-started.html" class="feature-link">查看指南 →</a>
+                        <a href="${resolvePath('guides/getting-started.html')}" class="feature-link">查看指南 →</a>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">🔔</div>
                         <h3>Webhook 指南</h3>
                         <p>事件驱动的通知机制，支持 20+ 种事件类型，自动推送变更通知。</p>
-                        <a href="guides/webhooks.html" class="feature-link">查看指南 →</a>
+                        <a href="${resolvePath('guides/webhooks.html')}" class="feature-link">查看指南 →</a>
                     </div>
 
                     <div class="feature-card">
                         <div class="feature-icon">📖</div>
                         <h3>参考文档</h3>
                         <p>错误码、字段类型、国际化等参考资料，便于快速查阅。</p>
-                        <a href="references/error-codes.html" class="feature-link">查看参考 →</a>
+                        <a href="${resolvePath('references/error-codes.html')}" class="feature-link">查看参考 →</a>
                     </div>
                 </div>
             </div>
@@ -149,25 +161,25 @@ async function generateHomePage() {
                 <div class="doc-section">
                     <h3>🚀 开发指南</h3>
                     <ul class="doc-list">
-                        <li><a href="guides/getting-started.html">快速开始</a> - 5分钟了解如何使用 API</li>
-                        <li><a href="guides/authentication.html">认证授权指南</a> - OAuth2、OIDC 和 JWT 详解</li>
-                        <li><a href="guides/document-model.html">文档模型详解</a> - 统一文档抽象和字段类型</li>
-                        <li><a href="guides/data-operations.html">数据操作指南</a> - CRUD 操作和高级查询</li>
-                        <li><a href="guides/webhooks.html">Webhook 使用指南</a> - 事件驱动通知机制</li>
-                        <li><a href="guides/best-practices.html">最佳实践</a> - 性能优化和安全建议</li>
-                        <li><a href="guides/examples.html">完整示例</a> - 常见场景的代码示例</li>
-                        <li><a href="guides/architecture.html">架构设计</a> - 系统架构和设计原则</li>
-                        <li><a href="guides/development.html">开发指南</a> - 项目开发和贡献指南</li>
+                        <li><a href="${resolvePath('guides/getting-started.html')}">快速开始</a> - 5分钟了解如何使用 API</li>
+                        <li><a href="${resolvePath('guides/authentication.html')}">认证授权指南</a> - OAuth2、OIDC 和 JWT 详解</li>
+                        <li><a href="${resolvePath('guides/document-model.html')}">文档模型详解</a> - 统一文档抽象和字段类型</li>
+                        <li><a href="${resolvePath('guides/data-operations.html')}">数据操作指南</a> - CRUD 操作和高级查询</li>
+                        <li><a href="${resolvePath('guides/webhooks.html')}">Webhook 使用指南</a> - 事件驱动通知机制</li>
+                        <li><a href="${resolvePath('guides/best-practices.html')}">最佳实践</a> - 性能优化和安全建议</li>
+                        <li><a href="${resolvePath('guides/examples.html')}">完整示例</a> - 常见场景的代码示例</li>
+                        <li><a href="${resolvePath('guides/architecture.html')}">架构设计</a> - 系统架构和设计原则</li>
+                        <li><a href="${resolvePath('guides/development.html')}">开发指南</a> - 项目开发和贡献指南</li>
                     </ul>
                 </div>
                 <div class="doc-section">
                     <h3>📖 参考文档</h3>
                     <ul class="doc-list">
-                        <li><a href="references/api-reference.html">API 参考手册</a> - 所有端点的详细文档</li>
-                        <li><a href="references/error-codes.html">错误码参考</a> - 完整的错误码列表</li>
-                        <li><a href="references/field-types.html">字段类型参考</a> - 25+ 种字段类型说明</li>
-                        <li><a href="references/i18n.html">国际化说明</a> - 多语言支持文档</li>
-                        <li><a href="references/changelog.html">变更日志</a> - 版本更新记录</li>
+                        <li><a href="${resolvePath('references/api-reference.html')}">API 参考手册</a> - 所有端点的详细文档</li>
+                        <li><a href="${resolvePath('references/error-codes.html')}">错误码参考</a> - 完整的错误码列表</li>
+                        <li><a href="${resolvePath('references/field-types.html')}">字段类型参考</a> - 25+ 种字段类型说明</li>
+                        <li><a href="${resolvePath('references/i18n.html')}">国际化说明</a> - 多语言支持文档</li>
+                        <li><a href="${resolvePath('references/changelog.html')}">变更日志</a> - 版本更新记录</li>
                     </ul>
                 </div>
             </div>
@@ -219,7 +231,7 @@ async function generateHomePage() {
                 <ul class="resources-list">
                     <li>📦 <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub 仓库</a></li>
                     <li>🐛 <a href="https://github.com/NexusBook/nexusbook-api/issues" target="_blank">问题反馈</a></li>
-                    <li>📝 <a href="references/changelog.html">变更日志</a></li>
+                    <li>📝 <a href="${resolvePath('references/changelog.html')}">变更日志</a></li>
                 </ul>
             </div>
         </section>
@@ -265,12 +277,12 @@ function generatePageTemplate(title, content, activeNav = '', currentPath = '') 
     <div class="main-wrapper">
         <header class="header">
             <div class="container">
-                <h1 class="logo"><a href="../index.html">NexusBook API</a></h1>
+                <h1 class="logo"><a href="${resolvePath('index.html')}">NexusBook API</a></h1>
                 <nav class="nav">
-                    <a href="../index.html">首页</a>
-                    <a href="../api/index.html" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
-                    <a href="../guides/getting-started.html" ${activeNav === 'guides' ? 'class="active"' : ''}>开发指南</a>
-                    <a href="../references/error-codes.html" ${activeNav === 'references' ? 'class="active"' : ''}>参考文档</a>
+                    <a href="${resolvePath('index.html')}">首页</a>
+                    <a href="${resolvePath('api/index.html')}" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
+                    <a href="${resolvePath('guides/getting-started.html')}" ${activeNav === 'guides' ? 'class="active"' : ''}>开发指南</a>
+                    <a href="${resolvePath('references/error-codes.html')}" ${activeNav === 'references' ? 'class="active"' : ''}>参考文档</a>
                     <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
                 </nav>
             </div>

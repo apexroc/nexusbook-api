@@ -17,7 +17,7 @@ using OpenAPI;
  * - **选项管理** - 为选择类字段定义可用选项
  * - **关联关系** - 定义字段间的关联和查找关系
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 字段类型（覆盖多维表格常见类型）
@@ -88,7 +88,7 @@ model Field {
     defaultValue?: unknown;
 
     /// 选择类字段的选项集合
-    selectOptions?: NexusBook.Common.SelectOption[];
+    selectOptions?: NexusBook.Api.Common.SelectOption[];
 
     /// 计算配置：公式/查找/汇总（字符串表达）
     formula?: string;
@@ -105,7 +105,7 @@ model Field {
         config?: unknown;
 
         /// 消息（多语言） Message
-        message?: NexusBook.Common.Message;
+        message?: NexusBook.Api.Common.Message;
     }[];
 }
 
@@ -140,7 +140,7 @@ model RollupConfig {
      * 聚合函数
      * Aggregation function
      */
-    agg: NexusBook.Common.AggregationFn;
+    agg: NexusBook.Api.Common.AggregationFn;
 }
 
 /**
@@ -193,7 +193,7 @@ interface MetadataApi {
     getMetadata(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<Metadata>;
+    ): NexusBook.Api.Common.ApiResponse<Metadata>;
 
     /**
      * 更新字段与显示配置，需具备管理权限。
@@ -206,5 +206,5 @@ interface MetadataApi {
         @path docType: string,
         @path docId: string,
         @body body: Metadata,
-    ): NexusBook.Common.ApiResponse<Metadata>;
+    ): NexusBook.Api.Common.ApiResponse<Metadata>;
 }

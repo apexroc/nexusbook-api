@@ -45,7 +45,7 @@ using OpenAPI;
  *   }'
  * ```
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 同步源类型
@@ -297,7 +297,7 @@ model SyncConfig {
      * 仅同步符合条件的数据。
      * Only sync data matching conditions.
      */
-    filters?: NexusBook.Common.FilterGroup;
+    filters?: NexusBook.Api.Common.FilterGroup;
 
     /**
      * 冲突解决策略
@@ -573,7 +573,7 @@ interface SyncApi {
     listSyncConfigs(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<SyncConfig[]>;
+    ): NexusBook.Api.Common.ApiResponse<SyncConfig[]>;
 
     /**
      * 创建同步配置
@@ -589,7 +589,7 @@ interface SyncApi {
         @path docType: string,
         @path docId: string,
         @body body: SyncConfig,
-    ): NexusBook.Common.ApiResponse<SyncConfig>;
+    ): NexusBook.Api.Common.ApiResponse<SyncConfig>;
 
     /**
      * 获取同步配置详情
@@ -606,7 +606,7 @@ interface SyncApi {
         @path docType: string,
         @path docId: string,
         @path configId: string,
-    ): NexusBook.Common.ApiResponse<SyncConfig>;
+    ): NexusBook.Api.Common.ApiResponse<SyncConfig>;
 
     /**
      * 更新同步配置
@@ -624,7 +624,7 @@ interface SyncApi {
         @path docId: string,
         @path configId: string,
         @body body: SyncConfig,
-    ): NexusBook.Common.ApiResponse<SyncConfig>;
+    ): NexusBook.Api.Common.ApiResponse<SyncConfig>;
 
     /**
      * 删除同步配置
@@ -641,7 +641,7 @@ interface SyncApi {
         @path docType: string,
         @path docId: string,
         @path configId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 手动触发同步
@@ -671,7 +671,7 @@ interface SyncApi {
              */
             dryRun?: boolean;
         },
-    ): NexusBook.Common.ApiResponse<SyncTask>;
+    ): NexusBook.Api.Common.ApiResponse<SyncTask>;
 
     /**
      * 获取同步任务历史
@@ -691,7 +691,7 @@ interface SyncApi {
         @query status?: SyncTaskStatus,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<SyncTask>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<SyncTask>>;
 
     /**
      * 获取任务详情
@@ -709,7 +709,7 @@ interface SyncApi {
         @path docId: string,
         @path configId: string,
         @path taskId: string,
-    ): NexusBook.Common.ApiResponse<SyncTask>;
+    ): NexusBook.Api.Common.ApiResponse<SyncTask>;
 
     /**
      * 取消同步任务
@@ -727,7 +727,7 @@ interface SyncApi {
         @path docId: string,
         @path configId: string,
         @path taskId: string,
-    ): NexusBook.Common.ApiResponse<SyncTask>;
+    ): NexusBook.Api.Common.ApiResponse<SyncTask>;
 
     /**
      * 获取同步冲突
@@ -747,7 +747,7 @@ interface SyncApi {
         @query resolved?: boolean,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<SyncConflict>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<SyncConflict>>;
 
     /**
      * 解决同步冲突
@@ -778,7 +778,7 @@ interface SyncApi {
              */
             customValue?: unknown;
         },
-    ): NexusBook.Common.ApiResponse<SyncConflict>;
+    ): NexusBook.Api.Common.ApiResponse<SyncConflict>;
 
     /**
      * 测试同步连接
@@ -798,7 +798,7 @@ interface SyncApi {
             sourceType: SyncSourceType;
             sourceConfig: unknown;
         },
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 是否成功
          * Success

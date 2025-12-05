@@ -6,6 +6,10 @@ import "./auth/index.tsp";
 import "./tenant/index.tsp";
 import "./document/index.tsp";
 import "./extensions/index.tsp";
+import "./i18n/index.tsp";
+import "./preferences/index.tsp";
+import "./billing/index.tsp";
+import "./audit/index.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;

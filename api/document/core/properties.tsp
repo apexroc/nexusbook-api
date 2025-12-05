@@ -59,7 +59,7 @@ using OpenAPI;
  * - **并发安全** - 版本号保证更新的安全性
  * - **审计追踪** - 记录每次修改的人和时间
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 文档属性模型
@@ -158,7 +158,7 @@ model DocumentProperties {
      * ]
      * ```
      */
-    properties?: NexusBook.Common.ValueEntry[];
+    properties?: NexusBook.Api.Common.ValueEntry[];
 
     /**
      * 版本号
@@ -213,7 +213,7 @@ interface DocumentPropertiesApi {
     getProperties(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<DocumentProperties>;
+    ): NexusBook.Api.Common.ApiResponse<DocumentProperties>;
 
     /**
      * 创建或初始化文档属性
@@ -229,7 +229,7 @@ interface DocumentPropertiesApi {
         @path docType: string,
         @path docId: string,
         @body body: DocumentProperties,
-    ): NexusBook.Common.ApiResponse<DocumentProperties>;
+    ): NexusBook.Api.Common.ApiResponse<DocumentProperties>;
 
     /**
      * 完全替换文档属性（进入变更请求）
@@ -270,7 +270,7 @@ interface DocumentPropertiesApi {
         @path docId: string,
         @body body: DocumentProperties,
         @query requestId?: string,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 部分更新文档属性（进入变更请求）
@@ -365,7 +365,7 @@ interface DocumentPropertiesApi {
         @query requestId?: string,
         @query merge?: boolean,
         @query version?: int64,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 获取属性的修订历史
@@ -383,7 +383,7 @@ interface DocumentPropertiesApi {
         @path docId: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<{
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<{
         /**
          * 变更版本
          * Change version
@@ -394,7 +394,7 @@ interface DocumentPropertiesApi {
          * 属性值快照
          * Properties snapshot
          */
-        properties: NexusBook.Common.ValueEntry[];
+        properties: NexusBook.Api.Common.ValueEntry[];
 
         /**
          * 变更时间
@@ -429,5 +429,5 @@ interface DocumentPropertiesApi {
         @path docType: string,
         @path docId: string,
         @query version?: int64,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 }

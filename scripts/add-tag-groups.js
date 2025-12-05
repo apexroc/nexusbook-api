@@ -55,6 +55,31 @@ async function main() {
           'Authentication',
           'API Keys'
         ]
+      },
+      {
+        name: 'Billing (商业化)',
+        tags: [
+          'Subscription Plans',
+          'Subscription Management',
+          'Invoices',
+          'Payment Methods',
+          'Usage & Quota'
+        ]
+      },
+      {
+        name: 'Audit (审计)',
+        tags: [
+          'Audit Logs',
+          'Compliance'
+        ]
+      },
+      {
+        name: 'Extensions (扩展)',
+        tags: [
+          'Webhooks',
+          'Internationalization',
+          'User Preferences'
+        ]
       }
     ];
   } else {
@@ -92,6 +117,31 @@ async function main() {
           'Authentication',
           'API Keys'
         ]
+      },
+      {
+        name: 'Billing (商业化)',
+        tags: [
+          'Subscription Plans',
+          'Subscription Management',
+          'Invoices',
+          'Payment Methods',
+          'Usage & Quota'
+        ]
+      },
+      {
+        name: 'Audit (审计)',
+        tags: [
+          'Audit Logs',
+          'Compliance'
+        ]
+      },
+      {
+        name: 'Extensions (扩展)',
+        tags: [
+          'Webhooks',
+          'Internationalization',
+          'User Preferences'
+        ]
       }
     ];
   }
@@ -115,7 +165,17 @@ async function main() {
     'Document - Sync': '数据同步',
     'Document - Collaboration': '协作功能（评论、实时）',
     'Document - Workflow': '工作流（审批、变更请求、修订）',
-    'Document - Tenancy': '多租户（组织/工作区级文档）'
+    'Document - Tenancy': '多租户（组织/工作区级文档）',
+    'Subscription Plans': '订阅计划管理',
+    'Subscription Management': '订阅管理',
+    'Invoices': '账单管理',
+    'Payment Methods': '支付方式管理',
+    'Usage & Quota': '使用量与配额管理',
+    'Audit Logs': '审计日志',
+    'Compliance': '合规性报告',
+    'Webhooks': 'Webhook 管理',
+    'Internationalization': '国际化翻译',
+    'User Preferences': '用户偏好设置'
   };
 
   // 更新 tags

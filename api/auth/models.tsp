@@ -6,32 +6,36 @@ using TypeSpec.Http;
 using OpenAPI;
 
 /**
- * 认证与授权模块
+ * NexusBook Authentication & Authorization - Data Models
+ * NexusBook 认证与授权 - 数据模型
  *
  * 提供 OAuth2 和 OIDC 兼容的身份认证和授权功能。
+ * Provides OAuth2 and OIDC compatible identity authentication and authorization features.
  *
- * 主要功能：
- * - OAuth2 客户端应用管理
- * - 令牌颁发和管理（访问令牌、刷新令牌）
- * - OIDC 身份提供商元数据和发现
- * - JWT 密钥管理（JWKS）
- * - 用户信息查询和权限声明
+ * Route Base: /auth
  *
- * ## 认证流程
+ * 主要功能 / Main Features:
+ * - OAuth2 客户端应用管理 OAuth2 client application management
+ * - 令牌颁发和管理 Token issuance and management
+ * - OIDC 身份提供商元数据 OIDC provider metadata
+ * - JWT 密钥管理 (JWKS) JWT key management (JWKS)
+ * - 用户信息查询和权限声明 User info query and permission claims
  *
- * ### 授权码流程 (Authorization Code Flow)
- * 1. GET /authorize - 重定向用户到认证服务器
- * 2. POST /token - 使用授权码交换令牌
+ * ## 认证流程 Authentication Flows
  *
- * ### 客户端凭证流程 (Client Credentials Flow)
- * 1. POST /token - 使用客户端 ID 和密钥获取令牌
+ * ### 授权码流程 Authorization Code Flow
+ * 1. GET /authorize - 重定向用户到认证服务器 Redirect user to auth server
+ * 2. POST /token - 使用授权码交换令牌 Exchange authorization code for token
  *
- * ### OIDC 发现
- * GET /.well-known/openid-configuration - 获取 OIDC 元数据
- * GET /jwks.json - 获取公钥集合用于验证
+ * ### 客户端凭证流程 Client Credentials Flow
+ * 1. POST /token - 使用客户端 ID 和密钥获取令牌 Get token with client ID and secret
+ *
+ * ### OIDC 发现 OIDC Discovery
+ * GET /.well-known/openid-configuration - 获取 OIDC 元数据 Get OIDC metadata
+ * GET /jwks.json - 获取公钥集合用于验证 Get public key set for verification
  */
 @route("/auth")
-namespace NexusBook.Auth {
+namespace NexusBook.Api.Auth {
     /**
      * OAuth2 客户端应用信息
      * OAuth2 client application info
@@ -298,7 +302,7 @@ namespace NexusBook.Auth {
         @route("/token")
         @post
         @summary("令牌颁发")
-        token(): NexusBook.Common.ApiResponse<TokenResponse>;
+        token(): NexusBook.Api.Common.ApiResponse<TokenResponse>;
 
         /**
          * 返回登录用户的信息声明。
@@ -308,7 +312,7 @@ namespace NexusBook.Auth {
         @route("/userinfo")
         @get
         @summary("用户信息")
-        userinfo(): NexusBook.Common.ApiResponse<UserInfo>;
+        userinfo(): NexusBook.Api.Common.ApiResponse<UserInfo>;
 
         /**
          * 返回 OIDC 提供方的标准发现文档。

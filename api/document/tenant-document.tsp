@@ -20,7 +20,7 @@ using OpenAPI;
  * - Organization-level documents - Public documents accessible to all organization members (e.g., policies, templates)
  * - Workspace-level documents - Business documents within specific workspaces (e.g., purchase orders, sales orders)
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 文档作用域枚举
@@ -188,7 +188,7 @@ interface OrganizationDocumentApi {
          * Revisions limit
          */
         @query revisionsLimit?: int32
-    ): NexusBook.Common.ApiResponse<DocBundle>;
+    ): NexusBook.Api.Common.ApiResponse<DocBundle>;
 
     /**
      * 列出组织文档
@@ -241,7 +241,7 @@ interface OrganizationDocumentApi {
          * 排序方向
          * Sort direction
          */
-        @query direction?: NexusBook.Common.Direction = NexusBook.Common.Direction.desc,
+        @query direction?: NexusBook.Api.Common.Direction = NexusBook.Api.Common.Direction.desc,
 
         /**
          * 页码
@@ -254,7 +254,7 @@ interface OrganizationDocumentApi {
          * Page size
          */
         @query pageSize?: int32 = 20
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<DocumentSummary>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<DocumentSummary>>;
 }
 
 /**
@@ -342,7 +342,7 @@ interface WorkspaceDocumentApi {
          * Revisions limit
          */
         @query revisionsLimit?: int32
-    ): NexusBook.Common.ApiResponse<DocBundle>;
+    ): NexusBook.Api.Common.ApiResponse<DocBundle>;
 
     /**
      * 列出工作区文档
@@ -401,7 +401,7 @@ interface WorkspaceDocumentApi {
          * 排序方向
          * Sort direction
          */
-        @query direction?: NexusBook.Common.Direction = NexusBook.Common.Direction.desc,
+        @query direction?: NexusBook.Api.Common.Direction = NexusBook.Api.Common.Direction.desc,
 
         /**
          * 页码
@@ -414,5 +414,5 @@ interface WorkspaceDocumentApi {
          * Page size
          */
         @query pageSize?: int32 = 20
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<DocumentSummary>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<DocumentSummary>>;
 }

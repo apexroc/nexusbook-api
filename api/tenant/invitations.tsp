@@ -5,20 +5,28 @@ import "./models.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;
-using NexusBook.Tenant;
+using NexusBook.Api.Tenant;
 
 /**
- * 邀请和加入申请模块
+ * NexusBook Tenant Management - Invitation & Join Request APIs
+ * NexusBook 租户管理 - 邀请与加入申请 API
  *
  * 提供组织邀请和加入申请的管理功能。
+ * Provides organization invitation and join request management features.
  *
- * 主要接口：
- * - 创建、管理邀请
- * - 接受/拒绝邀请
- * - 提交、管理加入申请
- * - 批准/拒绝加入申请
+ * Route Base: /api/v1/organizations/{organizationId}/invitations, /api/v1/organizations/{organizationId}/join-requests
+ *
+ * 主要接口 / Main Endpoints:
+ * - POST /invitations - 创建邀请 Create invitation
+ * - GET /invitations - 列出邀请 List invitations
+ * - POST /invitations/{invitationId}/revoke - 撤销邀请 Revoke invitation
+ * - POST /invitations/{invitationId}/accept - 接受邀请 Accept invitation
+ * - POST /join-requests - 提交加入申请 Submit join request
+ * - GET /join-requests - 列出加入申请 List join requests
+ * - POST /join-requests/{requestId}/approve - 批准申请 Approve join request
+ * - POST /join-requests/{requestId}/reject - 拒绝申请 Reject join request
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Tenant;
 
 // ==================== 请求/响应模型 ====================
 
@@ -137,7 +145,7 @@ interface InvitationApi {
          * Create invitation request
          */
         @body request: CreateInvitationRequest
-    ): NexusBook.Common.ApiResponse<Invitation>;
+    ): NexusBook.Api.Common.ApiResponse<Invitation>;
 
     /**
      * 列出组织邀请
@@ -179,7 +187,7 @@ interface InvitationApi {
          * Filter by status
          */
         @query status?: InvitationStatus
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Invitation>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Invitation>>;
 
     /**
      * 获取邀请详情
@@ -209,7 +217,7 @@ interface InvitationApi {
          * Invitation ID
          */
         @path invitationId: string
-    ): NexusBook.Common.ApiResponse<Invitation>;
+    ): NexusBook.Api.Common.ApiResponse<Invitation>;
 
     /**
      * 撤销邀请
@@ -239,7 +247,7 @@ interface InvitationApi {
          * Invitation ID
          */
         @path invitationId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 接受邀请
@@ -263,7 +271,7 @@ interface InvitationApi {
          * Invitation token
          */
         @path token: string
-    ): NexusBook.Common.ApiResponse<OrganizationMember>;
+    ): NexusBook.Api.Common.ApiResponse<OrganizationMember>;
 
     /**
      * 拒绝邀请
@@ -287,7 +295,7 @@ interface InvitationApi {
          * Invitation token
          */
         @path token: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 通过令牌获取邀请信息
@@ -311,7 +319,7 @@ interface InvitationApi {
          * Invitation token
          */
         @path token: string
-    ): NexusBook.Common.ApiResponse<Invitation>;
+    ): NexusBook.Api.Common.ApiResponse<Invitation>;
 }
 
 /**
@@ -352,7 +360,7 @@ interface JoinRequestApi {
          * Create request
          */
         @body request: CreateJoinRequestRequest
-    ): NexusBook.Common.ApiResponse<JoinRequest>;
+    ): NexusBook.Api.Common.ApiResponse<JoinRequest>;
 
     /**
      * 列出加入申请
@@ -394,7 +402,7 @@ interface JoinRequestApi {
          * Filter by status
          */
         @query status?: JoinRequestStatus
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<JoinRequest>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<JoinRequest>>;
 
     /**
      * 获取加入申请详情
@@ -424,7 +432,7 @@ interface JoinRequestApi {
          * Request ID
          */
         @path requestId: string
-    ): NexusBook.Common.ApiResponse<JoinRequest>;
+    ): NexusBook.Api.Common.ApiResponse<JoinRequest>;
 
     /**
      * 批准加入申请
@@ -465,7 +473,7 @@ interface JoinRequestApi {
          * Approve request
          */
         @body request: ApproveJoinRequestRequest
-    ): NexusBook.Common.ApiResponse<OrganizationMember>;
+    ): NexusBook.Api.Common.ApiResponse<OrganizationMember>;
 
     /**
      * 拒绝加入申请
@@ -505,7 +513,7 @@ interface JoinRequestApi {
          * Reject request
          */
         @body request: RejectJoinRequestRequest
-    ): NexusBook.Common.ApiResponse<JoinRequest>;
+    ): NexusBook.Api.Common.ApiResponse<JoinRequest>;
 
     /**
      * 取消加入申请（用户主动）
@@ -535,5 +543,5 @@ interface JoinRequestApi {
          * Request ID
          */
         @path requestId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 }

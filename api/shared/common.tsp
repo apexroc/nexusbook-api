@@ -2,22 +2,26 @@ import "@typespec/http";
 using TypeSpec.Http;
 
 /**
- * 通用模块
+ * NexusBook Common API Types
+ * NexusBook 通用 API 类型
  *
  * 定义所有 API 中使用的通用数据结构、错误码、查询和过滤机制。
+ * Defines common data structures, error codes, query and filter mechanisms used across all APIs.
  *
- * 主要内容：
- * - **响应格式** - ApiResponse, Page 等标准响应结构
- * - **错误管理** - 统一的错误码定义和多语言消息
- * - **查询引擎** - 支持过滤、排序、分组和聚合的查询模型
- * - **数据模型** - 通用的值类型、附件、用户引用等
+ * Route Base: N/A (共享类型，无路由 / Shared types, no routes)
  *
- * ## 查询示例
+ * 主要内容 / Main Components:
+ * - **响应格式 Response Format** - ApiResponse, Page 等标准响应结构
+ * - **错误管理 Error Management** - 统一的错误码定义和多语言消息
+ * - **查询引擎 Query Engine** - 支持过滤、排序、分组和聚合的查询模型
+ * - **数据模型 Data Models** - 通用的值类型、附件、用户引用等
  *
- * ### 简单查询
+ * ## 查询示例 Query Examples
+ *
+ * ### 简单查询 Simple Query
  * GET /doc/product/123/data?page=1&pageSize=20
  *
- * ### 高级查询
+ * ### 高级查询 Advanced Query
  * POST /doc/product/123/data/query
  * {
  *   "filters": {
@@ -31,7 +35,7 @@ using TypeSpec.Http;
  *   "pageSize": 20
  * }
  */
-namespace NexusBook.Common;
+namespace NexusBook.Api.Common;
 
 /**
  * 多语言消息

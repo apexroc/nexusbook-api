@@ -38,7 +38,7 @@ using OpenAPI;
  * 评论可以通过 parentId 指向另一条评论，形成讨论线程。
  * Replies chain via parentId, forming discussion threads.
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 评论位置定位器
@@ -89,7 +89,7 @@ model Reaction {
      * 反应人集合
      * Users who reacted
      */
-    users: NexusBook.Common.UserRef[];
+    users: NexusBook.Api.Common.UserRef[];
 
     /**
      * 反应数量
@@ -146,7 +146,7 @@ model Comment {
      * 在评论中被 @提及的用户列表。
      * List of users mentioned in the comment.
      */
-    mentions?: NexusBook.Common.UserRef[];
+    mentions?: NexusBook.Api.Common.UserRef[];
 
     /**
      * 附件集合
@@ -155,7 +155,7 @@ model Comment {
      * 评论中附加的文件。
      * Files attached to the comment.
      */
-    attachments?: NexusBook.Common.Attachment[];
+    attachments?: NexusBook.Api.Common.Attachment[];
 
     /**
      * 表情反应集合
@@ -279,7 +279,7 @@ interface CommentsApi {
         @query parentId?: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Comment>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Comment>>;
 
     /**
      * 创建新评论
@@ -320,7 +320,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @body body: Comment,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 获取评论详情
@@ -337,7 +337,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @path commentId: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 更新评论
@@ -355,7 +355,7 @@ interface CommentsApi {
         @path docId: string,
         @path commentId: string,
         @body body: Comment,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 删除评论
@@ -372,7 +372,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @path commentId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 置顶评论
@@ -389,7 +389,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @path commentId: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 取消置顶
@@ -403,7 +403,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @path commentId: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 标记为已解决
@@ -420,7 +420,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @path commentId: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 取消解决标记
@@ -434,7 +434,7 @@ interface CommentsApi {
         @path docType: string,
         @path docId: string,
         @path commentId: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 添加表情反应
@@ -452,7 +452,7 @@ interface CommentsApi {
         @path docId: string,
         @path commentId: string,
         @query emoji: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 
     /**
      * 移除表情反应
@@ -467,5 +467,5 @@ interface CommentsApi {
         @path docId: string,
         @path commentId: string,
         @path emoji: string,
-    ): NexusBook.Common.ApiResponse<Comment>;
+    ): NexusBook.Api.Common.ApiResponse<Comment>;
 }

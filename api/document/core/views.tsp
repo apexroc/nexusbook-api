@@ -23,7 +23,7 @@ using OpenAPI;
  * - `kanban` - 看板视图，适合工作流和进度管理
  * - `document` - 文档视图，适合详细内容查看
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 model View {
     /**
@@ -42,7 +42,7 @@ model View {
      * 视图类型（表格/相册/看板/文档）
      * View type (grid/gallery/kanban/document)
      */
-    type?: NexusBook.Common.ViewType;
+    type?: NexusBook.Api.Common.ViewType;
 
     /**
      * 用于渲染的字段列表
@@ -54,19 +54,19 @@ model View {
      * 过滤条件组合
      * Filter conditions group
      */
-    filters?: NexusBook.Common.FilterGroup;
+    filters?: NexusBook.Api.Common.FilterGroup;
 
     /**
      * 排序条件
      * Sort conditions
      */
-    sorts?: NexusBook.Common.Sort[];
+    sorts?: NexusBook.Api.Common.Sort[];
 
     /**
      * 分组与聚合
      * Grouping and aggregations
      */
-    group?: NexusBook.Common.GroupBy;
+    group?: NexusBook.Api.Common.GroupBy;
 
     /**
      * 列展示配置（宽度/顺序/固定/隐藏）
@@ -96,7 +96,7 @@ interface ViewsApi {
     listViews(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<View[]>;
+    ): NexusBook.Api.Common.ApiResponse<View[]>;
 
     /**
      * 创建新的视图定义。
@@ -109,7 +109,7 @@ interface ViewsApi {
         @path docType: string,
         @path docId: string,
         @body body: View,
-    ): NexusBook.Common.ApiResponse<View>;
+    ): NexusBook.Api.Common.ApiResponse<View>;
 
     /**
      * 获取视图配置与定义。
@@ -123,7 +123,7 @@ interface ViewsApi {
         @path docType: string,
         @path docId: string,
         @path viewId: string,
-    ): NexusBook.Common.ApiResponse<View>;
+    ): NexusBook.Api.Common.ApiResponse<View>;
 
     /**
      * 更新视图定义与配置。
@@ -138,7 +138,7 @@ interface ViewsApi {
         @path docId: string,
         @path viewId: string,
         @body body: View,
-    ): NexusBook.Common.ApiResponse<View>;
+    ): NexusBook.Api.Common.ApiResponse<View>;
 
     /**
      * 删除指定视图。
@@ -152,7 +152,7 @@ interface ViewsApi {
         @path docType: string,
         @path docId: string,
         @path viewId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 将指定视图设为默认视图。
@@ -166,5 +166,5 @@ interface ViewsApi {
         @path docType: string,
         @path docId: string,
         @path viewId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 }

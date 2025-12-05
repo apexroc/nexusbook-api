@@ -5,19 +5,31 @@ import "./models.tsp";
 
 using TypeSpec.Http;
 using OpenAPI;
-using NexusBook.Tenant;
+using NexusBook.Api.Tenant;
 
 /**
- * 工作区管理模块
+ * NexusBook Tenant Management - Workspace APIs
+ * NexusBook 租户管理 - 工作区 API
  *
  * 提供工作区创建、管理、成员管理等功能。
+ * Provides workspace creation, management, member management and other features.
  *
- * 主要接口：
- * - 创建和管理工作区
- * - 工作区成员管理
- * - 归档和恢复工作区
+ * Route Base: /api/v1/organizations/{organizationId}/workspaces
+ *
+ * 主要接口 / Main Endpoints:
+ * - POST / - 创建工作区 Create workspace
+ * - GET / - 列出工作区 List workspaces
+ * - GET /{workspaceId} - 获取工作区详情 Get workspace detail
+ * - PATCH /{workspaceId} - 更新工作区 Update workspace
+ * - POST /{workspaceId}/archive - 归档工作区 Archive workspace
+ * - POST /{workspaceId}/restore - 恢复工作区 Restore workspace
+ * - DELETE /{workspaceId} - 删除工作区 Delete workspace
+ * - GET /{workspaceId}/members - 列出成员 List members
+ * - POST /{workspaceId}/members - 添加成员 Add member
+ * - PATCH /{workspaceId}/members/{userId} - 更新成员 Update member
+ * - DELETE /{workspaceId}/members/{userId} - 移除成员 Remove member
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Tenant;
 
 // ==================== 请求/响应模型 ====================
 
@@ -199,7 +211,7 @@ interface WorkspaceApi {
          * Create request
          */
         @body request: CreateWorkspaceRequest
-    ): NexusBook.Common.ApiResponse<Workspace>;
+    ): NexusBook.Api.Common.ApiResponse<Workspace>;
 
     /**
      * 列出组织的工作区
@@ -246,7 +258,7 @@ interface WorkspaceApi {
          * Whether to include archived workspaces
          */
         @query includeArchived?: boolean = false
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Workspace>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Workspace>>;
 
     /**
      * 获取工作区详情
@@ -276,7 +288,7 @@ interface WorkspaceApi {
          * Workspace ID
          */
         @path workspaceId: string
-    ): NexusBook.Common.ApiResponse<WorkspaceDetail>;
+    ): NexusBook.Api.Common.ApiResponse<WorkspaceDetail>;
 
     /**
      * 更新工作区信息
@@ -317,7 +329,7 @@ interface WorkspaceApi {
          * Update request
          */
         @body request: UpdateWorkspaceRequest
-    ): NexusBook.Common.ApiResponse<Workspace>;
+    ): NexusBook.Api.Common.ApiResponse<Workspace>;
 
     /**
      * 归档工作区
@@ -347,7 +359,7 @@ interface WorkspaceApi {
          * Workspace ID
          */
         @path workspaceId: string
-    ): NexusBook.Common.ApiResponse<Workspace>;
+    ): NexusBook.Api.Common.ApiResponse<Workspace>;
 
     /**
      * 恢复归档的工作区
@@ -377,7 +389,7 @@ interface WorkspaceApi {
          * Workspace ID
          */
         @path workspaceId: string
-    ): NexusBook.Common.ApiResponse<Workspace>;
+    ): NexusBook.Api.Common.ApiResponse<Workspace>;
 
     /**
      * 删除工作区
@@ -407,7 +419,7 @@ interface WorkspaceApi {
          * Workspace ID
          */
         @path workspaceId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 
     /**
      * 列出工作区成员
@@ -455,7 +467,7 @@ interface WorkspaceApi {
          * Filter by role
          */
         @query role?: WorkspaceRole
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<WorkspaceMember>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<WorkspaceMember>>;
 
     /**
      * 添加工作区成员
@@ -496,7 +508,7 @@ interface WorkspaceApi {
          * Add member request
          */
         @body request: AddWorkspaceMemberRequest
-    ): NexusBook.Common.ApiResponse<WorkspaceMember>;
+    ): NexusBook.Api.Common.ApiResponse<WorkspaceMember>;
 
     /**
      * 获取工作区成员详情
@@ -532,7 +544,7 @@ interface WorkspaceApi {
          * Member ID
          */
         @path memberId: string
-    ): NexusBook.Common.ApiResponse<WorkspaceMember>;
+    ): NexusBook.Api.Common.ApiResponse<WorkspaceMember>;
 
     /**
      * 更新工作区成员角色
@@ -578,7 +590,7 @@ interface WorkspaceApi {
          * Update request
          */
         @body request: UpdateWorkspaceMemberRequest
-    ): NexusBook.Common.ApiResponse<WorkspaceMember>;
+    ): NexusBook.Api.Common.ApiResponse<WorkspaceMember>;
 
     /**
      * 移除工作区成员
@@ -614,5 +626,5 @@ interface WorkspaceApi {
          * Member ID
          */
         @path memberId: string
-    ): NexusBook.Common.ApiResponse<{}>;
+    ): NexusBook.Api.Common.ApiResponse<{}>;
 }

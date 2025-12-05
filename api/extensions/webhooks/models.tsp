@@ -84,7 +84,7 @@ using OpenAPI;
  * X-Webhook-Signature: sha256=<HMAC-SHA256(secret, body)>
  * ```
  */
-namespace NexusBook.Extensions.Webhooks;
+namespace NexusBook.Api.Extensions.Webhooks;
 
 /**
  * Webhook 事件类型
@@ -517,7 +517,7 @@ interface WebhooksApi {
         @query status?: WebhookStatus,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Webhook>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Webhook>>;
 
     /**
      * 创建 Webhook
@@ -546,7 +546,7 @@ interface WebhooksApi {
     @summary("创建 Webhook")
     createWebhook(
         @body body: Webhook,
-    ): NexusBook.Common.ApiResponse<Webhook>;
+    ): NexusBook.Api.Common.ApiResponse<Webhook>;
 
     /**
      * 获取 Webhook 详情
@@ -558,7 +558,7 @@ interface WebhooksApi {
     @summary("获取 Webhook 详情")
     getWebhook(
         @path webhookId: string,
-    ): NexusBook.Common.ApiResponse<Webhook>;
+    ): NexusBook.Api.Common.ApiResponse<Webhook>;
 
     /**
      * 更新 Webhook
@@ -571,7 +571,7 @@ interface WebhooksApi {
     updateWebhook(
         @path webhookId: string,
         @body body: Webhook,
-    ): NexusBook.Common.ApiResponse<Webhook>;
+    ): NexusBook.Api.Common.ApiResponse<Webhook>;
 
     /**
      * 删除 Webhook
@@ -583,7 +583,7 @@ interface WebhooksApi {
     @summary("删除 Webhook")
     deleteWebhook(
         @path webhookId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 暂停 Webhook
@@ -598,7 +598,7 @@ interface WebhooksApi {
     @summary("暂停 Webhook")
     pauseWebhook(
         @path webhookId: string,
-    ): NexusBook.Common.ApiResponse<Webhook>;
+    ): NexusBook.Api.Common.ApiResponse<Webhook>;
 
     /**
      * 恢复 Webhook
@@ -613,7 +613,7 @@ interface WebhooksApi {
     @summary("恢复 Webhook")
     resumeWebhook(
         @path webhookId: string,
-    ): NexusBook.Common.ApiResponse<Webhook>;
+    ): NexusBook.Api.Common.ApiResponse<Webhook>;
 
     /**
      * 测试 Webhook
@@ -629,7 +629,7 @@ interface WebhooksApi {
     testWebhook(
         @path webhookId: string,
         @body body?: WebhookTestRequest,
-    ): NexusBook.Common.ApiResponse<WebhookDelivery>;
+    ): NexusBook.Api.Common.ApiResponse<WebhookDelivery>;
 
     /**
      * 重新生成密钥
@@ -644,7 +644,7 @@ interface WebhooksApi {
     @summary("重新生成密钥")
     regenerateSecret(
         @path webhookId: string,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 新密钥
          * New secret
@@ -668,7 +668,7 @@ interface WebhooksApi {
         @query status?: "pending" | "success" | "failed" | "retrying",
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<WebhookDelivery>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<WebhookDelivery>>;
 
     /**
      * 获取投递详情
@@ -681,7 +681,7 @@ interface WebhooksApi {
     getDelivery(
         @path webhookId: string,
         @path deliveryId: string,
-    ): NexusBook.Common.ApiResponse<WebhookDelivery>;
+    ): NexusBook.Api.Common.ApiResponse<WebhookDelivery>;
 
     /**
      * 重新投递
@@ -697,7 +697,7 @@ interface WebhooksApi {
     redeliverWebhook(
         @path webhookId: string,
         @path deliveryId: string,
-    ): NexusBook.Common.ApiResponse<WebhookDelivery>;
+    ): NexusBook.Api.Common.ApiResponse<WebhookDelivery>;
 
     /**
      * 获取 Webhook 统计
@@ -714,7 +714,7 @@ interface WebhooksApi {
         @path webhookId: string,
         @query startDate?: string,
         @query endDate?: string,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 总触发次数
          * Total triggers

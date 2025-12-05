@@ -30,7 +30,7 @@ using OpenAPI;
  * - 批量操作 - 一次性提交多行变更
  * - 协同编辑 - 多人同时编辑一个请求
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 变更项
@@ -115,7 +115,7 @@ model Request {
      * 当前状态：open/merged/closed。
      * Current status: open/merged/closed.
      */
-    status: NexusBook.Common.RequestStatus;
+    status: NexusBook.Api.Common.RequestStatus;
 
     /**
      * 作者
@@ -212,7 +212,7 @@ interface RequestsApi {
     listRequests(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<Request[]>;
+    ): NexusBook.Api.Common.ApiResponse<Request[]>;
 
     /**
      * 创建新的合并请求以提交未生效变更。
@@ -225,7 +225,7 @@ interface RequestsApi {
         @path docType: string,
         @path docId: string,
         @body body: Request,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 获取合并请求的详细信息。
@@ -239,7 +239,7 @@ interface RequestsApi {
         @path docType: string,
         @path docId: string,
         @path reqId: string,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 将合并请求的变更应用到文档并生成修订。
@@ -308,7 +308,7 @@ interface RequestsApi {
              */
             deleteBranch?: boolean;
         },
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 生成的修订ID
          * Generated revision id
@@ -358,7 +358,7 @@ interface RequestsApi {
         @path docType: string,
         @path docId: string,
         @path reqId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 重新打开已关闭的合并请求。
@@ -372,7 +372,7 @@ interface RequestsApi {
         @path docType: string,
         @path docId: string,
         @path reqId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 检查合并请求与当前文档的冲突。
@@ -386,5 +386,5 @@ interface RequestsApi {
         @path docType: string,
         @path docId: string,
         @path reqId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 }

@@ -66,7 +66,7 @@ using OpenAPI;
  *
  * 更新行时需要提供当前版本号，系统使用乐观锁防止并发冲突。
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 批量更新项
@@ -213,7 +213,7 @@ model Row {
      * 字段ID与值的集合。
      * Collection of field ids and values.
      */
-    values: NexusBook.Common.ValueEntry[];
+    values: NexusBook.Api.Common.ValueEntry[];
 
     /**
      * 创建时间
@@ -275,7 +275,7 @@ model QueryRequest {
      * 嵌套过滤组合。
      * Nested filter groups.
      */
-    filters?: NexusBook.Common.FilterGroup;
+    filters?: NexusBook.Api.Common.FilterGroup;
 
     /**
      * 排序
@@ -284,7 +284,7 @@ model QueryRequest {
      * 排序条件集合。
      * Sort conditions.
      */
-    sorts?: NexusBook.Common.Sort[];
+    sorts?: NexusBook.Api.Common.Sort[];
 
     /**
      * 分组与聚合
@@ -293,7 +293,7 @@ model QueryRequest {
      * 分组字段与聚合函数。
      * Group fields and aggregation functions.
      */
-    group?: NexusBook.Common.GroupBy;
+    group?: NexusBook.Api.Common.GroupBy;
 
     /**
      * 页码
@@ -343,7 +343,7 @@ interface DataApi {
         @query filter?: string,
         @query group?: string,
         @query cursor?: string,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Row>>;
 
     /**
      * 以结构化体进行复杂查询（嵌套过滤、排序、分组与聚合）。
@@ -357,7 +357,7 @@ interface DataApi {
         @path docType: string,
         @path docId: string,
         @body body: QueryRequest,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Row>>;
 
     /**
      * 创建数据行（进入变更请求）
@@ -393,7 +393,7 @@ interface DataApi {
         @path docId: string,
         @body body: Row,
         @query requestId?: string,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 批量更新数据和属性（进入变更请求）
@@ -487,7 +487,7 @@ interface DataApi {
         @path docId: string,
         @body body: BulkUpdate[],
         @query requestId?: string,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 返回单条数据行详情。
@@ -501,7 +501,7 @@ interface DataApi {
         @path docType: string,
         @path docId: string,
         @path rowId: string,
-    ): NexusBook.Common.ApiResponse<Row>;
+    ): NexusBook.Api.Common.ApiResponse<Row>;
 
     /**
      * 更新数据行（进入变更请求）
@@ -520,7 +520,7 @@ interface DataApi {
         @path rowId: string,
         @body body: Row,
         @query requestId?: string,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 
     /**
      * 删除数据行（进入变更请求）
@@ -538,5 +538,5 @@ interface DataApi {
         @path docId: string,
         @path rowId: string,
         @query requestId?: string,
-    ): NexusBook.Common.ApiResponse<Request>;
+    ): NexusBook.Api.Common.ApiResponse<Request>;
 }

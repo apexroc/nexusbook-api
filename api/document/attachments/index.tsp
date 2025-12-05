@@ -38,7 +38,7 @@ using OpenAPI;
  *   -F 'generateThumbnail=true'
  * ```
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 附件详情（扩展版本）
@@ -475,7 +475,7 @@ interface AttachmentsApi {
     @summary("上传附件")
     uploadAttachment(
         @body body: bytes,
-    ): NexusBook.Common.ApiResponse<AttachmentDetail>;
+    ): NexusBook.Api.Common.ApiResponse<AttachmentDetail>;
 
     /**
      * 批量上传附件
@@ -490,7 +490,7 @@ interface AttachmentsApi {
     @summary("批量上传附件")
     batchUploadAttachments(
         @body body: bytes,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 上传成功的附件
          * Successfully uploaded
@@ -528,7 +528,7 @@ interface AttachmentsApi {
         @query createdBy?: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<AttachmentDetail>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<AttachmentDetail>>;
 
     /**
      * 获取附件详情
@@ -543,7 +543,7 @@ interface AttachmentsApi {
     @summary("获取附件详情")
     getAttachment(
         @path attachmentId: string,
-    ): NexusBook.Common.ApiResponse<AttachmentDetail>;
+    ): NexusBook.Api.Common.ApiResponse<AttachmentDetail>;
 
     /**
      * 更新附件元数据
@@ -564,7 +564,7 @@ interface AttachmentsApi {
             metadata?: unknown;
             isPublic?: boolean;
         },
-    ): NexusBook.Common.ApiResponse<AttachmentDetail>;
+    ): NexusBook.Api.Common.ApiResponse<AttachmentDetail>;
 
     /**
      * 删除附件
@@ -580,7 +580,7 @@ interface AttachmentsApi {
     deleteAttachment(
         @path attachmentId: string,
         @query permanent?: boolean,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 获取附件版本列表
@@ -595,7 +595,7 @@ interface AttachmentsApi {
     @summary("获取附件版本")
     getAttachmentVersions(
         @path attachmentId: string,
-    ): NexusBook.Common.ApiResponse<AttachmentVersion[]>;
+    ): NexusBook.Api.Common.ApiResponse<AttachmentVersion[]>;
 
     /**
      * 创建附件新版本
@@ -611,7 +611,7 @@ interface AttachmentsApi {
     createAttachmentVersion(
         @path attachmentId: string,
         @body body: bytes,
-    ): NexusBook.Common.ApiResponse<AttachmentVersion>;
+    ): NexusBook.Api.Common.ApiResponse<AttachmentVersion>;
 
     /**
      * 获取预览URL
@@ -628,7 +628,7 @@ interface AttachmentsApi {
         @path attachmentId: string,
         @query size?: PreviewSize,
         @query page?: int32,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 预览URL
          * Preview URL
@@ -656,7 +656,7 @@ interface AttachmentsApi {
     getAttachmentDownloadUrl(
         @path attachmentId: string,
         @query expiresIn?: int64,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 下载URL
          * Download URL
@@ -683,7 +683,7 @@ interface AttachmentsApi {
     @summary("获取存储配额")
     getStorageQuota(
         @path organizationId: string,
-    ): NexusBook.Common.ApiResponse<StorageQuota>;
+    ): NexusBook.Api.Common.ApiResponse<StorageQuota>;
 
     /**
      * 清理过期附件
@@ -699,7 +699,7 @@ interface AttachmentsApi {
     cleanupExpiredAttachments(
         @query organizationId?: string,
         @query dryRun?: boolean,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 清理数量
          * Cleaned count

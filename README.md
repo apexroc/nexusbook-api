@@ -146,13 +146,24 @@ docs/                # 生成的文档站点（不提交到 Git）
 # 开发相关
 make deps          # 安装依赖
 make openapi       # 生成 OpenAPI 规范
-make docs          # 构建完整文档站点
+make docs          # 构建完整文档站点（本地开发）
 make serve         # 启动文档服务器
+
+# GitHub Pages 部署
+npm run build-for-github  # 为 GitHub Pages 构建文档（带 /nexusbook-api/ 路径前缀）
 
 # 清理
 make clean         # 清理生成的文件
 make clean-docs    # 清理文档
 ```
+
+### 📦 构建说明
+
+**本地开发**：使用 `make docs` 或 `npm run build-docs`，生成的链接使用根路径 `/`
+
+**GitHub Pages 部署**：使用 `npm run build-for-github`，生成的链接使用子路径 `/nexusbook-api/`
+
+> 构建脚本通过环境变量 `BASE_PATH` 自动处理路径前缀，确保文档在不同部署环境下链接正确。
 
 详细的开发指南请查看 [开发指南](docs-src/guides/development.md)。
 

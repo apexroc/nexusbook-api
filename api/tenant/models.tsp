@@ -6,18 +6,21 @@ using TypeSpec.Http;
 using OpenAPI;
 
 /**
- * 租户管理模块 - 数据模型
+ * NexusBook Tenant Management - Data Models
+ * NexusBook 租户管理 - 数据模型
  *
  * 定义用户、组织、工作区等核心数据模型和枚举类型。
+ * Defines core data models and enumerations for users, organizations, and workspaces.
  *
- * 主要内容：
- * - 用户模型（User）和状态枚举
- * - OAuth 提供商和连接信息
- * - 组织模型（Organization）、成员、设置
- * - 工作区模型（Workspace）和成员
- * - 邀请和加入申请模型
+ * Route Base: N/A (模型定义，无路由 / Model definitions, no routes)
+ *
+ * 主要内容 / Main Components:
+ * - **用户模型 User Models** - 用户信息、状态、OAuth 连接
+ * - **组织模型 Organization Models** - 组织信息、成员、设置
+ * - **工作区模型 Workspace Models** - 工作区信息、成员、权限
+ * - **邀请模型 Invitation Models** - 邀请和加入申请
  */
-namespace NexusBook.Tenant;
+namespace NexusBook.Api.Tenant;
 
 // ==================== 用户相关模型 ====================
 

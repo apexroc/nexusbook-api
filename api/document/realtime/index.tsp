@@ -49,7 +49,7 @@ using OpenAPI;
  * };
  * ```
  */
-namespace NexusBook.Api;
+namespace NexusBook.Api.Document;
 
 /**
  * 实时会话
@@ -446,7 +446,7 @@ interface RealtimeApi {
     getConnectionInfo(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * WebSocket URL
          */
@@ -515,7 +515,7 @@ interface RealtimeApi {
     getOnlineUsers(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<OnlineUser[]>;
+    ): NexusBook.Api.Common.ApiResponse<OnlineUser[]>;
 
     /**
      * 锁定单元格
@@ -556,7 +556,7 @@ interface RealtimeApi {
              */
             autoRenew?: boolean;
         },
-    ): NexusBook.Common.ApiResponse<CellLock>;
+    ): NexusBook.Api.Common.ApiResponse<CellLock>;
 
     /**
      * 解锁单元格
@@ -573,7 +573,7 @@ interface RealtimeApi {
         @path docType: string,
         @path docId: string,
         @path lockId: string,
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 获取当前锁定
@@ -589,7 +589,7 @@ interface RealtimeApi {
     getCellLocks(
         @path docType: string,
         @path docId: string,
-    ): NexusBook.Common.ApiResponse<CellLock[]>;
+    ): NexusBook.Api.Common.ApiResponse<CellLock[]>;
 
     /**
      * 获取 Yjs 文档快照
@@ -606,7 +606,7 @@ interface RealtimeApi {
         @path docType: string,
         @path docId: string,
         @query version?: int64,
-    ): NexusBook.Common.ApiResponse<YjsSnapshot>;
+    ): NexusBook.Api.Common.ApiResponse<YjsSnapshot>;
 
     /**
      * 保存 Yjs 文档快照
@@ -635,7 +635,7 @@ interface RealtimeApi {
              */
             docUpdate: string;
         },
-    ): NexusBook.Common.ApiResponse<YjsSnapshot>;
+    ): NexusBook.Api.Common.ApiResponse<YjsSnapshot>;
 
     /**
      * 获取快照历史
@@ -653,7 +653,7 @@ interface RealtimeApi {
         @path docId: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<YjsSnapshot>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<YjsSnapshot>>;
 
     /**
      * 应用 Yjs 更新
@@ -685,7 +685,7 @@ interface RealtimeApi {
              */
             clientVersion?: int64;
         },
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 是否成功
          * Success
@@ -729,7 +729,7 @@ interface RealtimeApi {
              */
             awareness: unknown;
         },
-    ): NexusBook.Common.ApiResponse<unknown>;
+    ): NexusBook.Api.Common.ApiResponse<unknown>;
 
     /**
      * 获取实时事件历史
@@ -751,7 +751,7 @@ interface RealtimeApi {
         @query endTime?: string,
         @query page?: int32,
         @query pageSize?: int32,
-    ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<RealtimeEvent>>;
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<RealtimeEvent>>;
 
     /**
      * 断开所有会话
@@ -774,7 +774,7 @@ interface RealtimeApi {
              */
             reason?: string;
         },
-    ): NexusBook.Common.ApiResponse<{
+    ): NexusBook.Api.Common.ApiResponse<{
         /**
          * 断开的会话数
          * Disconnected count
@@ -792,7 +792,7 @@ interface RealtimeApi {
     @route("/messages/schema")
     @get
     @summary("获取 WebSocket 消息格式")
-    getMessageSchema(): NexusBook.Common.ApiResponse<{
+    getMessageSchema(): NexusBook.Api.Common.ApiResponse<{
         /** 客户端 → 服务端 消息帧 */
         clientMessage: RealtimeClientMessage,
         /** 服务端 → 客户端 消息帧 */
