@@ -162,6 +162,26 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=
 
 ## 批量更新（灵活 target/value）
 
+```mermaid
+flowchart LR
+  A["客户端 BulkUpdate[]"] --> B["服务端解析 metadata"]
+  B --> C{target 路由}
+  C --> C1["row + field"]
+  C --> C2["rows + field"]
+  C --> C3["property"]
+  C --> C4["properties"]
+  C1 --> D1["更新 Data 单元格"]
+  C2 --> D2["批量更新多行字段"]
+  C3 --> D3["更新 Properties 单值"]
+  C4 --> D4["更新 Properties 对象"]
+  D1 --> E["写入 Request"]
+  D2 --> E
+  D3 --> E
+  D4 --> E
+  E --> F["审批合并"]
+```
+
+
 - 统一接口：`POST /api/v1/doc/{docType}/{docId}/data/bulk?requestId=req-1`
 - 模型：`BulkUpdate[]`，其中 `target: {}` 为灵活结构，`value: unknown`
 

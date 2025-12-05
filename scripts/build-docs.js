@@ -320,6 +320,11 @@ async function convertMarkdownToHtml(mdPath, outputPath, title, activeNav) {
         new RegExp(`<p><MERMAID_BLOCK_${index}></MERMAID_BLOCK_${index}></p>`, 'g'),
         `<div class="mermaid">${code}</div>`
       );
+      // 兼容被 HTML 转义的占位符（marked 会将未知标签转义）
+      htmlContent = htmlContent.replace(
+        new RegExp(`&lt;MERMAID_BLOCK_${index}&gt;&lt;/MERMAID_BLOCK_${index}&gt;`, 'g'),
+        `<div class="mermaid">${code}</div>`
+      );
     });
     
     const fullHtml = generatePageTemplate(title, htmlContent, activeNav);

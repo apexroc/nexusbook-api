@@ -34,6 +34,43 @@ NexusBook 的**文档模型**是一个灵活、高度可扩展的抽象框架，
 
 ## 核心层次结构
 
+```mermaid
+flowchart TD
+  D["Document"] --> P["Properties"]
+  D --> M["Metadata"]
+  D --> V["Views"]
+  D --> DA["Data"]
+  D --> C["Comments"]
+  D --> R["Revisions"]
+  D --> S["Settings"]
+  M --> DA
+  V --> DA
+  C --> D
+  R --> D
+```
+
+## 设计原则与一致性规范
+- 清晰分层：Properties/Metadata/Data/Views/Comments/Revisions/Settings。
+- 一致性原则：Metadata 定义字段，Data 必须遵守；Properties 与 Data 分离，避免交叉污染。
+- 不可变记录：Revision 为只读历史，不可变更；通过 Revert 创建新的变更而非修改历史。
+- 审批先行：所有写入通过 Request，审批通过后生成 Revision 并落库。
+- 可审计性：每次写入都有 Request → Revision 链路，附带 contributors、timestamp。
+- 可扩展性：Attachment 与 Relation 为一等公民，可在 Properties 或 Data 中使用。
+
+## 对象关系总览
+- Document 持有 Properties/Metadata/Views/Data/Comments/Revisions/Settings。
+- Metadata 与 Data 存在强约束：Data 的 `values[].fieldId` 必须存在于 Metadata。
+- Views 不持有数据，只保存 `config`（列、过滤、排序、分组），用于投影 Data。
+- Comments 支持定位到 document/field/row/cell 四级。
+- Revisions 记录 ChangeOperation 序列，指向源 Request。
+
+## 生命周期与变更流
+1. Draft：初始化 Properties、Metadata、Views。
+2. Edit：用户在 Request 上协作修改 Data/Properties。
+3. Review：审批流程进行，可能通过/拒绝/回滚。
+4. Merge：合并生成 Revision，冻结操作历史。
+5. Audit：通过 Revisions/Operations/Diff 进行审计或回溯。
+
 ### 1. Properties（文档属性）- 元信息层
 
 存储**文档本身的属性信息**，不同于数据行的内容。
@@ -547,6 +584,113 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/revi
 }
 ```
 
+## 跨文档关联（Relation）与附件（Attachments）
+
+### 设计目标
+- 解耦数据实体，通过“边”连接不同文档或行，形成可导航的业务图谱
+- 提供双向关联，支持快速查询入边与出边，提高跨文档操作的可用性
+- 保持引用完整性（Referential Integrity），在删除/合并/克隆等操作中提供明确的级联策略
+- 权限可控：跨文档关联遵循源/目标文档的访问控制，不越权
+
+### 模型定义（逻辑模型）
+```typescript
+// 逻辑模型（说明性），实际以 OpenAPI/TypeSpec 为准
+model RelationEdge {
+  id: string;
+  type: string;           // 关系类型：depends_on | references | contains | blocks | linked_to ...
+  direction: "uni" | "bi"; // 单向或双向（bi 表示对称关系）
+
+  source: {
+    docType: string;
+    docId: string;
+    rowId?: string;       // 可选：指向具体行（cell 级不直接建边，建议通过行 + field 标识）
+  };
+
+  target: {
+    docType: string;
+    docId: string;
+    rowId?: string;
+  };
+
+  metadata?: Record<string, unknown>; // 辅助信息（权重、标签、备注等）
+  createdBy?: string;
+  createdAt?: string;
+}
+```
+
+- 边（Edge）为一等公民：不嵌入到任意一侧文档，独立存储，便于查询和治理
+- `type` 建议采用受控枚举，在业务域内约束语义；也可允许自定义前缀（如 `custom:rel`）
+
+### 关系类型与基数（Cardinality）
+- 文档 ↔ 文档：`doc` 与 `doc` 之间的关联（如发票依赖订货单）
+- 行 ↔ 行：`row` 与 `row` 之间的细粒度引用（如明细行对齐）
+- 行 ↔ 文档：`row` 指向 `doc`（如某库存行关联到产品资料文档）
+- 基数：一对一/一对多/多对多均通过 Edge 表示，不额外区分；由查询条件与业务约束控制
+
+### API 设计（建议）
+```
+GET    /doc/{docType}/{docId}/relations                # 查询出边（from 当前文档/可选按 rowId）
+GET    /doc/{docType}/{docId}/relations/inbound        # 查询入边（指向当前文档/可选按 rowId）
+POST   /relations                                      # 创建关系（请求体包含 source/target/type/metadata）
+PUT    /relations/{relId}                              # 更新关系（仅 metadata/type）
+DELETE /relations/{relId}                              # 删除关系
+POST   /relations/query                                # 复杂查询（按类型、范围、方向、文档集合、分页）
+```
+
+- 创建/更新/删除均走 `requestId` 工作流；审批通过后关系生效并入修订（Revision）
+- 查询默认分页，支持按照 `type/direction/docType/docId/rowId` 过滤
+
+### 一致性与级联策略
+- 删除策略（建议默认：限制删除）
+  - 删除目标文档/行时，如存在关系边，返回 `RELATION_CONFLICT`，引导用户先解除关系或改为软删
+  - 可配置某些 `type` 支持“级联删除”，但需谨慎使用并在审计中记录
+- 合并与克隆
+  - 合并文档：保留指向合并后实体的边，旧实体边迁移；在修订中记录自动迁移操作
+  - 克隆行/文档：默认不复制边；可选开启“边复制”策略（复制为新边并指向克隆目标）
+- 事务与审计
+  - 关系变更与数据变更同属请求内事务，审批通过后统一生成 Revision 的 `ChangeOperation` 记录
+
+### 权限与安全
+- 读取边：需要对 `source` 与 `target` 至少具备读取权限（建议以更严格者为准）
+- 写入边：需要对 `source` 具备写权限，并满足组织/空间策略（如跨租户禁止）
+- 跨文档边的暴露遵循最小权限原则，必要时对目标端进行脱敏（仅暴露 ID 与类型）
+
+### 索引与性能建议
+- 复合索引：`source(docType, docId, rowId) + type`、`target(docType, docId, rowId) + type`
+- 大量边的分页：游标分页优先；避免一次拉取全部入/出边
+- 批量查询：支持 `POST /relations/query` 以文档集合为输入，返回聚合计数与示例边
+
+### 使用示例
+```bash
+# 创建行到行的引用关系（在 Request req-1 中）
+curl -X POST 'https://open.nexusbook.com/api/v1/relations?requestId=req-1' \
+  -H 'Authorization: Bearer TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "type": "references",
+    "direction": "uni",
+    "source": {"docType": "invoice", "docId": "inv-123", "rowId": "row-1"},
+    "target": {"docType": "purchaseOrder", "docId": "po-456", "rowId": "row-99"},
+    "metadata": {"note": "发票行引用订货单行"}
+  }'
+
+# 查询文档的所有出边（按类型过滤）
+curl 'https://open.nexusbook.com/api/v1/doc/inventory/inv-001/relations?type=contains' \
+  -H 'Authorization: Bearer TOKEN'
+
+# 查询指向当前文档的入边（按行过滤）
+curl 'https://open.nexusbook.com/api/v1/doc/product/prod-001/relations/inbound?rowId=row-42' \
+  -H 'Authorization: Bearer TOKEN'
+```
+
+### 关系示意图
+```mermaid
+flowchart LR
+  DocA["Product(doc-123)"] -- depends_on --> DocB["Supplier(doc-456)"]
+  RowA["Row(row-1)"] -- references --> RowB["Row(row-99)"]
+  DocA -- contains --> RowA
+```
+
 ## 聚合查询（DocBundle）
 
 ### 概念
@@ -628,6 +772,18 @@ curl 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=prop
 
 ### 完整的订货工作流
 
+```mermaid
+flowchart LR
+  A["创建文档"] --> B["初始化 Properties/Metadata/Views"]
+  B --> C["添加/更新 Data"]
+  C --> D["协作与评论"]
+  D --> E["创建 Request(协同编辑)"]
+  E --> F["审批"]
+  F --> G["合并生成 Revision"]
+  G --> H["回溯与对比"]
+```
+
+
 ```
 1. 创建文档
    ├─ 初始化 Properties（订单时间、门店等）
@@ -663,6 +819,13 @@ curl 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=prop
    ├─ 查看谁改了什么
    └─ 必要时回滚到之前版本
 ```
+
+## 权限模型与审批工作流
+- 权限域（Scopes）：`doc:read/doc:write/data:read/data:write/views:manage/comments:write/approvals:manage/requests:manage`。
+- 角色示例：Reader/Editor/Approver/Admin，不同角色映射不同 Scopes。
+- 审批策略：串签/并签/条件签；通过 `approval_*` 事件与 Webhook 通知外部系统。
+- Request 与 Revision：每个 Request 合并后生成一个 Revision，拒绝则保留为草稿或关闭；Diff 对比基于 ChangeOperation。
+- 并发控制：行级 version 乐观锁；锁定机制用于细粒度协作（结合实时协同）。
 
 ## 使用场景详解
 
@@ -763,6 +926,13 @@ curl 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=prop
   ]
 }
 ```
+
+## 命名与ID规范
+- 文档 ID：`doc-{type}-{ulid}`，例如 `doc-product-01H...`。
+- 行 ID：`row-{ulid}`；字段 ID 使用 `snake_case` 或 `camelCase`，与 Metadata 保持一致。
+- 视图 ID：`view-{ulid}`；评论 ID：`comment-{ulid}`；修订 ID：`rev-{ulid}`；请求 ID：`req-{ulid}`。
+- 附件 ID：`att-{ulid}`；关系 ID：`rel-{ulid}`。
+- 建议使用 ULID/UUID，避免语义化 ID 泄露业务信息。
 
 ## 最佳实践
 

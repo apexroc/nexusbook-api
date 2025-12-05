@@ -4,6 +4,20 @@
 
 ## 1. 总览
 
+```mermaid
+flowchart LR
+  Client["客户端"] -->|GET connect| Connect["连接信息"]
+  Connect -->|wsUrl| WS["WebSocket"]
+  Connect -->|sseUrl| SSE["SSE 只读流"]
+  WS --> Auth["auth"]
+  Auth --> Sub["subscribe_doc"]
+  Sub --> Yjs["yjs_update"]
+  Sub --> Aware["awareness_update"]
+  Client --> Lock["lock_request/lock_release"]
+  WS --> Err["error"]
+```
+
+
 - **传输协议**：WebSocket（推荐）；HTTP 备用端点用于断线或低配环境
 - **CRDT 引擎**：Yjs（Y.Doc/Y.Map/Y.Array）
 - **状态共享**：Awareness（光标、选区、用户颜色等）
@@ -125,6 +139,14 @@
 - 查询锁定：`GET /realtime/doc/{docType}/{docId}/locks`
 
 ## 8. 断线重连与后备策略
+
+```mermaid
+flowchart LR
+  Ping["ping/pong 心跳"] -->|断线| Retry["指数退避重连"]
+  Retry -->|失败| Fallback["HTTP 后备 (apply-update / awareness)"]
+  Retry -->|成功| Resume["拉取快照对齐状态向量"]
+```
+
 
 - 心跳：`ping/pong`，间隔建议 15s
 - 断线重连：指数退避（1s/2s/4s…，最大 30s），最多 10 次

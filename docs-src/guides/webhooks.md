@@ -2,6 +2,17 @@
 
 ## 概述
 
+```mermaid
+flowchart LR
+  Event["文档事件"] --> Delivery["Webhook 投递"]
+  Delivery --> Receiver["接收端"]
+  Receiver --> Verify["签名验证"]
+  Verify --> Queue["入队/幂等校验"]
+  Queue --> Process["业务处理"]
+  Process --> Resp["快速响应 200"]
+```
+
+
 Webhook 提供事件驱动的通知机制，当文档发生特定变更时，系统会自动向您配置的 URL 发送 HTTP POST 请求。
 
 ## 支持的事件类型
