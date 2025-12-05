@@ -82,41 +82,6 @@ def get_access_token():
     return response.json()['access_token']
 ```
 
-**Go**:
-```go
-package main
-
-import (
-    "encoding/json"
-    "net/http"
-    "net/url"
-    "strings"
-)
-
-func getAccessToken() (string, error) {
-    data := url.Values{}
-    data.Set("grant_type", "client_credentials")
-    data.Set("client_id", "your_client_id")
-    data.Set("client_secret", "your_client_secret")
-    data.Set("scope", "doc:read data:read data:write")
-    
-    resp, err := http.Post(
-        "https://auth.nexusbook.com/token",
-        "application/x-www-form-urlencoded",
-        strings.NewReader(data.Encode()),
-    )
-    if err != nil {
-        return "", err
-    }
-    defer resp.Body.Close()
-    
-    var result map[string]interface{}
-    json.NewDecoder(resp.Body).Decode(&result)
-    
-    return result["access_token"].(string), nil
-}
-```
-
 ### 授权码流程（Authorization Code Flow）
 
 **适用场景**：Web 应用、移动应用（需要用户授权）

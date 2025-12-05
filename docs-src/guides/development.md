@@ -9,13 +9,10 @@
 | **TypeSpec** | 1.6.0 | API 定义语言 |
 | **OpenAPI** | 3.0 | API 规范标准 |
 | **Redocly** | 2.12.0 | API 文档生成 |
-| **oapi-codegen** | latest | Go 代码生成 |
-| **Go** | 1.21+ | 后端实现 |
 
 ## 前置要求
 
 - Node.js 16+
-- Go 1.21+ (可选，用于生成 Go 代码)
 - Make
 
 ## 快速开始
@@ -54,7 +51,7 @@ make serve
 | `dist/redoc/index.html` | Redoc 静态文档 |
 | `docs/` | 完整文档站点（生成） |
 | `docs-src/` | 文档源文件（Markdown） |
-| `server/apigen/apigen.gen.go` | Go 服务端代码 |
+| `dist/openapi/openapi.yaml` | 合并后的 OpenAPI 入口文件 |
 
 ## 项目命令
 
@@ -69,10 +66,6 @@ make serve-docs    # 预览 Redoc 文档（端口 8091）
 make docs          # 构建完整文档站点
 make serve         # 启动文档服务器（端口 8091）
 make clean-docs    # 清理生成的文档
-
-# Go 相关
-make generate-go   # 生成 Go 代码
-make serve-go      # 启动 Go 服务器
 
 # 清理
 make clean         # 清理生成的文件
@@ -170,38 +163,6 @@ const guides = [
   // ... 现有文档
   { file: 'my-new-guide', title: '新指南标题' }
 ];
-```
-
-## 代码生成
-
-### 生成 Go 服务端代码
-
-```bash
-make generate-go
-```
-
-生成的代码位于 `server/apigen/apigen.gen.go`，包含：
-- 所有数据模型的 Go 结构体
-- Gin 路由处理器接口
-- 请求/响应绑定
-
-### 实现服务端
-
-```go
-// server/apigen/impl.go
-package apigen
-
-import "github.com/gin-gonic/gin"
-
-type ServerImpl struct{}
-
-func (s *ServerImpl) GetMetadata(c *gin.Context, docType string, docId string) {
-  // 实现逻辑
-  c.JSON(200, ApiResponse{
-    Success: true,
-    Payload: metadata,
-  })
-}
 ```
 
 ## 文档注释规范
@@ -308,9 +269,27 @@ enum ErrorCode {
 
 修改 `api/shared/common.tsp` 中的 `ApiResponse` 模型，但建议保持向后兼容。
 
-### Q: 生成的 Go 代码如何使用？
+### Q: 如何使用生成的 OpenAPI 规范？
 
-参考 `server/apigen/impl.go` 和 `cmd/server/main.go` 中的示例实现。
+生成的 OpenAPI 文件 (`dist/openapi/openapi.yaml`) 可以：
+
+1. **用于任意后端语言的代码生成**
+   - Python: `openapi-generator`
+   - Java/Kotlin: `openapi-generator`
+   - TypeScript/JavaScript: `openapi-typescript-codegen`
+   - 其他语言：查看 [OpenAPI Generator](https://openapi-generator.tech/)
+
+2. **导入到 API 测试工具**
+   - Postman
+   - Insomnia
+   - Swagger UI
+
+3. **生成客户端 SDK**
+
+例如使用 Python：
+```bash
+openapi-generator-cli generate -i dist/openapi/openapi.yaml -g python -o client-python
+```
 
 ### Q: 如何调试 TypeSpec 编译错误？
 

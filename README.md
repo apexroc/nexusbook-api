@@ -32,7 +32,6 @@ NexusBook API 是一个功能完整的文档管理和数据协作平台，提供
 ### 前置要求
 
 - Node.js 16+
-- Go 1.21+ (可选，用于生成 Go 代码)
 - Make
 
 ### 安装与使用
@@ -149,10 +148,6 @@ make deps          # 安装依赖
 make openapi       # 生成 OpenAPI 规范
 make docs          # 构建完整文档站点
 make serve         # 启动文档服务器
-
-# Go 相关
-make generate-go   # 生成 Go 代码
-make serve-go      # 启动 Go 服务器
 
 # 清理
 make clean         # 清理生成的文件

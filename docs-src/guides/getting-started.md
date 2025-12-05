@@ -8,7 +8,7 @@
 
 - **Node.js**: 16+ 版本
 - **Make**: 构建工具
-- **Go**: 1.21+ 版本（可选，仅用于生成 Go 服务端代码）
+- **Node.js**: 16+ 版本
 - **Python 3**: 用于本地文档服务器（macOS 和大多数 Linux 发行版已预装）
 
 ### 检查环境
@@ -36,7 +36,8 @@ make deps
 这个命令会自动：
 - 安装 TypeSpec 编译器
 - 安装 Redocly CLI（用于生成 API 文档）
-- 安装 oapi-codegen（用于生成 Go 代码）
+- 安装 TypeSpec CLI
+- 安装 Redocly（可选，用于本地预览 API 文档）
 
 ## 生成 OpenAPI 文档
 
