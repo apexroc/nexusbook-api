@@ -13,10 +13,39 @@ using OpenAPI;
  *
  * 主要功能：
  * - **行管理** - 创建、读取、更新、删除数据行
- * - **批量操作** - 批量创建/更新/删除多行数据
+ * - **批量更新** - 批量更新指定行、指定字段的值
  * - **查询** - 支持简单分页和复杂结构化查询
  * - **版本控制** - 通过版本号实现乐观锁并发控制
- * - **变更请求** - 默认生成合并请求，支持直接应用
+ * - **变更请求工作流** - 所有修改先进入 Request，通过审批后生效
+ *
+ * ## 变更工作流
+ *
+ * 所有数据修改操作（创建、更新、删除）都会：
+ * 1. 创建或追加到一个变更请求（Request）
+ * 2. 多人可以协同编辑同一个 Request
+ * 3. 通过审批流程后，Request 合并才真正生效
+ * 4. 生效后创建修订记录（Revision）
+ *
+ * ## 批量更新设计
+ *
+ * 批量更新采用简化的数据提交方式：
+ * - 客户端只需提供目标（行ID + 字段ID）和原始值
+ * - 服务端根据 metadata 自动解析值的类型
+ * - 无需客户端了解字段类型细节
+ *
+ * 示例：
+ * ```json
+ * [
+ *   {"target": "row-1.price", "value": 99.99},
+ *   {"target": "row-2.name", "value": "iPhone 15"},
+ *   {"target": "row-3.date", "value": "2024-12-05"}
+ * ]
+ * ```
+ *
+ * 服务端会根据字段定义自动转换：
+ * - price（currency 类型）→ {"currency": 99.99}
+ * - name（text 类型）→ {"text": "iPhone 15"}
+ * - date（date 类型）→ {"date": "2024-12-05"}
  *
  * ## 数据行结构
  *
@@ -38,6 +67,127 @@ using OpenAPI;
  * 更新行时需要提供当前版本号，系统使用乐观锁防止并发冲突。
  */
 namespace NexusBook.Api;
+
+/**
+ * 批量更新项
+ * Bulk update entry
+ *
+ * 灵活的更新结构，支持多种更新场景。
+ * Flexible update structure supporting multiple update scenarios.
+ *
+ * ## Target 结构说明
+ *
+ * target 是一个灵活的结构，可以指定：
+ * - 行ID：`{row: "row-1"}`
+ * - 行ID + 字段ID：`{row: "row-1", field: "price"}`
+ * - 属性字段：`{property: "amount"}`
+ * - 多个目标：`{rows: ["row-1", "row-2"], field: "status"}`
+ *
+ * ## Value 说明
+ *
+ * value 可以是：
+ * - 单个原始值：`99.99`、`"iPhone 15"`、`true`
+ * - 对象（多个字段）：`{price: 99.99, name: "iPhone 15"}`
+ * - 数组（批量值）：`[99.99, 88.88, 77.77]`
+ *
+ * ## 使用示例
+ *
+ * ### 1. 修改单个字段
+ * ```json
+ * {
+ *   "target": {"row": "row-1", "field": "price"},
+ *   "value": 99.99
+ * }
+ * ```
+ *
+ * ### 2. 修改整行（多个字段）
+ * ```json
+ * {
+ *   "target": {"row": "row-1"},
+ *   "value": {
+ *     "price": 99.99,
+ *     "name": "iPhone 15",
+ *     "stock": 50
+ *   }
+ * }
+ * ```
+ *
+ * ### 3. 修改多行的同一字段
+ * ```json
+ * {
+ *   "target": {"rows": ["row-1", "row-2", "row-3"], "field": "status"},
+ *   "value": "active"
+ * }
+ * ```
+ *
+ * ### 4. 修改多行的同一字段（不同值）
+ * ```json
+ * {
+ *   "target": {"rows": ["row-1", "row-2", "row-3"], "field": "price"},
+ *   "value": [99.99, 88.88, 77.77]
+ * }
+ * ```
+ *
+ * ### 5. 修改文档属性
+ * ```json
+ * {
+ *   "target": {"property": "amount"},
+ *   "value": 5000.00
+ * }
+ * ```
+ *
+ * ### 6. 修改多个文档属性
+ * ```json
+ * {
+ *   "target": {"properties": true},
+ *   "value": {
+ *     "amount": 5000.00,
+ *     "quantity": 100,
+ *     "date": "2024-12-05"
+ *   }
+ * }
+ * ```
+ */
+model BulkUpdate {
+    /**
+     * 目标（灵活结构）
+     * Target (flexible structure)
+     *
+     * 支持多种目标指定方式：
+     * - {row: "row-1"} - 单行
+     * - {row: "row-1", field: "price"} - 单行单字段
+     * - {rows: ["row-1", "row-2"], field: "status"} - 多行同一字段
+     * - {property: "amount"} - 单个属性
+     * - {properties: true} - 多个属性
+     *
+     * Supports multiple target specification methods:
+     * - {row: "row-1"} - Single row
+     * - {row: "row-1", field: "price"} - Single row single field
+     * - {rows: ["row-1", "row-2"], field: "status"} - Multiple rows same field
+     * - {property: "amount"} - Single property
+     * - {properties: true} - Multiple properties
+     */
+    target: {};
+
+    /**
+     * 值（原始格式，可以是单值、对象或数组）
+     * Value (raw format, can be single value, object or array)
+     *
+     * 根据 target 的不同，value 可以是：
+     * - 单个原始值：99.99, "text", true
+     * - 对象（多个字段）：{price: 99.99, name: "iPhone"}
+     * - 数组（多行不同值）：[99.99, 88.88, 77.77]
+     *
+     * Depending on target, value can be:
+     * - Single raw value: 99.99, "text", true
+     * - Object (multiple fields): {price: 99.99, name: "iPhone"}
+     * - Array (different values for multiple rows): [99.99, 88.88, 77.77]
+     *
+     * 服务端根据 metadata 自动解析值的类型。
+     * Server auto-parses value type based on metadata.
+     */
+    value: unknown;
+}
 
 /**
  * 数据行（包含字段值与审计信息）
@@ -210,13 +360,27 @@ interface DataApi {
     ): NexusBook.Common.ApiResponse<NexusBook.Common.Page<Row>>;
 
     /**
-     * 默认生成合并请求，可用 `apply=true` 直接应用。
+     * 创建数据行（进入变更请求）
      *
-     * Generates a merge-request by default, use `apply=true` to apply directly.
+     * Create data row (goes into change request)
+     *
+     * 创建的数据行会添加到指定的变更请求中，不会立即生效。
+     * Created row will be added to the specified change request, not applied immediately.
+     *
+     * - 如果指定 `requestId`，追加到该请求
+     * - 如果不指定，创建新的请求或追加到默认请求
+     * - 多人可以编辑同一个请求
+     * - 请求合并后才真正生效
+     *
+     * Request workflow:
+     * - If `requestId` specified, append to that request
+     * - If not specified, create new request or append to default request
+     * - Multiple users can edit the same request
+     * - Changes apply only after request is merged
      *
      * 示例（cURL）:
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true' \\
+     * curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \\
      *   -H 'Authorization: Bearer TOKEN' \\
      *   -H 'Content-Type: application/json' \\
      *   -d '{"id":"row-1","values":[{"fieldId":"name","value":{"text":"新产品"}}]}'
@@ -228,22 +392,101 @@ interface DataApi {
         @path docType: string,
         @path docId: string,
         @body body: Row,
-        @query apply?: boolean,
+        @query requestId?: string,
     ): NexusBook.Common.ApiResponse<Request>;
 
     /**
-     * 批量创建/更新/删除，默认生成合并请求，可用 `apply=true` 直接应用。
+     * 批量更新数据和属性（进入变更请求）
      *
-     * Bulk create/update/delete, MR by default, use `apply=true` to apply directly.
+     * Bulk update data and properties (goes into change request)
+     *
+     * 灵活的批量更新接口，支持：
+     * - 修改单个/多个字段
+     * - 修改单行/多行
+     * - 修改单个/多个属性
+     * - 值始终保持简单（原始格式）
+     *
+     * Flexible bulk update interface supporting:
+     * - Update single/multiple fields
+     * - Update single/multiple rows
+     * - Update single/multiple properties
+     * - Values always stay simple (raw format)
+     *
+     * 示例（cURL）：
+     * ```bash
+     * # 1. 修改单个字段
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {"target": {"row": "row-1", "field": "price"}, "value": 99.99}
+     * ]'
+     *
+     * # 2. 修改整行
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {
+     *     "target": {"row": "row-1"},
+     *     "value": {"price": 99.99, "name": "iPhone 15", "stock": 50}
+     *   }
+     * ]'
+     *
+     * # 3. 修改多行的同一字段
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {
+     *     "target": {"rows": ["row-1", "row-2", "row-3"], "field": "status"},
+     *     "value": "active"
+     *   }
+     * ]'
+     *
+     * # 4. 修改多行的同一字段（不同值）
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {
+     *     "target": {"rows": ["row-1", "row-2", "row-3"], "field": "price"},
+     *     "value": [99.99, 88.88, 77.77]
+     *   }
+     * ]'
+     *
+     * # 5. 修改单个属性
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {"target": {"property": "amount"}, "value": 5000.00}
+     * ]'
+     *
+     * # 6. 修改多个属性
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {
+     *     "target": {"properties": true},
+     *     "value": {"amount": 5000.00, "quantity": 100, "date": "2024-12-05"}
+     *   }
+     * ]'
+     *
+     * # 7. 混合更新（数据 + 属性）
+     * curl -X POST '.../data/bulk?requestId=req-1' -d '[
+     *   {"target": {"row": "row-1", "field": "price"}, "value": 99.99},
+     *   {"target": {"property": "amount"}, "value": 5000.00}
+     * ]'
+     * ```
+     *
+     * 服务端处理逻辑：
+     * 1. 根据 docId 获取 metadata
+     * 2. 对每个 target，解析目标类型（行/属性）
+     * 3. 查找字段定义获取类型
+     * 4. 将原始值转换为类型化值
+     * 5. 验证值的有效性
+     * 6. 添加到指定的 Request
+     *
+     * Server processing:
+     * 1. Get metadata by docId
+     * 2. For each target, parse target type (row/property)
+     * 3. Lookup field definition to get type
+     * 4. Convert raw value to typed value
+     * 5. Validate value
+     * 6. Add to specified Request
      */
     @route("/bulk")
     @post
-    @summary("批量操作数据")
-    bulkRows(
+    @summary("批量更新")
+    bulkUpdate(
         @path docType: string,
         @path docId: string,
-        @body body: Row[],
-        @query apply?: boolean,
+        @body body: BulkUpdate[],
+        @query requestId?: string,
     ): NexusBook.Common.ApiResponse<Request>;
 
     /**
@@ -261,9 +504,12 @@ interface DataApi {
     ): NexusBook.Common.ApiResponse<Row>;
 
     /**
-     * 默认生成合并请求，可用 `apply=true` 直接应用。
+     * 更新数据行（进入变更请求）
      *
-     * Generates a merge-request by default, use `apply=true` to apply directly.
+     * Update data row (goes into change request)
+     *
+     * 更新的数据行会添加到指定的变更请求中，不会立即生效。
+     * Updated row will be added to the specified change request, not applied immediately.
      */
     @route("/{rowId}")
     @put
@@ -273,13 +519,16 @@ interface DataApi {
         @path docId: string,
         @path rowId: string,
         @body body: Row,
-        @query apply?: boolean,
+        @query requestId?: string,
     ): NexusBook.Common.ApiResponse<Request>;
 
     /**
-     * 默认生成合并请求，可用 `apply=true` 直接应用。
+     * 删除数据行（进入变更请求）
      *
-     * Generates a merge-request by default, use `apply=true` to apply directly.
+     * Delete data row (goes into change request)
+     *
+     * 删除操作会添加到指定的变更请求中，不会立即生效。
+     * Delete operation will be added to the specified change request, not applied immediately.
      */
     @route("/{rowId}")
     @delete
@@ -288,6 +537,6 @@ interface DataApi {
         @path docType: string,
         @path docId: string,
         @path rowId: string,
-        @query apply?: boolean,
+        @query requestId?: string,
     ): NexusBook.Common.ApiResponse<Request>;
 }

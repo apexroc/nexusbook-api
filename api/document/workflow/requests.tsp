@@ -15,7 +15,7 @@ using OpenAPI;
  * - **工作流管理** - open/merged/closed 三态流转
  * - **评审机制** - 指定评审人和权限控制
  * - **冲突检测** - 检测合并冲突
- * - **直接应用** - 支持 apply=true 直接应用变更
+ * - **协同编辑** - 多人可以编辑同一个 Request
  *
  * ## 工作流状态
  *
@@ -28,8 +28,57 @@ using OpenAPI;
  * - 审批工作流 - 需要审批的重要变更
  * - 草稿保存 - 未生效变更的保存
  * - 批量操作 - 一次性提交多行变更
+ * - 协同编辑 - 多人同时编辑一个请求
  */
 namespace NexusBook.Api;
+
+/**
+ * 变更项
+ * Change entry
+ */
+model Change {
+    /**
+     * 变更ID
+     * Change id
+     */
+    id: string;
+
+    /**
+     * 变更类型
+     * Change type: data, properties, view, metadata, other
+     */
+    type: string;
+
+    /**
+     * 操作类型
+     * Operation type
+     */
+    operation: "create" | "update" | "delete";
+
+    /**
+     * 目标ID
+     * Target id (row id, property id, etc.)
+     */
+    targetId?: string;
+
+    /**
+     * 变更数据
+     * Change data
+     */
+    data?: unknown;
+
+    /**
+     * 变更时间
+     * Changed at
+     */
+    changedAt: string;
+
+    /**
+     * 变更人
+     * Changed by
+     */
+    changedBy: string;
+}
 
 model Request {
     /**
@@ -99,10 +148,10 @@ model Request {
      * 变更集
      * Changes
      *
-     * 包含待合并的变更。
-     * Contains changes to be merged.
+     * 包含待合并的变更。支持数据行、属性、视图等多种类型的变更。
+     * Contains changes to be merged. Supports data rows, properties, views, and other types.
      */
-    changes?: unknown[];
+    changes?: Change[];
 
     /**
      * 生成的修订ID

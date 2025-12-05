@@ -147,11 +147,37 @@ model RollupConfig {
  * 文档元数据集合
  * Document metadata collection
  *
- * 字段集合与元设置。
- * Field collection and meta settings.
+ * 包含数据行字段定义和文档属性定义。
+ * Contains data row field definitions and document property definitions.
+ *
+ * - **fields** - 数据行的字段定义（表格列）
+ * - **properties** - 文档级别的属性定义（文档元信息字段）
+ *
+ * Field collection and property definitions:
+ * - **fields** - Field definitions for data rows (table columns)
+ * - **properties** - Property field definitions for document-level metadata
  */
 model Metadata {
+    /**
+     * 数据行字段定义
+     * Data row field definitions
+     *
+     * 定义数据行（表格行）的字段结构。
+     * Defines the field structure for data rows (table rows).
+     */
     fields: Field[];
+
+    /**
+     * 文档属性字段定义
+     * Document property field definitions
+     *
+     * 定义文档级别属性的字段结构（如订单时间、总金额等）。
+     * Defines the field structure for document-level properties (e.g., order time, total amount).
+     *
+     * 这些字段定义用于 `DocumentProperties.properties` 中的值。
+     * These field definitions are used for values in `DocumentProperties.properties`.
+     */
+    properties?: Field[];
 }
 
 @route("/doc/{docType}/{docId}/metadata")
