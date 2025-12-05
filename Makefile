@@ -11,6 +11,8 @@ deps:
 
 openapi: deps
 	$(TSP) compile api/main.tsp --emit @typespec/openapi3 --output-dir dist/openapi
+	@echo "Adding x-tagGroups to OpenAPI..."
+	@node scripts/add-tag-groups.js
 
 build-docs: openapi
 	mkdir -p dist/redoc
@@ -21,6 +23,7 @@ build-docs: openapi
 		npx redocly build-docs $$FILES --output dist/redoc/index.html; \
 	else \
 		npx redocly join $$FILES -o dist/openapi/openapi.yaml && \
+		node scripts/add-tag-groups.js dist/openapi/openapi.yaml && \
 		npx redocly build-docs dist/openapi/openapi.yaml --output dist/redoc/index.html; \
 	fi
 

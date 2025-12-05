@@ -5,6 +5,7 @@
     "@typespec/http": "^1.6.0",
     "@typespec/openapi3": "^1.6.0",
     "fs-extra": "^11.2.0",
+    "js-yaml": "^4.1.0",
     "marked": "^11.1.1"
   }
 }
