@@ -59,7 +59,7 @@ graph TB
     Requests -->|合并生成| Revisions
     Requests -->|可选| Approvals
     Data -->|默认生成| Requests
-    Data -->|apply=true| Revisions
+    %% Removed apply=true edge
     
     OAuth --> Token
     Token --> Scope

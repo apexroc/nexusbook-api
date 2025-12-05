@@ -208,33 +208,21 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
   }'
 ```
 
-### 示例 4：批量操作
+### 示例 4：批量操作（统一 BulkUpdate）
 
-批量创建多个数据行：
+使用统一的 BulkUpdate 接口进行混合更新（数据与属性），所有写操作必须携带 `requestId`：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=true' \
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
-  -d '{
-    "rows": [
-      {
-        "id": "row-batch-001",
-        "values": [
-          {"fieldId": "name", "value": {"text": "产品A"}},
-          {"fieldId": "price", "value": {"number": 49.99}}
-        ]
-      },
-      {
-        "id": "row-batch-002",
-        "values": [
-          {"fieldId": "name", "value": {"text": "产品B"}},
-          {"fieldId": "price", "value": {"number": 59.99}}
-        ]
-      }
-    ]
-  }'
+  -d '[
+    {"target": {"row": "row-1", "field": "price"}, "value": 99.99},
+    {"target": {"property": "amount"}, "value": 5000.00}
+  ]'
 ```
+
+更多说明见下文“批量更新（灵活 target/value）”。
 
 ## 批量更新（灵活 target/value）
 

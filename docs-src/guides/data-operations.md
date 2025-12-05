@@ -53,24 +53,17 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=r
   }'
 ```
 
-**批量创建**：
+**批量创建（已废弃）**：请改用“批量更新（BulkUpdate）”接口，支持同时更新数据与属性，且统一走 `requestId` 工作流。
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=true' \
+# 推荐：BulkUpdate 统一接口
+curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
-  -d '{
-    "rows": [
-      {
-        "id": "row-001",
-        "values": [...]
-      },
-      {
-        "id": "row-002",
-        "values": [...]
-      }
-    ]
-  }'
+  -d '[
+    {"target": {"row": "row-001"}, "value": {"name": "iPhone 15", "price": 799.99, "stock": 100}},
+    {"target": {"row": "row-002"}, "value": {"name": "iPad Pro", "price": 1099.99, "stock": 50}}
+  ]'
 ```
 
 ### 读取数据行
@@ -114,7 +107,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
 **全量更新**：
 
 ```bash
-curl -X PUT 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?apply=true' \
+curl -X PUT 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -231,48 +224,12 @@ flowchart LR
 - 建议客户端明确传入 `requestId` 以便协作追踪
 
 
-`apply` 参数控制变更如何应用：
-
 ### （已废弃）apply 参数
 
-> 说明：`apply` 参数已不再支持，统一使用 `requestId` 工作流。
+> 说明：`apply` 参数已不再支持，全部写操作统一通过 `requestId` 工作流进行。请在写接口中附带 `?requestId=...` 或在请求体中包含 `{"requestId":"..."}`。
 
-
-变更立即生效，直接修改数据：
-
-```bash
-curl -X POST '.../data?apply=true' \
-  -H 'Authorization: Bearer TOKEN' \
-  -d '...'
-```
-
-**适用场景**：
-- 权限充足的直接操作
-- 不需要审批的简单变更
-- 系统自动化操作
-
-### 工作流示例
-
-```bash
-# 在 Request req-1 中创建数据
-curl -X POST '.../data?requestId=req-1' -d '{...}'
-
-# 审批通过后，变更进入主文档
-```
-
-
-创建变更请求（Request），需要审核后合并：
-
-```bash
-curl -X POST '.../data?apply=false' \
-  -H 'Authorization: Bearer TOKEN' \
-  -d '...'
-```
-
-**适用场景**：
-- 需要审批的重要变更
-- 多人协作编辑
-- 变更追踪和审计
+- 统一入口：`POST /doc/{docType}/{docId}/data/bulk?requestId=req-1`
+- 示例参见上文“批量更新（BulkUpdate）格式”和各写操作示例
 
 ## 并发控制
 

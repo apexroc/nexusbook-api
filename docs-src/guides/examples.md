@@ -90,7 +90,7 @@ const rows = [
   }
 ];
 
-await api.post('/doc/purchaseOrder/order-001/data/bulk?apply=true', {
+await api.post('/doc/purchaseOrder/order-001/data/bulk?requestId=req-1', {
   rows
 });
 ```
@@ -175,7 +175,7 @@ class OrderManagementSystem {
       ]
     }));
     
-    await this.api.post(`/doc/purchaseOrder/${orderId}/data/bulk?apply=true`, {
+    await this.api.post(`/doc/purchaseOrder/${orderId}/data/bulk?requestId=req-1`, {
       rows
     });
     
@@ -394,7 +394,7 @@ async function importFromCSV(filePath, docType, docId) {
       for (let i = 0; i < rows.length; i += batchSize) {
         const batch = rows.slice(i, i + batchSize);
         
-        await api.post(`/doc/${docType}/${docId}/data/bulk?apply=true`, {
+        await api.post(`/doc/${docType}/${docId}/data/bulk?requestId=req-1`, {
           rows: batch
         });
         

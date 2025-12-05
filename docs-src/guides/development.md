@@ -48,7 +48,7 @@ make serve
 | 文件 | 说明 |
 |------|------|
 | `dist/openapi/@typespec/openapi3/*.yaml` | OpenAPI 规范文件 |
-| `dist/redoc/index.html` | Redoc 静态文档 |
+| `docs/api/index.html` | Redoc 单页 API 文档 |
 | `docs/` | 完整文档站点（生成） |
 | `docs-src/` | 文档源文件（Markdown） |
 | `dist/openapi/openapi.yaml` | 合并后的 OpenAPI 入口文件 |

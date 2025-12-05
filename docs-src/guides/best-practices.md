@@ -81,7 +81,7 @@
 ✅ **推荐**：
 ```javascript
 // 批量创建 100 行
-await api.post('/data/bulk?apply=true', {
+await api.post('/data/bulk?requestId=req-1', {
   rows: Array.from({length: 100}, (_, i) => ({
     id: `row-${i}`,
     values: [...]
@@ -109,7 +109,7 @@ async function updateRow(rowId, newValues) {
   const row = await api.get(`/data/${rowId}`);
   
   // 2. 更新时提供版本号
-  await api.put(`/data/${rowId}?apply=true`, {
+  await api.put(`/data/${rowId}?requestId=req-1`, {
     values: newValues,
     version: row.version
   });
@@ -125,7 +125,7 @@ async function safeUpdate(rowId, newValues) {
   for (let i = 0; i < maxRetries; i++) {
     try {
       const row = await api.get(`/data/${rowId}`);
-      await api.put(`/data/${rowId}?apply=true`, {
+      await api.put(`/data/${rowId}?requestId=req-1`, {
         values: newValues,
         version: row.version
       });
@@ -366,7 +366,7 @@ describe('数据行 CRUD', () => {
     const row = await api.get('/data/row-001');
     
     // 模拟另一个用户更新
-    await api.put('/data/row-001?apply=true', {
+    await api.put('/data/row-001?requestId=req-1', {
       values: [...],
       version: row.version
     });
