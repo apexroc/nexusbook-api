@@ -82,6 +82,9 @@ namespace NexusBook.Api.Document;
  * - 行ID + 字段ID：`{row: "row-1", field: "price"}`
  * - 属性字段：`{property: "amount"}`
  * - 多个目标：`{rows: ["row-1", "row-2"], field: "status"}`
+ * - 删除行：`{row: "row-1", delete: true}`
+ * - 按条件更新：`{condition: {...}, field: "status"}`
+ * - 按条件删除：`{condition: {...}, delete: true}`
  *
  * ## Value 说明
  *
@@ -147,6 +150,41 @@ namespace NexusBook.Api.Document;
  *   }
  * }
  * ```
+ *
+ * ### 7. 删除单行
+ * ```json
+ * {
+ *   "target": {"row": "row-1", "delete": true}
+ * }
+ * ```
+ * 注意：删除操作不需要提供 value 字段。
+ *
+ * ### 8. 按条件删除
+ * ```json
+ * {
+ *   "target": {
+ *     "condition": {
+ *       "logic": "and",
+ *       "conditions": [{"field": "status", "operator": "eq", "value": "inactive"}]
+ *     },
+ *     "delete": true
+ *   }
+ * }
+ * ```
+ *
+ * ### 9. 按条件更新
+ * ```json
+ * {
+ *   "target": {
+ *     "condition": {
+ *       "logic": "and",
+ *       "conditions": [{"field": "status", "operator": "eq", "value": "pending"}]
+ *     },
+ *     "field": "reviewStatus"
+ *   },
+ *   "value": "reviewing"
+ * }
+ * ```
  */
 model BulkUpdate {
     /**
@@ -159,6 +197,10 @@ model BulkUpdate {
      * - {rows: ["row-1", "row-2"], field: "status"} - 多行同一字段
      * - {property: "amount"} - 单个属性
      * - {properties: true} - 多个属性
+     * - {row: "row-1", delete: true} - 删除单行
+     * - {rows: ["row-1", "row-2"], delete: true} - 删除多行
+     * - {condition: {...}, field: "status"} - 按条件更新
+     * - {condition: {...}, delete: true} - 按条件删除
      *
      * Supports multiple target specification methods:
      * - {row: "row-1"} - Single row
@@ -166,6 +208,10 @@ model BulkUpdate {
      * - {rows: ["row-1", "row-2"], field: "status"} - Multiple rows same field
      * - {property: "amount"} - Single property
      * - {properties: true} - Multiple properties
+     * - {row: "row-1", delete: true} - Delete single row
+     * - {rows: ["row-1", "row-2"], delete: true} - Delete multiple rows
+     * - {condition: {...}, field: "status"} - Conditional update
+     * - {condition: {...}, delete: true} - Conditional delete
      */
     target: {};
 
@@ -185,8 +231,11 @@ model BulkUpdate {
      *
      * 服务端根据 metadata 自动解析值的类型。
      * Server auto-parses value type based on metadata.
+     *
+     * 注意：删除操作（delete: true）不需要提供 value。
+     * Note: Delete operations (delete: true) do not require value.
      */
-    value: unknown;
+    value?: unknown;
 }
 
 /**
@@ -231,7 +280,7 @@ model Row {
      * 创建者。
      * Author.
      */
-    createdBy?: string;
+    createdBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 更新时间
@@ -249,7 +298,7 @@ model Row {
      * 更新者。
      * Updater.
      */
-    updatedBy?: string;
+    updatedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 版本（并发控制）
@@ -331,6 +380,26 @@ interface DataApi {
      *
      * List rows with pagination, supports simple DSL query parameters
      * (`page/pageSize/sort/filter/group/cursor`).
+     *
+     * ## 数据叠加读取
+     *
+     * 如果提供 `requestId` 参数，返回的数据将是：
+     * **生产数据 + Request 变更**的叠加视图。
+     *
+     * If `requestId` is provided, the returned data will be:
+     * **Production data + Request changes** merged view.
+     *
+     * 示例：
+     * ```bash
+     * # 查看生产数据
+     * GET /api/v1/doc/product/123/data
+     *
+     * # 预览变更效果（叠加 Request 变更）
+     * GET /api/v1/doc/product/123/data?requestId=req-abc
+     *
+     * # 查看变更详情（包含变更标记）
+     * GET /api/v1/doc/product/123/data?requestId=req-abc&includeChanges=true
+     * ```
      */
     @get
     @summary("列出数据")
@@ -343,12 +412,22 @@ interface DataApi {
         @query filter?: string,
         @query group?: string,
         @query cursor?: string,
+        @query requestId?: string,
+        @query includeChanges?: boolean,
     ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Row>>;
 
     /**
-     * 以结构化体进行复杂查询（嵌套过滤、排序、分组与聚合）。
+     * 以结构化体进行复杂查询（嵌套过滤、排序、分页）。
      *
-     * Perform complex query with structured body (nested filters, sorts, group/aggregations).
+     * Perform complex query with structured body (nested filters, sorts, pagination).
+     *
+     * 注意：如果需要分组查询，请使用 `/query/group` 接口。
+     * Note: For group queries, use `/query/group` endpoint.
+     *
+     * ## 数据叠加读取
+     *
+     * 支持通过 `requestId` 查询参数获取叠加后的数据视图。
+     * Supports `requestId` query parameter for merged data view.
      */
     @route("/query")
     @post
@@ -357,7 +436,104 @@ interface DataApi {
         @path docType: string,
         @path docId: string,
         @body body: QueryRequest,
+        @query requestId?: string,
+        @query includeChanges?: boolean,
     ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.Page<Row>>;
+
+    /**
+     * 分组查询接口（支持多级分组与聚合）
+     *
+     * Group query endpoint (supports multi-level grouping and aggregations)
+     *
+     * 该接口专门用于分组查询，返回树状结构的分组结果。
+     * This endpoint is specifically for grouped queries, returning tree-structured group results.
+     *
+     * ## 多级分组示例
+     *
+     * ### 单级分组 (Single-level grouping)
+     * ```json
+     * {
+     *   "filters": {...},
+     *   "group": {
+     *     "fields": ["category"],
+     *     "aggregations": [
+     *       {"kind": "count", "field": "*"},
+     *       {"kind": "sum", "field": "amount"}
+     *     ]
+     *   }
+     * }
+     * ```
+     *
+     * ### 二级分组 (Two-level grouping)
+     * ```json
+     * {
+     *   "group": {
+     *     "fields": ["region", "category"],
+     *     "aggregations": [
+     *       {"kind": "count", "field": "*"},
+     *       {"kind": "sum", "field": "revenue"}
+     *     ]
+     *   }
+     * }
+     * ```
+     *
+     * ### 三级分组 (Three-level grouping)
+     * ```json
+     * {
+     *   "group": {
+     *     "fields": ["region", "category", "status"],
+     *     "aggregations": [{"kind": "count", "field": "*"}]
+     *   }
+     * }
+     * ```
+     *
+     * ## 返回结构示例
+     *
+     * ```json
+     * {
+     *   "groups": [
+     *     {
+     *       "key": "North",
+     *       "field": "region",
+     *       "count": 100,
+     *       "aggregations": {"count_*": 100, "sum_revenue": 50000},
+     *       "children": [
+     *         {
+     *           "key": "Electronics",
+     *           "field": "category",
+     *           "count": 60,
+     *           "aggregations": {"count_*": 60, "sum_revenue": 30000}
+     *         },
+     *         {
+     *           "key": "Clothing",
+     *           "field": "category",
+     *           "count": 40,
+     *           "aggregations": {"count_*": 40, "sum_revenue": 20000}
+     *         }
+     *       ]
+     *     }
+     *   ],
+     *   "total": 100,
+     *   "groupBy": {...}
+     * }
+     * ```
+     *
+     * ## 数据叠加读取
+     *
+     * 支持通过 `requestId` 查询参数获取叠加后的数据视图。
+     * Supports `requestId` query parameter for merged data view.
+     */
+    @route("/query/group")
+    @post
+    @summary("分组查询数据")
+    queryGroupedRows(
+        @path docType: string,
+        @path docId: string,
+        @body body: QueryRequest,
+        @query requestId?: string,
+        @query includeChanges?: boolean,
+        @query includeRows?: boolean,
+    ): NexusBook.Api.Common.ApiResponse<NexusBook.Api.Common.GroupedResult>;
 
     /**
      * 创建数据行（进入变更请求）
@@ -493,6 +669,11 @@ interface DataApi {
      * 返回单条数据行详情。
      *
      * Return single row detail.
+     *
+     * ## 数据叠加读取
+     *
+     * 支持通过 `requestId` 查询参数获取叠加后的数据视图。
+     * Supports `requestId` query parameter for merged data view.
      */
     @route("/{rowId}")
     @get
@@ -501,6 +682,8 @@ interface DataApi {
         @path docType: string,
         @path docId: string,
         @path rowId: string,
+        @query requestId?: string,
+        @query includeChanges?: boolean,
     ): NexusBook.Api.Common.ApiResponse<Row>;
 
     /**

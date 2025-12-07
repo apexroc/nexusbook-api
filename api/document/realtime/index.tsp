@@ -78,7 +78,7 @@ model RealtimeSession {
      * 用户ID
      * User id
      */
-    userId: string;
+    userId: NexusBook.Api.Common.UserRef;
 
     /**
      * WebSocket 连接ID
@@ -156,7 +156,7 @@ model OnlineUser {
      * 用户ID
      * User id
      */
-    userId: string;
+    userId: NexusBook.Api.Common.UserRef;
 
     /**
      * 显示名称
@@ -228,7 +228,7 @@ model CellLock {
      * 锁定者用户ID
      * Locked by user id
      */
-    lockedBy: string;
+    lockedBy: NexusBook.Api.Common.UserRef;
 
     /**
      * 锁定者会话ID
@@ -348,7 +348,7 @@ model RealtimeEvent {
      * 用户ID
      * User id
      */
-    userId?: string;
+    userId?: NexusBook.Api.Common.UserRef;
 
     /**
      * 会话ID

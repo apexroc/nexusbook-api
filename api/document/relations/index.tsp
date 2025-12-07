@@ -250,7 +250,7 @@ model Relation {
      * 创建人
      * Created by
      */
-    createdBy?: string;
+    createdBy?: NexusBook.Api.Common.UserRef;
 }
 
 /**

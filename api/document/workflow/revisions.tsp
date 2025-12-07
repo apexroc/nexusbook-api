@@ -208,7 +208,7 @@ model Revision {
      * 在请求中贡献变更的所有用户。
      * All users who contributed changes in the request.
      */
-    contributors?: string[];
+    contributors?: NexusBook.Api.Common.UserRef[];
 
     /**
      * 合并者
@@ -217,7 +217,7 @@ model Revision {
      * 执行合并操作的用户。
      * User who performed the merge.
      */
-    mergedBy?: string;
+    mergedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 变更操作集合

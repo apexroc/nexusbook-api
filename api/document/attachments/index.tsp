@@ -241,7 +241,7 @@ model AttachmentDetail {
      * 创建人
      * Created by
      */
-    createdBy: string;
+    createdBy: NexusBook.Api.Common.UserRef;
 
     /**
      * 更新时间
@@ -253,7 +253,7 @@ model AttachmentDetail {
      * 更新人
      * Updated by
      */
-    updatedBy?: string;
+    updatedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 过期时间（可选）
@@ -399,7 +399,7 @@ model AttachmentVersion {
      * 创建人
      * Created by
      */
-    createdBy: string;
+    createdBy: NexusBook.Api.Common.UserRef;
 
     /**
      * 变更说明

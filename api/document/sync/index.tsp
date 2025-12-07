@@ -350,7 +350,7 @@ model SyncConfig {
      * 创建人
      * Created by
      */
-    createdBy?: string;
+    createdBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 更新时间
@@ -470,7 +470,7 @@ model SyncTask {
      * 触发用户
      * Triggered user
      */
-    triggeredUser?: string;
+    triggeredUser?: NexusBook.Api.Common.UserRef;
 }
 
 /**
@@ -542,7 +542,7 @@ model SyncConflict {
      * 解决人
      * Resolved by
      */
-    resolvedBy?: string;
+    resolvedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 解决时间

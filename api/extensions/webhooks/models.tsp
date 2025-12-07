@@ -188,7 +188,7 @@ model EventFilter {
      * 只接收指定用户触发的事件。
      * Only receive events triggered by specified users.
      */
-    userIds?: string[];
+    userIds?: NexusBook.Api.Common.UserRef[];
 
     /**
      * 自定义条件
@@ -314,7 +314,7 @@ model Webhook {
      * 创建人
      * Created by
      */
-    createdBy?: string;
+    createdBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 更新时间

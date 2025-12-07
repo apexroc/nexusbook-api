@@ -316,18 +316,184 @@ model Aggregation {
     field: string;
 }
 
+/**
+ * 分组定义（支持多级分组）
+ * Group-by definition (supports multi-level grouping)
+ *
+ * 示例 / Example:
+ * ```json
+ * {
+ *   "fields": ["category", "status"],
+ *   "aggregations": [
+ *     {"kind": "count", "field": "*"},
+ *     {"kind": "sum", "field": "amount"}
+ *   ]
+ * }
+ * ```
+ */
 model GroupBy {
     /**
-     * 分组字段
-     * Group fields
+     * 分组字段列表（按顺序定义分组层级）
+     * Group fields (defines grouping levels in order)
+     *
+     * 第一个字段为第一级分组，第二个字段为第二级分组，以此类推。
+     * First field is the first level, second field is the second level, and so on.
+     *
+     * 示例 / Example:
+     * - ["category"] - 单级分组 / Single-level grouping
+     * - ["category", "status"] - 二级分组 / Two-level grouping
+     * - ["region", "category", "status"] - 三级分组 / Three-level grouping
      */
     fields: string[];
 
     /**
-     * 聚合集合
+     * 聚合函数集合
      * Aggregations
+     *
+     * 聚合计算会应用到每个分组层级。
+     * Aggregations are applied to each grouping level.
      */
     aggregations?: Aggregation[];
+}
+
+/**
+ * 分组结果节点（支持树状结构）
+ * Grouped result node (supports tree structure)
+ *
+ * 用于表示多级分组的结果，每个节点代表一个分组。
+ * Represents multi-level grouping results, each node represents a group.
+ *
+ * 示例 / Example (单级分组 / Single-level):
+ * ```json
+ * {
+ *   "key": "Electronics",
+ *   "count": 150,
+ *   "aggregations": {
+ *     "total_amount": 45000,
+ *     "avg_price": 300
+ *   }
+ * }
+ * ```
+ *
+ * 示例 / Example (多级分组 / Multi-level):
+ * ```json
+ * {
+ *   "key": "Electronics",
+ *   "count": 150,
+ *   "aggregations": {
+ *     "total_amount": 45000
+ *   },
+ *   "children": [
+ *     {
+ *       "key": "Active",
+ *       "count": 120,
+ *       "aggregations": {"total_amount": 40000}
+ *     },
+ *     {
+ *       "key": "Inactive",
+ *       "count": 30,
+ *       "aggregations": {"total_amount": 5000}
+ *     }
+ *   ]
+ * }
+ * ```
+ */
+model GroupNode {
+    /**
+     * 分组键值
+     * Group key
+     *
+     * 当前层级的分组字段值。
+     * The value of the grouping field at current level.
+     */
+    key: unknown;
+
+    /**
+     * 分组字段名
+     * Group field name
+     *
+     * 当前层级的分组字段名称。
+     * The name of the grouping field at current level.
+     */
+    field: string;
+
+    /**
+     * 数据行数
+     * Row count
+     *
+     * 当前分组包含的数据行数量。
+     * Number of rows in this group.
+     */
+    count: int64;
+
+    /**
+     * 聚合结果
+     * Aggregation results
+     *
+     * 键为聚合名称（如 "sum_amount", "avg_price"），值为聚合结果。
+     * Keys are aggregation names (e.g., "sum_amount", "avg_price"), values are results.
+     *
+     * 命名规则：{function}_{field}
+     * Naming convention: {function}_{field}
+     */
+    aggregations?: Record<unknown>;
+
+    /**
+     * 子分组
+     * Child groups
+     *
+     * 下一级分组的结果列表。如果是最后一级分组，则为空。
+     * List of next-level grouping results. Empty if this is the last level.
+     */
+    children?: GroupNode[];
+
+    /**
+     * 数据行（可选）
+     * Data rows (optional)
+     *
+     * 如果请求包含数据行，则此字段包含当前分组的实际数据。
+     * If data rows are requested, this field contains the actual data in this group.
+     *
+     * 注意：通常只在最后一级分组或明确请求时返回。
+     * Note: Usually only returned at the last level or when explicitly requested.
+     */
+    rows?: Record<unknown>[];
+}
+
+/**
+ * 分组查询结果
+ * Grouped query result
+ *
+ * 包含分组树和元信息。
+ * Contains grouping tree and metadata.
+ */
+model GroupedResult {
+    /**
+     * 分组树
+     * Group tree
+     *
+     * 顶层分组节点列表。
+     * Top-level group nodes.
+     */
+    groups: GroupNode[];
+
+    /**
+     * 总行数
+     * Total row count
+     *
+     * 所有分组的总数据行数。
+     * Total number of rows across all groups.
+     */
+    total: int64;
+
+    /**
+     * 分组定义
+     * Group-by definition
+     *
+     * 返回使用的分组定义，便于客户端理解结果结构。
+     * Returns the grouping definition used, helping clients understand the result structure.
+     */
+    groupBy: GroupBy;
 }
 
 model SelectOption {
@@ -445,7 +611,7 @@ model Attachment {
      * 上传者。
      * Uploader.
      */
-    createdBy: string;
+    createdBy: UserRef;
 }
 
 model UserRef {

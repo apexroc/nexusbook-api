@@ -354,7 +354,7 @@ model Organization {
      * 组织所有者用户ID
      * Organization owner user ID
      */
-    ownerId: string;
+    ownerId: NexusBook.Api.Common.UserRef;
 
     /**
      * 状态
@@ -495,13 +495,13 @@ model OrganizationMember {
      * 邀请人用户ID
      * Inviter user ID
      */
-    invitedBy?: string;
+    invitedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 批准人用户ID
      * Approver user ID
      */
-    approvedBy?: string;
+    approvedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 更新时间
@@ -596,7 +596,7 @@ model Workspace {
      * 工作区负责人
      * Workspace owner
      */
-    ownerId: string;
+    ownerId: NexusBook.Api.Common.UserRef;
 
     /**
      * 工作区设置
@@ -713,7 +713,7 @@ model WorkspaceMember {
      * 添加者用户ID
      * Added by user ID
      */
-    addedBy?: string;
+    addedBy?: NexusBook.Api.Common.UserRef;
 }
 
 // ==================== 邀请相关模型 ====================
@@ -778,7 +778,7 @@ model Invitation {
      * 邀请人用户ID
      * Inviter user ID
      */
-    inviterUserId: string;
+    inviterUserId: NexusBook.Api.Common.UserRef;
 
     /**
      * 邀请人信息（可选包含）

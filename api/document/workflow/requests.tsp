@@ -77,7 +77,7 @@ model Change {
      * 变更人
      * Changed by
      */
-    changedBy: string;
+    changedBy: NexusBook.Api.Common.UserRef;
 }
 
 model Request {
@@ -124,7 +124,7 @@ model Request {
      * 创建者。
      * Author.
      */
-    author?: string;
+    author?: NexusBook.Api.Common.UserRef;
 
     /**
      * 评审人
@@ -133,7 +133,7 @@ model Request {
      * 评审人列表。
      * List of reviewers.
      */
-    reviewers?: string[];
+    reviewers?: NexusBook.Api.Common.UserRef[];
 
     /**
      * 贡献者
@@ -142,7 +142,7 @@ model Request {
      * 对该请求添加或修改变更的所有用户。
      * All users who added or modified changes in this request.
      */
-    contributors?: string[];
+    contributors?: NexusBook.Api.Common.UserRef[];
 
     /**
      * 变更集
@@ -196,7 +196,7 @@ model Request {
      * 执行合并操作的用户。
      * User who performed the merge.
      */
-    mergedBy?: string;
+    mergedBy?: NexusBook.Api.Common.UserRef;
 }
 
 @route("/doc/{docType}/{docId}/requests")
@@ -331,7 +331,7 @@ interface RequestsApi {
          * 所有贡献者
          * All contributors
          */
-        contributors: string[];
+        contributors: NexusBook.Api.Common.UserRef[];
 
         /**
          * 合并时间
@@ -343,7 +343,7 @@ interface RequestsApi {
          * 合并者
          * User who merged
          */
-        mergedBy: string;
+        mergedBy: NexusBook.Api.Common.UserRef;
     }>;
 
     /**

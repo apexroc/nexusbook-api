@@ -375,7 +375,7 @@ model TranslationResource {
      * 更新者
      * Updated by
      */
-    updatedBy: string;
+    updatedBy: NexusBook.Api.Common.UserRef;
 }
 
 /**

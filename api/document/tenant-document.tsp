@@ -106,7 +106,7 @@ model DocumentSummary {
      * 创建者
      * Created by
      */
-    createdBy?: string;
+    createdBy?: NexusBook.Api.Common.UserRef;
 }
 
 /**

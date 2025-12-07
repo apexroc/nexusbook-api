@@ -194,7 +194,7 @@ model DocumentProperties {
      * 最后更新的用户。
      * User who last updated.
      */
-    updatedBy?: string;
+    updatedBy?: NexusBook.Api.Common.UserRef;
 }
 
 @route("/doc/{docType}/{docId}/properties")
@@ -207,12 +207,19 @@ interface DocumentPropertiesApi {
      *
      * 获取文档级别的所有元信息（订单时间、门店、金额等）。
      * Get all document-level metadata (order time, store, amount, etc).
+     *
+     * ## 数据叠加读取
+     *
+     * 支持通过 `requestId` 查询参数获取叠加后的属性视图。
+     * Supports `requestId` query parameter for merged properties view.
      */
     @get
     @summary("获取文档属性")
     getProperties(
         @path docType: string,
         @path docId: string,
+        @query requestId?: string,
+        @query includeChanges?: boolean,
     ): NexusBook.Api.Common.ApiResponse<DocumentProperties>;
 
     /**
@@ -406,7 +413,7 @@ interface DocumentPropertiesApi {
          * 变更人
          * Changed by
          */
-        changedBy: string;
+        changedBy: NexusBook.Api.Common.UserRef;
 
         /**
          * 变更说明

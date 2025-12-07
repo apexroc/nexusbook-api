@@ -191,7 +191,7 @@ model Comment {
      * 解决此评论的人。
      * Who resolved this comment.
      */
-    resolvedBy?: string;
+    resolvedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 是否置顶
@@ -212,7 +212,7 @@ model Comment {
      * 创建人
      * Created by
      */
-    createdBy?: string;
+    createdBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 更新时间
@@ -224,7 +224,7 @@ model Comment {
      * 更新人
      * Updated by
      */
-    updatedBy?: string;
+    updatedBy?: NexusBook.Api.Common.UserRef;
 
     /**
      * 回复数量
