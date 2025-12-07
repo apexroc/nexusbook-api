@@ -48,7 +48,8 @@ jobs:
             [ -d "$dir" ] || continue
             dirname=$(basename "$dir")
             mkdir -p "sync-wiki/$dirname"
-            cp -r "$dir"*.md "sync-wiki/$dirname/" 2>/dev/null || true
+            # 复制子目录中的所有 .md 文件
+            find "$dir" -maxdepth 1 -name "*.md" -exec cp {} "sync-wiki/$dirname/" \; 2>/dev/null || true
           done
           
           # 生成侧边栏
@@ -56,7 +57,7 @@ jobs:
 ## NexusBook API 文档
 
 ### 开始使用
-- [[Home|项目概述]]
+- [[Home]]
 - [[快速开始]]
 - [[认证与授权]]
 
