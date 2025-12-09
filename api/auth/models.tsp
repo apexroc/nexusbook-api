@@ -5,6 +5,98 @@ import "../shared/index.tsp";
 using TypeSpec.Http;
 using OpenAPI;
 
+// ==================== 公共权限范围枚举 ====================
+
+/**
+ * 统一权限范围定义
+ * Unified authorization scope
+ * 
+ * 此枚举为所有认证方式(OAuth Client、API Key)提供统一的权限范围定义
+ * This enum provides unified scope definitions for all authentication methods
+ */
+enum AuthScope {
+    /**
+     * 读取文档 Read documents
+     */
+    "doc:read",
+
+    /**
+     * 写入文档 Write documents
+     */
+    "doc:write",
+
+    /**
+     * 删除文档 Delete documents
+     */
+    "doc:delete",
+
+    /**
+     * 读取数据 Read data
+     */
+    "data:read",
+
+    /**
+     * 写入数据 Write data
+     */
+    "data:write",
+
+    /**
+     * 删除数据 Delete data
+     */
+    "data:delete",
+
+    /**
+     * 管理组织 Manage organizations
+     */
+    "org:manage",
+
+    /**
+     * 管理工作区 Manage workspaces
+     */
+    "workspace:manage",
+
+    /**
+     * 管理用户 Manage users
+     */
+    "user:manage",
+
+    /**
+     * Webhook 管理 Webhook management
+     */
+    "webhook:manage",
+
+    /**
+     * 完整权限 Full access
+     */
+    "all",
+}
+
+/**
+ * OIDC 标准 Scope
+ * OIDC standard scopes
+ */
+enum OidcStandardScope {
+    /**
+     * OpenID Connect
+     */
+    openid,
+
+    /**
+     * 个人资料 Profile
+     */
+    profile,
+
+    /**
+     * 邮箱 Email
+     */
+    email,
+
+    /**
+     * 离线访问(获取刷新令牌) Offline access (get refresh token)
+     */
+    offline_access,
+}
+
 /**
  * NexusBook Authentication & Authorization - Data Models
  * NexusBook 认证与授权 - 数据模型
@@ -12,7 +104,7 @@ using OpenAPI;
  * 提供 OAuth2 和 OIDC 兼容的身份认证和授权功能。
  * Provides OAuth2 and OIDC compatible identity authentication and authorization features.
  *
- * Route Base: /auth
+ * Domain: https://auth.nexusbook.com
  *
  * 主要功能 / Main Features:
  * - OAuth2 客户端应用管理 OAuth2 client application management
@@ -34,18 +126,50 @@ using OpenAPI;
  * GET /.well-known/openid-configuration - 获取 OIDC 元数据 Get OIDC metadata
  * GET /jwks.json - 获取公钥集合用于验证 Get public key set for verification
  */
-@route("/auth")
+@route("/")
 namespace NexusBook.Api.Auth {
     /**
-     * OAuth2 客户端应用信息
-     * OAuth2 client application info
+     * OAuth2 客户端基础元数据 (协议层)
+     * OAuth2 client metadata (protocol layer)
+     * 
+     * 此模型定义 OAuth2 标准协议层的客户端基础信息,供业务管理模型复用
+     * This model defines OAuth2 standard protocol layer client metadata for reuse
      */
-    model Client {
+    model ClientMetadata {
+        /**
+         * 客户端ID
+         * Client ID
+         */
         client_id: string;
+
+        /**
+         * 客户端名称
+         * Client name
+         */
         client_name?: string;
+
+        /**
+         * 允许的授权类型
+         * Grant types
+         */
         grant_types?: string[];
+
+        /**
+         * 重定向 URI 列表
+         * Redirect URIs
+         */
         redirect_uris?: string[];
+
+        /**
+         * 授权范围
+         * Scopes
+         */
         scopes?: string[];
+
+        /**
+         * 令牌端点认证方法
+         * Token endpoint auth method
+         */
         token_endpoint_auth_method?: string;
     }
 
@@ -210,21 +334,50 @@ namespace NexusBook.Api.Auth {
     }
 
     /**
-     * 用户信息声明
-     * User info claims
+     * 用户信息声明 (OIDC Core 1.0 标准)
+     * User info claims (OIDC Core 1.0 Standard)
+     * 
+     * 包含 OIDC 标准字段和 NexusBook 扩展字段
+     * Includes OIDC standard claims and NexusBook extensions
      */
     model UserInfo {
         /**
-         * 主体ID
-         * Subject id
+         * 主体ID (必需)
+         * Subject identifier (required)
          */
         `sub`: string;
 
+        // ========== OIDC 标准字段 Standard Claims ==========
+
         /**
-         * 姓名
-         * Name
+         * 全名
+         * Full name
          */
         name?: string;
+
+        /**
+         * 名字
+         * Given name / First name
+         */
+        given_name?: string;
+
+        /**
+         * 姓氏
+         * Family name / Last name
+         */
+        family_name?: string;
+
+        /**
+         * 中间名
+         * Middle name
+         */
+        middle_name?: string;
+
+        /**
+         * 昵称
+         * Nickname
+         */
+        nickname?: string;
 
         /**
          * 用户名
@@ -233,8 +386,26 @@ namespace NexusBook.Api.Auth {
         preferred_username?: string;
 
         /**
+         * 个人主页 URL
+         * Profile page URL
+         */
+        profile?: string;
+
+        /**
+         * 头像 URL
+         * Picture URL
+         */
+        picture?: string;
+
+        /**
+         * 个人网站
+         * Website URL
+         */
+        website?: string;
+
+        /**
          * 邮箱
-         * Email
+         * Email address
          */
         email?: string;
 
@@ -245,22 +416,90 @@ namespace NexusBook.Api.Auth {
         email_verified?: boolean;
 
         /**
+         * 性别
+         * Gender
+         */
+        gender?: string;
+
+        /**
+         * 生日 (YYYY-MM-DD 格式)
+         * Birthdate (YYYY-MM-DD format)
+         */
+        birthdate?: string;
+
+        /**
+         * 时区信息
+         * Time zone (e.g., "Asia/Shanghai")
+         */
+        zoneinfo?: string;
+
+        /**
          * 语言区域
-         * Locale
+         * Locale (e.g., "zh-CN", "en-US")
          */
         locale?: string;
 
         /**
-         * 更新时间
-         * Updated at
+         * 手机号
+         * Phone number
+         */
+        phone_number?: string;
+
+        /**
+         * 手机号已验证
+         * Phone number verified
+         */
+        phone_number_verified?: boolean;
+
+        /**
+         * 地址信息
+         * Address
+         */
+        address?: {
+            /**
+             * 完整地址
+             * Formatted address
+             */
+            formatted?: string;
+
+            /**
+             * 街道地址
+             * Street address
+             */
+            street_address?: string;
+
+            /**
+             * 城市
+             * Locality / City
+             */
+            locality?: string;
+
+            /**
+             * 省/州
+             * Region / State
+             */
+            region?: string;
+
+            /**
+             * 邮编
+             * Postal code
+             */
+            postal_code?: string;
+
+            /**
+             * 国家
+             * Country
+             */
+            country?: string;
+        };
+
+        /**
+         * 信息更新时间 (Unix 时间戳)
+         * Updated at (Unix timestamp)
          */
         updated_at?: int64;
 
-        /**
-         * 头像
-         * Picture
-         */
-        picture?: string;
+        // ========== NexusBook 扩展字段 Extensions ==========
 
         /**
          * 角色列表
@@ -282,7 +521,7 @@ namespace NexusBook.Api.Auth {
          *
          * Authorization endpoint for authorization code flow.
          */
-        @route("/authorize")
+        @route("authorize")
         @get
         @summary("授权请求")
         authorize(): void;
@@ -299,7 +538,7 @@ namespace NexusBook.Api.Auth {
          *   -d 'grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&scope=doc:read data:read'
          * ```
          */
-        @route("/token")
+        @route("token")
         @post
         @summary("令牌颁发")
         token(): NexusBook.Api.Common.ApiResponse<TokenResponse>;
@@ -309,7 +548,7 @@ namespace NexusBook.Api.Auth {
          *
          * Return user info claims.
          */
-        @route("/userinfo")
+        @route("userinfo")
         @get
         @summary("用户信息")
         userinfo(): NexusBook.Api.Common.ApiResponse<UserInfo>;
@@ -319,7 +558,7 @@ namespace NexusBook.Api.Auth {
          *
          * Return OIDC provider discovery document.
          */
-        @route("/.well-known/openid-configuration")
+        @route(".well-known/openid-configuration")
         @get
         @summary("OIDC元数据")
         openidConfiguration(): ProviderMetadata;
@@ -329,7 +568,7 @@ namespace NexusBook.Api.Auth {
          *
          * Return JSON Web Key Set public keys.
          */
-        @route("/jwks.json")
+        @route("jwks.json")
         @get
         @summary("JWKS 公钥")
         jwks(): {

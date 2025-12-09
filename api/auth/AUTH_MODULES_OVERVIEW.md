@@ -3,13 +3,19 @@
 ## 创建日期
 2024-12-05
 
+## 最后更新
+2024-12-09 - 新增 OAuth 2.0 客户端管理、第三方 OIDC 提供商集成、令牌撤销/自省、设备授权流程、PKCE 支持
+
 ## 模块概述
 
-NexusBook 认证模块提供完整的身份认证、授权和 API 密钥管理功能，包含三个核心子模块：
+NexusBook 认证模块提供完整的身份认证、授权和 API 密钥管理功能,符合 OAuth 2.0 (RFC 6749)、OIDC 和相关扩展标准,包含六个核心子模块:
 
 1. **OAuth2/OIDC 认证** (`models.tsp`) - 标准 OAuth2 和 OIDC 协议支持
 2. **用户注册与登录** (`registration.tsp`) - 完整的用户生命周期管理
 3. **API 密钥管理** (`apikeys.tsp`) - 开放 API 密钥的全生命周期管理
+4. **OAuth 客户端管理** (`oauth-clients.tsp`) - OAuth 2.0 客户端应用注册和管理
+5. **第三方 OIDC 集成** (`oidc-providers.tsp`) - 国际主流 OIDC 提供商登录支持
+6. **OAuth 扩展功能** (`oauth-extensions.tsp`) - 令牌撤销、自省、设备授权、PKCE
 
 ---
 
@@ -24,16 +30,26 @@ NexusBook 认证模块提供完整的身份认证、授权和 API 密钥管理�
 - ✅ OIDC 元数据发现
 - ✅ JWKS 公钥管理
 - ✅ 用户信息查询
+- ✅ PKCE 支持 (RFC 7636) - 用于 SPA 和移动应用
+- ✅ 令牌撤销 (RFC 7009)
+- ✅ 令牌自省 (RFC 7662)
+- ✅ 设备授权流程 (RFC 8628)
 
 ### 核心接口
 
 | 接口 | 方法 | 路径 | 说明 |
 |------|------|------|------|
-| 授权请求 | GET | `/auth/authorize` | 授权码流程的授权端点 |
-| 令牌颁发 | POST | `/auth/token` | 颁发访问令牌和刷新令牌 |
-| 用户信息 | GET | `/auth/userinfo` | 获取登录用户信息声明 |
-| OIDC元数据 | GET | `/auth/.well-known/openid-configuration` | OIDC 提供方发现文档 |
-| JWKS 公钥 | GET | `/auth/jwks.json` | JSON Web Key Set 公钥集合 |
+| 授权请求 | GET | `/authorize` | 授权码流程的授权端点 |
+| 令牌颁发 | POST | `/token` | 颁发访问令牌和刷新令牌 |
+| 用户信息 | GET | `/userinfo` | 获取登录用户信息声明 |
+| OIDC元数据 | GET | `/.well-known/openid-configuration` | OIDC 提供方发现文档 |
+| JWKS 公钥 | GET | `/jwks.json` | JSON Web Key Set 公钥集合 |
+| 令牌撤销 | POST | `/revoke` | 撤销访问令牌或刷新令牌 (RFC 7009) |
+| 令牌自省 | POST | `/introspect` | 检查令牌有效性及元数据 (RFC 7662) |
+| 设备授权 | POST | `/device/authorize` | 启动设备授权流程 (RFC 8628) |
+| 设备确认 | POST | `/device/confirm` | 用户确认设备授权 |
+| 授权同意 | GET | `/consent` | 获取授权请求详情 |
+| 授权决策 | POST | `/consent` | 提交授权决策 |
 
 ### 使用示例
 
@@ -551,6 +567,313 @@ CREATE TABLE api_key_usage_logs (
     FOREIGN KEY (api_key_id) REFERENCES api_keys(id) ON DELETE CASCADE
 );
 ```
+```
+---
+
+## 4. OAuth 客户端应用管理模块
+
+### 功能列表
+
+- ✅ 注册 OAuth 客户端应用
+- ✅ 客户端凭证管理（ID/Secret）
+- ✅ 重定向 URI 管理
+- ✅ 授权范围配置
+- ✅ 支持公开/机密客户端类型
+- ✅ PKCE 配置和强制
+- ✅ 客户端授权记录
+- ✅ 用户授权管理
+
+### 核心接口
+
+| 接口 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 注册客户端 | POST | `/api/v1/oauth/clients` | 创建新的 OAuth 客户端应用 |
+| 列出客户端 | GET | `/api/v1/oauth/clients` | 获取客户端列表 |
+| 获取详情 | GET | `/api/v1/oauth/clients/{clientId}` | 获取客户端详情 |
+| 更新客户端 | PATCH | `/api/v1/oauth/clients/{clientId}` | 更新客户端配置 |
+| 重生成密钥 | POST | `/api/v1/oauth/clients/{clientId}/regenerate-secret` | 重新生成客户端密钥 |
+| 吊销客户端 | POST | `/api/v1/oauth/clients/{clientId}/revoke` | 吊销客户端 |
+| 删除客户端 | DELETE | `/api/v1/oauth/clients/{clientId}` | 删除客户端 |
+| 列出授权 | GET | `/api/v1/oauth/clients/authorizations` | 列出用户授权 |
+| 撤销授权 | DELETE | `/api/v1/oauth/clients/authorizations/{authorizationId}` | 撤销用户授权 |
+
+### 使用示例
+
+#### 注册 OAuth 客户端应用
+
+```bash
+curl -X POST 'https://open.nexusbook.com/api/v1/oauth/clients' \
+  -H 'Authorization: Bearer TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "我的应用",
+    "clientType": "confidential",
+    "grantTypes": ["authorization_code", "refresh_token"],
+    "redirectUris": ["https://myapp.com/callback"],
+    "scopes": ["openid", "profile", "email", "doc:read"],
+    "requirePkce": false
+  }'
+```
+
+响应：
+```json
+{
+  "data": {
+    "clientId": "oauth_abc123",
+    "clientSecret": "secret_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "secretPrefix": "secret_abc...",
+    "name": "我的应用",
+    "clientType": "confidential",
+    "grantTypes": ["authorization_code", "refresh_token"],
+    "redirectUris": ["https://myapp.com/callback"],
+    "scopes": ["openid", "profile", "email", "doc:read"],
+    "status": "active",
+    "createdAt": "2024-12-09T10:00:00Z"
+  }
+}
+```
+
+---
+
+## 5. 第三方 OIDC 提供商集成模块
+
+### 支持的提供商
+
+#### 国际主流平台
+- ✅ **Google** - Google 账号登录
+- ✅ **GitHub** - GitHub 账号登录
+- ✅ **Microsoft** - Microsoft / Azure AD 登录
+- ✅ **Apple** - Sign in with Apple
+- ✅ **Facebook** - Facebook 登录
+- ✅ **Twitter/X** - Twitter/X 账号登录
+- ✅ **LinkedIn** - LinkedIn 登录
+- ✅ **Slack** - Slack 工作区登录
+- ✅ **GitLab** - GitLab 账号登录
+- ✅ **Bitbucket** - Bitbucket 账号登录
+
+#### 国内企业平台
+- ✅ **企业微信** (WeChat Work) - 企业微信登录
+- ✅ **钉钉** (DingTalk) - 钉钉工作台登录
+- ✅ **飞书** (Lark/Feishu) - 飞书工作台登录
+
+#### 自定义 OIDC
+- ✅ **自定义 OIDC** - 支持任意符合 OIDC 标准的身份提供商
+
+### 功能列表
+
+- ✅ 配置 OIDC 提供商
+- ✅ 自动账号创建
+- ✅ 账号关联管理
+- ✅ 统一的 OAuth 登录流程
+- ✅ 第三方账号解绑
+
+### 核心接口
+
+| 接口 | 方法 | 路径 | 说明 |
+|------|------|------|------|
+| 列出提供商 | GET | `/api/v1/oidc/providers` | 列出可用的 OIDC 提供商 |
+| 添加提供商 | POST | `/api/v1/oidc/providers` | 添加 OIDC 提供商配置（管理员） |
+| 获取配置 | GET | `/api/v1/oidc/providers/{providerId}` | 获取提供商配置（管理员） |
+| 更新配置 | PATCH | `/api/v1/oidc/providers/{providerId}` | 更新提供商配置（管理员） |
+| 删除配置 | DELETE | `/api/v1/oidc/providers/{providerId}` | 删除提供商配置（管理员） |
+| 获取登录URL | GET | `/api/v1/auth/oauth/{provider}/authorize` | 获取 OAuth 登录 URL |
+| OAuth回调 | POST | `/api/v1/auth/oauth/{provider}/callback` | 处理 OAuth 回调 |
+| 关联账号 | POST | `/api/v1/auth/oauth/{provider}/link` | 关联第三方账号 |
+| 列出关联 | GET | `/api/v1/auth/oauth/linked-accounts` | 列出关联的第三方账号 |
+| 解除关联 | DELETE | `/api/v1/auth/oauth/linked-accounts/{linkId}` | 解除第三方账号关联 |
+
+### 使用示例
+
+#### 配置 Google OIDC 提供商（管理员）
+
+```bash
+curl -X POST 'https://open.nexusbook.com/api/v1/oidc/providers' \
+  -H 'Authorization: Bearer ADMIN_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "providerType": "google",
+    "name": "Google",
+    "clientId": "YOUR_GOOGLE_CLIENT_ID",
+    "clientSecret": "YOUR_GOOGLE_CLIENT_SECRET",
+    "scopes": ["openid", "profile", "email"],
+    "allowAutoAccountCreation": true,
+    "allowAccountLinking": true
+  }'
+```
+
+#### 使用 Google 登录
+
+```bash
+# 1. 获取授权 URL
+curl -X GET 'https://open.nexusbook.com/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
+
+# 响应：
+{
+  "data": {
+    "authorizationUrl": "https://accounts.google.com/o/oauth2/v2/auth?client_id=...&redirect_uri=...&state=...",
+    "state": "random_state_code"
+  }
+}
+
+# 2. 用户访问 authorizationUrl 并授权后，Google 会重定向到 redirectUri，带上 code 和 state
+
+# 3. 处理回调
+curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/google/callback' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "code": "AUTHORIZATION_CODE",
+    "state": "random_state_code",
+    "redirectUri": "https://myapp.com/callback"
+  }'
+
+# 响应：
+{
+  "data": {
+    "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken": "refresh_token_here",
+    "tokenType": "Bearer",
+    "expiresIn": 3600,
+    "user": {
+      "id": "user_123",
+      "email": "user@gmail.com",
+      "displayName": "John Doe",
+      "avatarUrl": "https://lh3.googleusercontent.com/..."
+    },
+    "isNewAccount": false
+  }
+}
+```
+
+#### 关联第三方账号
+
+```bash
+# 用户已登录，希望关联 GitHub 账号
+curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/github/link' \
+  -H 'Authorization: Bearer USER_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "code": "GITHUB_AUTHORIZATION_CODE",
+    "state": "random_state_code",
+    "redirectUri": "https://myapp.com/settings/accounts"
+  }'
+```
+
+---
+
+## 6. OAuth 扩展功能模块
+
+### 功能列表
+
+- ✅ 令牌撤销 (RFC 7009)
+- ✅ 令牌自省 (RFC 7662)
+- ✅ 设备授权流程 (RFC 8628)
+- ✅ PKCE 支持 (RFC 7636)
+- ✅ 授权同意界面
+
+### 核心接口
+
+已在上面 OAuth2/OIDC 认证模块中列出。
+
+### 使用示例
+
+#### 设备授权流程（用于智能电视、IoT 设备等）
+
+```bash
+# 1. 设备端：启动设备授权流程
+curl -X POST 'https://auth.nexusbook.com/device/authorize' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'client_id=CLIENT_ID&scope=doc:read data:read'
+
+# 响应：
+{
+  "device_code": "GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
+  "user_code": "WDJB-MJHT",
+  "verification_uri": "https://nexusbook.com/device",
+  "verification_uri_complete": "https://nexusbook.com/device?user_code=WDJB-MJHT",
+  "expires_in": 1800,
+  "interval": 5
+}
+
+# 2. 设备端：显示 user_code 和 verification_uri 给用户
+
+# 3. 用户：访问 verification_uri，输入 user_code，确认授权
+curl -X POST 'https://auth.nexusbook.com/device/confirm' \
+  -H 'Authorization: Bearer USER_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "user_code": "WDJB-MJHT",
+    "approved": true
+  }'
+
+# 4. 设备端：轮询令牌端点（每 5 秒一次）
+curl -X POST 'https://auth.nexusbook.com/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=urn:ietf:params:oauth:grant-type:device_code&device_code=GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS&client_id=CLIENT_ID'
+
+# 用户授权后，响应：
+{
+  "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "refresh_token": "refresh_token_here",
+  "scope": "doc:read data:read"
+}
+```
+
+#### PKCE 流程（用于 SPA 和移动应用）
+
+```bash
+# 1. 客户端：生成 code_verifier 和 code_challenge
+# code_verifier: 随机字符串 (43-128 个字符)
+# code_challenge: BASE64URL(SHA256(code_verifier))
+
+# 2. 客户端：跳转到授权端点
+GET https://auth.nexusbook.com/authorize?
+  response_type=code&
+  client_id=CLIENT_ID&
+  redirect_uri=https://myapp.com/callback&
+  scope=openid profile email&
+  state=random_state&
+  code_challenge=CODE_CHALLENGE&
+  code_challenge_method=S256
+
+# 3. 用户登录并授权后，重定向到 redirect_uri，带上 code
+
+# 4. 客户端：使用 code 和 code_verifier 换取令牌
+curl -X POST 'https://auth.nexusbook.com/token' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=authorization_code&code=AUTHORIZATION_CODE&redirect_uri=https://myapp.com/callback&client_id=CLIENT_ID&code_verifier=CODE_VERIFIER'
+```
+
+#### 令牌撤销
+
+```bash
+curl -X POST 'https://auth.nexusbook.com/revoke' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'token=ACCESS_TOKEN&token_type_hint=access_token&client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
+```
+
+#### 令牌自省
+
+```bash
+curl -X POST 'https://auth.nexusbook.com/introspect' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'token=ACCESS_TOKEN&client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
+
+# 响应：
+{
+  "active": true,
+  "scope": "doc:read data:read",
+  "client_id": "CLIENT_ID",
+  "username": "user@example.com",
+  "token_type": "Bearer",
+  "exp": 1702123456,
+  "iat": 1702119856,
+  "sub": "user_123",
+  "aud": "https://api.nexusbook.com",
+  "iss": "https://auth.nexusbook.com"
+}
+```
 
 ---
 
@@ -594,18 +917,33 @@ CREATE TABLE api_key_usage_logs (
 
 ```
 api/auth/
-├── index.tsp           # 模块入口和总览
-├── models.tsp          # OAuth2/OIDC 标准认证
-├── registration.tsp    # 用户注册、登录、密码、2FA、会话（711 行）
-└── apikeys.tsp         # API 密钥管理（803 行）
+├── index.tsp                 # 模块入口和总览
+├── models.tsp                # OAuth2/OIDC 标准认证
+├── registration.tsp          # 用户注册、登录、密码、2FA、会话 (711 行)
+├── apikeys.tsp               # API 密钥管理 (803 行)
+├── oauth-clients.tsp         # OAuth 客户端应用管理 (696 行)
+├── oidc-providers.tsp        # 第三方 OIDC 提供商集成 (688 行)
+└── oauth-extensions.tsp      # OAuth 扩展功能 (令牌撤销/自省、设备授权、PKCE) (571 行)
 ```
 
 ### API 统计
 
-- **总接口数**：30+ 个
+- **总接口数**：50+ 个
 - **用户认证**：11 个接口
 - **API Key 管理**：10 个接口
-- **OAuth2/OIDC**：5 个接口
+- **OAuth2/OIDC**：11 个接口
+- **OAuth 客户端管理**：8 个接口
+- **OIDC 提供商管理**：5 个接口
+- **第三方登录**：5 个接口
 - **会话管理**：3 个接口
+
+### 标准符合性
+
+✅ **OAuth 2.0 (RFC 6749)** - 完整支持
+✅ **OIDC Core 1.0** - 完整支持
+✅ **PKCE (RFC 7636)** - 支持 SPA 和移动应用
+✅ **Token Revocation (RFC 7009)** - 令牌撤销支持
+✅ **Token Introspection (RFC 7662)** - 令牌自省支持
+✅ **Device Authorization Grant (RFC 8628)** - 设备授权流程支持
 
 所有功能都已完整实现，包括详细的注释、示例和错误处理！

@@ -61,76 +61,13 @@ enum ApiKeyStatus {
 }
 
 /**
- * API Key 权限范围
- * API Key scope
+ * API Key 权限范围 (引用公共枚举)
+ * API Key scope (references common enum)
+ * 
+ * API Key 使用统一的 AuthScope 枚举来定义权限范围
+ * API Key uses unified AuthScope enum to define permission scopes
  */
-enum ApiKeyScope {
-    /**
-     * 读取文档
-     * Read documents
-     */
-    "doc:read",
-
-    /**
-     * 写入文档
-     * Write documents
-     */
-    "doc:write",
-
-    /**
-     * 删除文档
-     * Delete documents
-     */
-    "doc:delete",
-
-    /**
-     * 读取数据
-     * Read data
-     */
-    "data:read",
-
-    /**
-     * 写入数据
-     * Write data
-     */
-    "data:write",
-
-    /**
-     * 删除数据
-     * Delete data
-     */
-    "data:delete",
-
-    /**
-     * 管理组织
-     * Manage organizations
-     */
-    "org:manage",
-
-    /**
-     * 管理工作区
-     * Manage workspaces
-     */
-    "workspace:manage",
-
-    /**
-     * 管理用户
-     * Manage users
-     */
-    "user:manage",
-
-    /**
-     * Webhook 管理
-     * Webhook management
-     */
-    "webhook:manage",
-
-    /**
-     * 完整权限
-     * Full access
-     */
-    "all",
-}
+alias ApiKeyScope = NexusBook.Api.Auth.AuthScope;
 
 // ==================== 核心模型 ====================
 
