@@ -5,98 +5,6 @@ import "../shared/index.tsp";
 using TypeSpec.Http;
 using OpenAPI;
 
-// ==================== 公共权限范围枚举 ====================
-
-/**
- * 统一权限范围定义
- * Unified authorization scope
- * 
- * 此枚举为所有认证方式(OAuth Client、API Key)提供统一的权限范围定义
- * This enum provides unified scope definitions for all authentication methods
- */
-enum AuthScope {
-    /**
-     * 读取文档 Read documents
-     */
-    "doc:read",
-
-    /**
-     * 写入文档 Write documents
-     */
-    "doc:write",
-
-    /**
-     * 删除文档 Delete documents
-     */
-    "doc:delete",
-
-    /**
-     * 读取数据 Read data
-     */
-    "data:read",
-
-    /**
-     * 写入数据 Write data
-     */
-    "data:write",
-
-    /**
-     * 删除数据 Delete data
-     */
-    "data:delete",
-
-    /**
-     * 管理组织 Manage organizations
-     */
-    "org:manage",
-
-    /**
-     * 管理工作区 Manage workspaces
-     */
-    "workspace:manage",
-
-    /**
-     * 管理用户 Manage users
-     */
-    "user:manage",
-
-    /**
-     * Webhook 管理 Webhook management
-     */
-    "webhook:manage",
-
-    /**
-     * 完整权限 Full access
-     */
-    "all",
-}
-
-/**
- * OIDC 标准 Scope
- * OIDC standard scopes
- */
-enum OidcStandardScope {
-    /**
-     * OpenID Connect
-     */
-    openid,
-
-    /**
-     * 个人资料 Profile
-     */
-    profile,
-
-    /**
-     * 邮箱 Email
-     */
-    email,
-
-    /**
-     * 离线访问(获取刷新令牌) Offline access (get refresh token)
-     */
-    offline_access,
-}
-
 /**
  * NexusBook Authentication & Authorization - Data Models
  * NexusBook 认证与授权 - 数据模型
@@ -128,6 +36,98 @@ enum OidcStandardScope {
  */
 @route("/")
 namespace NexusBook.Api.Auth {
+    // ==================== 公共权限范围枚举 ====================
+
+    /**
+     * 统一权限范围定义
+     * Unified authorization scope
+     * 
+     * 此枚举为所有认证方式(OAuth Client、API Key)提供统一的权限范围定义
+     * This enum provides unified scope definitions for all authentication methods
+     */
+    enum AuthScope {
+        /**
+         * 读取文档 Read documents
+         */
+        "doc:read",
+
+        /**
+         * 写入文档 Write documents
+         */
+        "doc:write",
+
+        /**
+         * 删除文档 Delete documents
+         */
+        "doc:delete",
+
+        /**
+         * 读取数据 Read data
+         */
+        "data:read",
+
+        /**
+         * 写入数据 Write data
+         */
+        "data:write",
+
+        /**
+         * 删除数据 Delete data
+         */
+        "data:delete",
+
+        /**
+         * 管理组织 Manage organizations
+         */
+        "org:manage",
+
+        /**
+         * 管理工作区 Manage workspaces
+         */
+        "workspace:manage",
+
+        /**
+         * 管理用户 Manage users
+         */
+        "user:manage",
+
+        /**
+         * Webhook 管理 Webhook management
+         */
+        "webhook:manage",
+
+        /**
+         * 完整权限 Full access
+         */
+        "all",
+    }
+
+    /**
+     * OIDC 标准 Scope
+     * OIDC standard scopes
+     */
+    enum OidcStandardScope {
+        /**
+         * OpenID Connect
+         */
+        openid,
+
+        /**
+         * 个人资料 Profile
+         */
+        profile,
+
+        /**
+         * 邮箱 Email
+         */
+        email,
+
+        /**
+         * 离线访问(获取刷新令牌) Offline access (get refresh token)
+         */
+        offline_access,
+    }
+
     /**
      * OAuth2 客户端基础元数据 (协议层)
      * OAuth2 client metadata (protocol layer)
