@@ -31,7 +31,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/i18n/languages?enabledOnly=true' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/i18n/languages?enabledOnly=true' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -55,7 +55,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/i18n/languages/zh' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/i18n/languages/zh' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -79,7 +79,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/i18n/translations?language=zh&namespace=common' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/i18n/translations?language=zh&namespace=common' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -145,7 +145,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/i18n/translations/batch' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/i18n/translations/batch' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -195,7 +195,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/i18n/detect-language' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/i18n/detect-language' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{"text": "这是一段测试文本"}'
@@ -241,7 +241,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/i18n/translation-coverage?namespace=common' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/i18n/translation-coverage?namespace=common' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -271,7 +271,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/i18n/timezones?region=Asia' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/i18n/timezones?region=Asia' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -301,7 +301,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/i18n/currencies' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/i18n/currencies' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -331,7 +331,7 @@ interface I18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/i18n/format-preview' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/i18n/format-preview' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

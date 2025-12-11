@@ -1,6 +1,6 @@
 ## 目标与原则
 - 以 TypeSpec 定义完整的认证（OAuth2/OIDC）与文档（Doc）模型，覆盖多维表格 SaaS 能力。
-- 双域：open.nexusbook.com（API）、auth.nexusbook.com（认证）。所有业务路由以 `/api/v1` 开头。
+- 双域：open.nexusbook.app（API）、auth.nexusbook.app（认证）。所有业务路由以 `/api/v1` 开头。
 - 统一响应结构 `ApiResponse<T>`，错误码枚举化，双语文档注释（中文/English）。
 
 ## 认证模型完善（Auth）
@@ -83,7 +83,7 @@
 - `api/types/settings.tsp`：`Settings`、`Sharing`、`Permissions`、`Retention` 与注释。
 
 ## 错误码与安全方案集成
-- 在业务 OpenAPI 中声明 OAuth2 安全组件（`authorizationUrl`、`tokenUrl` 指向 `auth.nexusbook.com`）。
+- 在业务 OpenAPI 中声明 OAuth2 安全组件（`authorizationUrl`、`tokenUrl` 指向 `auth.nexusbook.app`）。
 - 受保护端点标注所需 Scopes；在示例中展示 `success=false + code + message` 的统一错误返回。
 
 ## 验证与交付

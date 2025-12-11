@@ -186,7 +186,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -222,7 +222,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces?page=1&pageSize=20' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces?page=1&pageSize=20' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -269,7 +269,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -299,7 +299,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -340,7 +340,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/archive' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/archive' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -370,7 +370,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/restore' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/restore' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -400,7 +400,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -430,7 +430,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/members' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/members' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -478,7 +478,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/members' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/members' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -519,7 +519,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/members/member-999' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/members/member-999' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -555,7 +555,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/members/member-999' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/members/member-999' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -601,7 +601,7 @@ interface WorkspaceApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/members/member-999' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/members/member-999' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */

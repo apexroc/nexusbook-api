@@ -2,6 +2,119 @@
 
 NexusBook API 使用 OAuth2 和 OIDC 标准进行认证和授权，提供安全可靠的访问控制机制。
 
+## 域名规划
+
+NexusBook 采用基于功能分离的域名架构，将认证协议层、开放业务 API 和管理 API 部署在不同的域名下，以提供更好的安全性和可维护性。
+
+### 认证授权中心 (auth.nexusbook.app)
+
+**用途**：OAuth2/OIDC 标准协议端点
+
+此域名专门用于 OAuth2 和 OIDC 核心协议端点，所有接口直接挂载在根路径下：
+
+```bash
+# OIDC 发现端点
+GET https://auth.nexusbook.app/.well-known/openid-configuration
+
+# JWKS 公钥端点
+GET https://auth.nexusbook.app/jwks.json
+
+# 授权端点
+GET https://auth.nexusbook.app/authorize
+
+# 令牌端点
+POST https://auth.nexusbook.app/token
+
+# 用户信息端点
+GET https://auth.nexusbook.app/userinfo
+```
+
+**注意**：根据部署规范，`auth.nexusbook.app` 域名下的 API 接口**不包含** `/auth` 子路径，所有接口直接挂载在根路径下。
+
+### 开放业务 API (open.nexusbook.app)
+
+**用途**：面向最终用户和第三方应用的业务接口
+
+#### 用户认证与管理
+
+```bash
+# 用户注册
+POST https://open.nexusbook.app/api/v1/auth/register
+
+# 用户登录（支持多种方式：邮箱+密码、手机+验证码）
+POST https://open.nexusbook.app/api/v1/auth/login
+
+# 会话管理
+GET https://open.nexusbook.app/api/v1/auth/sessions
+DELETE https://open.nexusbook.app/api/v1/auth/sessions/{sessionId}
+```
+
+#### API 密钥管理
+
+```bash
+# 创建 API Key
+POST https://open.nexusbook.app/api/v1/api-keys
+
+# 列出 API Keys
+GET https://open.nexusbook.app/api/v1/api-keys
+
+# 吊销 API Key
+POST https://open.nexusbook.app/api/v1/api-keys/{keyId}/revoke
+```
+
+#### OAuth 客户端管理
+
+```bash
+# 创建 OAuth 客户端
+POST https://open.nexusbook.app/api/v1/oauth/clients
+
+# 重新生成密钥
+POST https://open.nexusbook.app/api/v1/oauth/clients/{clientId}/regenerate-secret
+```
+
+#### 第三方登录
+
+```bash
+# 列出可用的第三方登录选项（公开）
+GET https://open.nexusbook.app/api/v1/oidc/providers
+
+# 获取 OAuth 登录 URL
+GET https://open.nexusbook.app/api/v1/auth/oauth/{provider}/authorize
+
+# OAuth 回调处理
+POST https://open.nexusbook.app/api/v1/auth/oauth/{provider}/callback
+```
+
+#### OIDC 提供商管理（管理员）
+
+```bash
+# 列出所有 OIDC 提供商配置
+GET https://open.nexusbook.app/api/v1/admin/oidc/providers
+
+# 添加 OIDC 提供商
+POST https://open.nexusbook.app/api/v1/admin/oidc/providers
+
+# 更新 OIDC 提供商
+PATCH https://open.nexusbook.app/api/v1/admin/oidc/providers/{providerId}
+
+# 删除 OIDC 提供商
+DELETE https://open.nexusbook.app/api/v1/admin/oidc/providers/{providerId}
+```
+
+### 域名总览
+
+| 域名 | 路径前缀 | 用途 | 权限 |
+|------|---------|------|------|
+| `auth.nexusbook.app` | `/` | OAuth2/OIDC 核心协议 | 公开 |
+| `open.nexusbook.app` | `/api/v1/auth` | 用户认证与管理 | 用户自助 |
+| `open.nexusbook.app` | `/api/v1/api-keys` | API 密钥管理 | 用户自助 |
+| `open.nexusbook.app` | `/api/v1/oauth/clients` | OAuth 客户端管理 | 开发者自助 |
+| `open.nexusbook.app` | `/api/v1/oidc/providers` | 第三方登录查询 | 公开 |
+| `open.nexusbook.app` | `/api/v1/auth/oauth` | 第三方 OAuth 登录 | 公开 |
+| `open.nexusbook.app` | `/api/v1/admin/oidc/providers` | OIDC 提供商管理 | 管理员 |
+
+---
+
 ## OAuth2 认证流程
 
 ### 客户端凭证流程（Client Credentials Flow）
@@ -33,7 +146,7 @@ NexusBook API 使用 OAuth2 和 OIDC 标准进行认证和授权，提供安全�
 
 **cURL**:
 ```bash
-curl -X POST https://auth.nexusbook.com/token \
+curl -X POST https://auth.nexusbook.app/token \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=client_credentials' \
   -d 'client_id=your_client_id' \
@@ -48,7 +161,7 @@ const qs = require('querystring');
 
 async function getAccessToken() {
   const response = await axios.post(
-    'https://auth.nexusbook.com/token',
+    'https://auth.nexusbook.app/token',
     qs.stringify({
       grant_type: 'client_credentials',
       client_id: 'your_client_id',
@@ -70,7 +183,7 @@ import requests
 
 def get_access_token():
     response = requests.post(
-        'https://auth.nexusbook.com/token',
+        'https://auth.nexusbook.app/token',
         data={
             'grant_type': 'client_credentials',
             'client_id': 'your_client_id',
@@ -123,7 +236,7 @@ def get_access_token():
 
 ```javascript
 // 构建授权 URL
-const authUrl = new URL('https://auth.nexusbook.com/authorize');
+const authUrl = new URL('https://auth.nexusbook.app/authorize');
 authUrl.searchParams.set('response_type', 'code');
 authUrl.searchParams.set('client_id', 'your_client_id');
 authUrl.searchParams.set('redirect_uri', 'https://yourapp.com/callback');
@@ -148,7 +261,7 @@ app.get('/callback', async (req, res) => {
   
   // 用授权码换取 Token
   const response = await axios.post(
-    'https://auth.nexusbook.com/token',
+    'https://auth.nexusbook.app/token',
     qs.stringify({
       grant_type: 'authorization_code',
       code: code,
@@ -175,17 +288,17 @@ app.get('/callback', async (req, res) => {
 获取 OIDC 配置信息：
 
 ```bash
-curl https://auth.nexusbook.com/.well-known/openid-configuration
+curl https://auth.nexusbook.app/.well-known/openid-configuration
 ```
 
 **响应示例**：
 ```json
 {
-  "issuer": "https://auth.nexusbook.com",
-  "authorization_endpoint": "https://auth.nexusbook.com/authorize",
-  "token_endpoint": "https://auth.nexusbook.com/token",
-  "userinfo_endpoint": "https://auth.nexusbook.com/userinfo",
-  "jwks_uri": "https://auth.nexusbook.com/jwks.json",
+  "issuer": "https://auth.nexusbook.app",
+  "authorization_endpoint": "https://auth.nexusbook.app/authorize",
+  "token_endpoint": "https://auth.nexusbook.app/token",
+  "userinfo_endpoint": "https://auth.nexusbook.app/userinfo",
+  "jwks_uri": "https://auth.nexusbook.app/jwks.json",
   "scopes_supported": ["openid", "profile", "email", "doc:read", "data:write"],
   "response_types_supported": ["code", "token"],
   "grant_types_supported": ["authorization_code", "client_credentials", "refresh_token"]
@@ -197,7 +310,7 @@ curl https://auth.nexusbook.com/.well-known/openid-configuration
 获取 JWT 验证公钥：
 
 ```bash
-curl https://auth.nexusbook.com/jwks.json
+curl https://auth.nexusbook.app/jwks.json
 ```
 
 ### UserInfo 端点
@@ -205,7 +318,7 @@ curl https://auth.nexusbook.com/jwks.json
 获取当前用户信息：
 
 ```bash
-curl https://auth.nexusbook.com/userinfo \
+curl https://auth.nexusbook.app/userinfo \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
 ```
 
@@ -261,7 +374,7 @@ SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQss... # Signature
 使用 Refresh Token 获取新的 Access Token：
 
 ```bash
-curl -X POST https://auth.nexusbook.com/token \
+curl -X POST https://auth.nexusbook.app/token \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=refresh_token' \
   -d 'refresh_token=YOUR_REFRESH_TOKEN' \
@@ -298,7 +411,7 @@ class TokenManager {
   }
   
   async refreshAccessToken() {
-    const response = await axios.post('https://auth.nexusbook.com/token', {
+    const response = await axios.post('https://auth.nexusbook.app/token', {
       grant_type: 'refresh_token',
       refresh_token: this.refreshToken,
       client_id: this.clientId,
@@ -355,7 +468,7 @@ API 密钥用于服务集成与自动化任务，支持最小权限与可撤销�
 
 ### 创建 API Key
 ```bash
-curl -X POST 'https://auth.nexusbook.com/api-keys' \
+curl -X POST 'https://auth.nexusbook.app/api-keys' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -367,7 +480,7 @@ curl -X POST 'https://auth.nexusbook.com/api-keys' \
 
 ### 吊销 API Key
 ```bash
-curl -X POST 'https://auth.nexusbook.com/api-keys/{keyId}/revoke' \
+curl -X POST 'https://auth.nexusbook.app/api-keys/{keyId}/revoke' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
 ```
 
@@ -395,10 +508,10 @@ curl -X POST 'https://auth.nexusbook.com/api-keys/{keyId}/revoke' \
 **始终使用 HTTPS** 传输敏感信息：
 ```javascript
 // ✅ 正确
-const apiUrl = 'https://open.nexusbook.com/api/v1/...';
+const apiUrl = 'https://open.nexusbook.app/api/v1/...';
 
 // ❌ 错误
-const apiUrl = 'http://open.nexusbook.com/api/v1/...';
+const apiUrl = 'http://open.nexusbook.app/api/v1/...';
 ```
 
 ### 2. Scope 最小权限原则
@@ -424,7 +537,7 @@ function verifyToken(token) {
   return new Promise((resolve, reject) => {
     jwt.verify(token, getKey, {
       audience: 'your_client_id',
-      issuer: 'https://auth.nexusbook.com',
+      issuer: 'https://auth.nexusbook.app',
       algorithms: ['RS256']
     }, (err, decoded) => {
       if (err) reject(err);

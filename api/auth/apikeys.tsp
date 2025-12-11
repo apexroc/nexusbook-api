@@ -453,7 +453,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/api-keys' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/api-keys' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -478,7 +478,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/api-keys?page=1&pageSize=20&status=active' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/api-keys?page=1&pageSize=20&status=active' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -537,7 +537,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/api-keys/{apiKeyId}' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -564,7 +564,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/api-keys/{apiKeyId}/revoke' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}/revoke' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -582,7 +582,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/api-keys/{apiKeyId}/regenerate' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}/regenerate' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -600,7 +600,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/api-keys/{apiKeyId}' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -618,7 +618,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/api-keys/{apiKeyId}/logs?page=1&pageSize=50&startTime=2024-12-01T00:00:00Z&endTime=2024-12-05T23:59:59Z' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}/logs?page=1&pageSize=50&startTime=2024-12-01T00:00:00Z&endTime=2024-12-05T23:59:59Z' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -680,7 +680,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/api-keys/{apiKeyId}/stats?period=7d' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}/stats?period=7d' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -706,7 +706,7 @@ interface ApiKeyApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/api-keys/batch-revoke' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/api-keys/batch-revoke' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

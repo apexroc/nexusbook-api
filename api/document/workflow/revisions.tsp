@@ -403,7 +403,7 @@ interface RevisionsApi {
      * 示例（cURL）:
      * ```bash
      * # 比较 rev-2 与 rev-1（base）的差异
-     * curl 'https://open.nexusbook.com/api/v1/doc/product/123/revisions/rev-2/diff?base=rev-1' \\
+     * curl 'https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-2/diff?base=rev-1' \\
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -456,7 +456,7 @@ interface RevisionsApi {
      *
      * 示例 - 查询某行的变更历史:
      * ```bash
-     * curl 'https://open.nexusbook.com/api/v1/doc/product/123/revisions/history?targetKind=row&rowId=row-1' \\
+     * curl 'https://open.nexusbook.app/api/v1/doc/product/123/revisions/history?targetKind=row&rowId=row-1' \\
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */

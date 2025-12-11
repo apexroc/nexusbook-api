@@ -476,7 +476,7 @@ interface AuthenticationApi {
      *
      * 示例（邮箱注册）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/auth/register' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/auth/register' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
      *     "email": "user@example.com",
@@ -500,7 +500,7 @@ interface AuthenticationApi {
      *
      * 示例（邮箱登录）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/auth/login' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/auth/login' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
      *     "email": "user@example.com",

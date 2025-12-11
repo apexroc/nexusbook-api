@@ -31,7 +31,7 @@ interface OrganizationI18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/config' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/config' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -55,7 +55,7 @@ interface OrganizationI18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PUT 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/config' \
+     * curl -X PUT 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/config' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -93,7 +93,7 @@ interface OrganizationI18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/custom-translations?language=zh&namespace=custom' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations?language=zh&namespace=custom' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -141,7 +141,7 @@ interface OrganizationI18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PUT 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/custom-translations' \
+     * curl -X PUT 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -212,7 +212,7 @@ interface OrganizationI18nApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/custom-translations?language=zh&keys=field.custom_status,label.department' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations?language=zh&keys=field.custom_status,label.department' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -262,7 +262,7 @@ interface TranslationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/i18n/translate' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/i18n/translate' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -319,7 +319,7 @@ interface TranslationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/i18n/translation-suggestions' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/i18n/translation-suggestions' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -383,7 +383,7 @@ interface TranslationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/glossary?sourceLanguage=zh&targetLanguage=en' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/glossary?sourceLanguage=zh&targetLanguage=en' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -425,7 +425,7 @@ interface TranslationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/i18n/glossary' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/glossary' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

@@ -461,15 +461,28 @@ model OAuthCallbackRequest {
 
 // ==================== API 接口 ====================
 
+/**
+ * OIDC 提供商公开查询 API
+ * OIDC Provider Public API
+ *
+ * Domain: https://open.nexusbook.app
+ * Route Prefix: /api/v1/oidc/providers
+ *
+ * 公开查询接口，用于登录页面显示可用的第三方登录选项。
+ * Public query interface for displaying available third-party login options on login page.
+ */
 @route("/api/v1/oidc/providers")
-@tag("OIDC Providers")
-interface OidcProviderApi {
+@tag("OIDC Providers - Public")
+interface OidcProviderPublicApi {
     /**
-     * 列出可用的 OIDC 提供商
-     * List available OIDC providers
+     * 列出可用的 OIDC 提供商（公开）
+     * List available OIDC providers (public)
      *
-     * 获取系统配置的所有 OIDC 提供商列表（公开接口，用于登录页面）。
-     * Get list of all configured OIDC providers (public endpoint, for login page).
+     * 获取系统配置的所有活跃 OIDC 提供商列表，返回简化信息（不含密钥等敏感数据）。
+     * Get list of all active OIDC providers with simplified info (no sensitive data like secrets).
+     *
+     * 用于登录页面展示可用的第三方登录选项。
+     * Used to display available third-party login options on login page.
      */
     @get
     @summary("列出可用的 OIDC 提供商")
@@ -497,6 +510,45 @@ interface OidcProviderApi {
          */
         logoUrl?: string;
     }[]>;
+}
+
+/**
+ * OIDC 提供商管理 API
+ * OIDC Provider Admin API
+ *
+ * Domain: https://open.nexusbook.app (当前) / https://admin.nexusbook.app (规划)
+ * Current Domain: https://open.nexusbook.app / Planned: https://admin.nexusbook.app
+ *
+ * Route Prefix: /api/v1/admin/oidc/providers
+ *
+ * 平台管理员专用接口，用于配置和管理第三方 OIDC 登录提供商。
+ * Platform admin interface for configuring and managing third-party OIDC login providers.
+ *
+ * 权限要求：平台管理员
+ * Permission Required: Platform Administrator
+ */
+@route("/api/v1/admin/oidc/providers")
+@tag("OIDC Providers - Admin")
+interface OidcProviderAdminApi {
+    /**
+     * 列出所有 OIDC 提供商配置（管理员）
+     * List all OIDC provider configurations (admin)
+     *
+     * 获取所有 OIDC 提供商的完整配置信息，包括密钥等敏感信息。
+     * Get complete configuration of all OIDC providers, including sensitive data like secrets.
+     *
+     * 权限要求：平台管理员
+     * Permission required: Platform administrator
+     *
+     * 示例：
+     * ```bash
+     * curl -X GET 'https://open.nexusbook.app/api/v1/admin/oidc/providers' \
+     *   -H 'Authorization: Bearer ADMIN_TOKEN'
+     * ```
+     */
+    @get
+    @summary("列出所有 OIDC 提供商配置")
+    listAllProviders(): NexusBook.Api.Common.ApiResponse<OidcProviderConfig[]>;
 
     /**
      * 添加 OIDC 提供商配置（管理员）
@@ -507,7 +559,7 @@ interface OidcProviderApi {
      *
      * 示例（Google）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/oidc/providers' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/admin/oidc/providers' \
      *   -H 'Authorization: Bearer ADMIN_TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -528,6 +580,9 @@ interface OidcProviderApi {
     /**
      * 获取 OIDC 提供商配置（管理员）
      * Get OIDC provider configuration (admin)
+     *
+     * 获取指定 OIDC 提供商的完整配置信息。
+     * Get complete configuration of specified OIDC provider.
      */
     @get
     @route("/{providerId}")
@@ -537,6 +592,9 @@ interface OidcProviderApi {
     /**
      * 更新 OIDC 提供商配置（管理员）
      * Update OIDC provider configuration (admin)
+     *
+     * 更新指定 OIDC 提供商的配置信息。
+     * Update configuration of specified OIDC provider.
      */
     @patch
     @route("/{providerId}")
@@ -549,6 +607,9 @@ interface OidcProviderApi {
     /**
      * 删除 OIDC 提供商配置（管理员）
      * Delete OIDC provider configuration (admin)
+     *
+     * 删除指定的 OIDC 提供商配置。
+     * Delete specified OIDC provider configuration.
      */
     @delete
     @route("/{providerId}")
@@ -568,7 +629,7 @@ interface OAuthLoginApi {
      *
      * 示例（Google 登录）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
+     * curl -X GET 'https://open.nexusbook.app/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
      * ```
      */
     @get
@@ -588,7 +649,7 @@ interface OAuthLoginApi {
      *
      * 示例（Google 回调）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/google/callback' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/auth/oauth/google/callback' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
      *     "code": "AUTHORIZATION_CODE",

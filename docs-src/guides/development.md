@@ -193,7 +193,7 @@ getMetadata(...): ApiResponse<Metadata>;
  *
  * 示例（cURL）:
  * ```bash
- * curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true' \
+ * curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data?apply=true' \
  *   -H 'Authorization: Bearer TOKEN' \
  *   -H 'Content-Type: application/json' \
  *   -d '{"id":"row-1","values":[{"fieldId":"name","value":{"text":"新产品"}}]}'
@@ -207,7 +207,7 @@ getMetadata(...): ApiResponse<Metadata>;
 
 ```bash
 # 设置环境变量
-export API_BASE="https://open.nexusbook.com/api/v1"
+export API_BASE="https://open.nexusbook.app/api/v1"
 export TOKEN="your_access_token"
 
 # 测试端点

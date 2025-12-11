@@ -40,7 +40,7 @@
 **单行创建**：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -57,7 +57,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=r
 
 ```bash
 # 推荐：BulkUpdate 统一接口
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '[
@@ -71,21 +71,21 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?reques
 **获取单行**：
 
 ```bash
-curl 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001' \
+curl 'https://open.nexusbook.app/api/v1/doc/product/123/data/row-001' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
 **列表查询**：
 
 ```bash
-curl 'https://open.nexusbook.com/api/v1/doc/product/123/data?page=1&pageSize=20' \
+curl 'https://open.nexusbook.app/api/v1/doc/product/123/data?page=1&pageSize=20' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
 **结构化查询**：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data/query' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -107,7 +107,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
 **全量更新**：
 
 ```bash
-curl -X PUT 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1' \
+curl -X PUT 'https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -122,7 +122,7 @@ curl -X PUT 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requ
 **部分更新**：
 
 ```bash
-curl -X PATCH 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1' \
+curl -X PATCH 'https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -138,14 +138,14 @@ curl -X PATCH 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?re
 **单行删除**：
 
 ```bash
-curl -X DELETE 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1' \
+curl -X DELETE 'https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
 **批量删除**：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=true' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?apply=true' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -237,7 +237,7 @@ flowchart LR
 
 ```bash
 # 1. 获取当前数据
-curl 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001' \
+curl 'https://open.nexusbook.app/api/v1/doc/product/123/data/row-001' \
   -H 'Authorization: Bearer TOKEN'
 
 # 响应
@@ -248,7 +248,7 @@ curl 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001' \
 }
 
 # 2. 更新时提供版本号
-curl -X PUT 'https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?apply=true' \
+curl -X PUT 'https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?apply=true' \
   -H 'Authorization: Bearer TOKEN' \
   -d '{
     "values": [...],

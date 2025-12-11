@@ -42,10 +42,10 @@
 
 # 域名与路由约定
 
-* API 基址：`https://open.nexusbook.com/api/v1`
-* 认证基址：`https://auth.nexusbook.com`
-* OIDC 发现：`https://auth.nexusbook.com/.well-known/openid-configuration`
-* JWKS：`https://auth.nexusbook.com/jwks.json`
+* API 基址：`https://open.nexusbook.app/api/v1`
+* 认证基址：`https://auth.nexusbook.app`
+* OIDC 发现：`https://auth.nexusbook.app/.well-known/openid-configuration`
+* JWKS：`https://auth.nexusbook.app/jwks.json`
 
 # 生成要求
 * 命名空间为 NexusBook.Api 与 NexusBook.Auth

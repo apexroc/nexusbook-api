@@ -31,7 +31,7 @@ interface UserPreferencesApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/users/me/preferences?section=regional' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/users/me/preferences?section=regional' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -54,7 +54,7 @@ interface UserPreferencesApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/users/me/preferences' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/users/me/preferences' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -114,7 +114,7 @@ interface UserPreferencesApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/users/me/preferences/reset' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/users/me/preferences/reset' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -151,7 +151,7 @@ interface UserPreferencesApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/users/me/preferences/language' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/users/me/preferences/language' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -169,7 +169,7 @@ interface UserPreferencesApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PUT 'https://open.nexusbook.com/api/v1/users/me/preferences/language' \
+     * curl -X PUT 'https://open.nexusbook.app/api/v1/users/me/preferences/language' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

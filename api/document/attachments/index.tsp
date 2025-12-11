@@ -31,7 +31,7 @@ using OpenAPI;
  *
  * ### 上传附件
  * ```bash
- * curl -X POST 'https://open.nexusbook.com/api/v1/attachments/upload' \
+ * curl -X POST 'https://open.nexusbook.app/api/v1/attachments/upload' \
  *   -H 'Authorization: Bearer TOKEN' \
  *   -F 'file=@image.png' \
  *   -F 'scanForVirus=true' \

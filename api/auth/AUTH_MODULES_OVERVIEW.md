@@ -55,7 +55,7 @@ NexusBook 认证模块提供完整的身份认证、授权和 API 密钥管理�
 
 ```bash
 # 客户端凭证流程获取令牌
-curl -X POST 'https://auth.nexusbook.com/token' \
+curl -X POST 'https://auth.nexusbook.app/token' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&scope=doc:read data:read'
 ```
@@ -128,7 +128,7 @@ curl -X POST 'https://auth.nexusbook.com/token' \
 #### 邮箱注册
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/register' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/register' \
   -H 'Content-Type: application/json' \
   -d '{
     "email": "user@example.com",
@@ -141,7 +141,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/register' \
 #### 邮箱登录
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/login' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/login' \
   -H 'Content-Type: application/json' \
   -d '{
     "email": "user@example.com",
@@ -154,7 +154,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/login' \
 
 ```bash
 # 1. 发送验证码
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/verification-code' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/verification-code' \
   -H 'Content-Type: application/json' \
   -d '{
     "target": "+86 138 1234 5678",
@@ -162,7 +162,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/verification-code' \
   }'
 
 # 2. 使用验证码登录
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/login' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/login' \
   -H 'Content-Type: application/json' \
   -d '{
     "phone": "+86 138 1234 5678",
@@ -174,7 +174,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/login' \
 
 ```bash
 # 1. 初始化设置
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/two-factor/setup' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/two-factor/setup' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -191,7 +191,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/two-factor/setup' \
 }
 
 # 2. 使用 Google Authenticator 扫描二维码后，启用两步验证
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/two-factor/enable' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/two-factor/enable' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -204,14 +204,14 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/two-factor/enable' \
 
 ```bash
 # 1. 请求密码重置
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/forgot-password' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/forgot-password' \
   -H 'Content-Type: application/json' \
   -d '{
     "target": "user@example.com"
   }'
 
 # 2. 使用验证码重置密码
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/reset-password' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/reset-password' \
   -H 'Content-Type: application/json' \
   -d '{
     "target": "user@example.com",
@@ -275,7 +275,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/reset-password' \
 #### 创建 API Key
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/api-keys' \
+curl -X POST 'https://open.nexusbook.app/api/v1/api-keys' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -310,14 +310,14 @@ curl -X POST 'https://open.nexusbook.com/api/v1/api-keys' \
 #### 列出 API Keys
 
 ```bash
-curl -X GET 'https://open.nexusbook.com/api/v1/api-keys?page=1&pageSize=20&status=active' \
+curl -X GET 'https://open.nexusbook.app/api/v1/api-keys?page=1&pageSize=20&status=active' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
 #### 更新 API Key
 
 ```bash
-curl -X PATCH 'https://open.nexusbook.com/api/v1/api-keys/key_abc123' \
+curl -X PATCH 'https://open.nexusbook.app/api/v1/api-keys/key_abc123' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -330,14 +330,14 @@ curl -X PATCH 'https://open.nexusbook.com/api/v1/api-keys/key_abc123' \
 #### 吊销 API Key
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/api-keys/key_abc123/revoke' \
+curl -X POST 'https://open.nexusbook.app/api/v1/api-keys/key_abc123/revoke' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
 #### 查看使用记录
 
 ```bash
-curl -X GET 'https://open.nexusbook.com/api/v1/api-keys/key_abc123/logs?page=1&pageSize=50&startTime=2024-12-01T00:00:00Z&endTime=2024-12-05T23:59:59Z' \
+curl -X GET 'https://open.nexusbook.app/api/v1/api-keys/key_abc123/logs?page=1&pageSize=50&startTime=2024-12-01T00:00:00Z&endTime=2024-12-05T23:59:59Z' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
@@ -368,7 +368,7 @@ curl -X GET 'https://open.nexusbook.com/api/v1/api-keys/key_abc123/logs?page=1&p
 #### 查看使用统计
 
 ```bash
-curl -X GET 'https://open.nexusbook.com/api/v1/api-keys/key_abc123/stats?period=7d' \
+curl -X GET 'https://open.nexusbook.app/api/v1/api-keys/key_abc123/stats?period=7d' \
   -H 'Authorization: Bearer TOKEN'
 ```
 
@@ -602,7 +602,7 @@ CREATE TABLE api_key_usage_logs (
 #### 注册 OAuth 客户端应用
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/oauth/clients' \
+curl -X POST 'https://open.nexusbook.app/api/v1/oauth/clients' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -687,7 +687,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/oauth/clients' \
 #### 配置 Google OIDC 提供商（管理员）
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/oidc/providers' \
+curl -X POST 'https://open.nexusbook.app/api/v1/oidc/providers' \
   -H 'Authorization: Bearer ADMIN_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -705,7 +705,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/oidc/providers' \
 
 ```bash
 # 1. 获取授权 URL
-curl -X GET 'https://open.nexusbook.com/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
+curl -X GET 'https://open.nexusbook.app/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
 
 # 响应：
 {
@@ -718,7 +718,7 @@ curl -X GET 'https://open.nexusbook.com/api/v1/auth/oauth/google/authorize?redir
 # 2. 用户访问 authorizationUrl 并授权后，Google 会重定向到 redirectUri，带上 code 和 state
 
 # 3. 处理回调
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/google/callback' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/oauth/google/callback' \
   -H 'Content-Type: application/json' \
   -d '{
     "code": "AUTHORIZATION_CODE",
@@ -748,7 +748,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/google/callback' \
 
 ```bash
 # 用户已登录，希望关联 GitHub 账号
-curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/github/link' \
+curl -X POST 'https://open.nexusbook.app/api/v1/auth/oauth/github/link' \
   -H 'Authorization: Bearer USER_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -780,7 +780,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/auth/oauth/github/link' \
 
 ```bash
 # 1. 设备端：启动设备授权流程
-curl -X POST 'https://auth.nexusbook.com/device/authorize' \
+curl -X POST 'https://auth.nexusbook.app/device/authorize' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'client_id=CLIENT_ID&scope=doc:read data:read'
 
@@ -788,8 +788,8 @@ curl -X POST 'https://auth.nexusbook.com/device/authorize' \
 {
   "device_code": "GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS",
   "user_code": "WDJB-MJHT",
-  "verification_uri": "https://nexusbook.com/device",
-  "verification_uri_complete": "https://nexusbook.com/device?user_code=WDJB-MJHT",
+  "verification_uri": "https://nexusbook.app/device",
+  "verification_uri_complete": "https://nexusbook.app/device?user_code=WDJB-MJHT",
   "expires_in": 1800,
   "interval": 5
 }
@@ -797,7 +797,7 @@ curl -X POST 'https://auth.nexusbook.com/device/authorize' \
 # 2. 设备端：显示 user_code 和 verification_uri 给用户
 
 # 3. 用户：访问 verification_uri，输入 user_code，确认授权
-curl -X POST 'https://auth.nexusbook.com/device/confirm' \
+curl -X POST 'https://auth.nexusbook.app/device/confirm' \
   -H 'Authorization: Bearer USER_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -806,7 +806,7 @@ curl -X POST 'https://auth.nexusbook.com/device/confirm' \
   }'
 
 # 4. 设备端：轮询令牌端点（每 5 秒一次）
-curl -X POST 'https://auth.nexusbook.com/token' \
+curl -X POST 'https://auth.nexusbook.app/token' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=urn:ietf:params:oauth:grant-type:device_code&device_code=GmRhmhcxhwAzkoEqiMEg_DnyEysNkuNhszIySk9eS&client_id=CLIENT_ID'
 
@@ -828,7 +828,7 @@ curl -X POST 'https://auth.nexusbook.com/token' \
 # code_challenge: BASE64URL(SHA256(code_verifier))
 
 # 2. 客户端：跳转到授权端点
-GET https://auth.nexusbook.com/authorize?
+GET https://auth.nexusbook.app/authorize?
   response_type=code&
   client_id=CLIENT_ID&
   redirect_uri=https://myapp.com/callback&
@@ -840,7 +840,7 @@ GET https://auth.nexusbook.com/authorize?
 # 3. 用户登录并授权后，重定向到 redirect_uri，带上 code
 
 # 4. 客户端：使用 code 和 code_verifier 换取令牌
-curl -X POST 'https://auth.nexusbook.com/token' \
+curl -X POST 'https://auth.nexusbook.app/token' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=authorization_code&code=AUTHORIZATION_CODE&redirect_uri=https://myapp.com/callback&client_id=CLIENT_ID&code_verifier=CODE_VERIFIER'
 ```
@@ -848,7 +848,7 @@ curl -X POST 'https://auth.nexusbook.com/token' \
 #### 令牌撤销
 
 ```bash
-curl -X POST 'https://auth.nexusbook.com/revoke' \
+curl -X POST 'https://auth.nexusbook.app/revoke' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'token=ACCESS_TOKEN&token_type_hint=access_token&client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
 ```
@@ -856,7 +856,7 @@ curl -X POST 'https://auth.nexusbook.com/revoke' \
 #### 令牌自省
 
 ```bash
-curl -X POST 'https://auth.nexusbook.com/introspect' \
+curl -X POST 'https://auth.nexusbook.app/introspect' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'token=ACCESS_TOKEN&client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
 
@@ -870,8 +870,8 @@ curl -X POST 'https://auth.nexusbook.com/introspect' \
   "exp": 1702123456,
   "iat": 1702119856,
   "sub": "user_123",
-  "aud": "https://api.nexusbook.com",
-  "iss": "https://auth.nexusbook.com"
+  "aud": "https://api.nexusbook.app",
+  "iss": "https://auth.nexusbook.app"
 }
 ```
 

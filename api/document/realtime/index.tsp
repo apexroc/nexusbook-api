@@ -40,7 +40,7 @@ using OpenAPI;
  *
  * ### WebSocket 连接
  * ```javascript
- * const ws = new WebSocket('wss://open.nexusbook.com/api/v1/realtime/doc/product/123');
+ * const ws = new WebSocket('wss://open.nexusbook.app/api/v1/realtime/doc/product/123');
  * ws.onopen = () => {
  *   ws.send(JSON.stringify({
  *     type: 'auth',

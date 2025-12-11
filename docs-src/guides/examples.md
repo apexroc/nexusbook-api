@@ -194,7 +194,7 @@ class OrderManagementSystem {
 
 // 使用示例
 const oms = new OrderManagementSystem(
-  'https://open.nexusbook.com/api/v1',
+  'https://open.nexusbook.app/api/v1',
   'YOUR_ACCESS_TOKEN'
 );
 

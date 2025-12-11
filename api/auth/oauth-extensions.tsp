@@ -463,7 +463,7 @@ interface OAuthExtensionsApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://auth.nexusbook.com/revoke' \
+     * curl -X POST 'https://auth.nexusbook.app/revoke' \
      *   -H 'Content-Type: application/x-www-form-urlencoded' \
      *   -d 'token=ACCESS_TOKEN&token_type_hint=access_token&client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
      * ```
@@ -482,7 +482,7 @@ interface OAuthExtensionsApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://auth.nexusbook.com/introspect' \
+     * curl -X POST 'https://auth.nexusbook.app/introspect' \
      *   -H 'Content-Type: application/x-www-form-urlencoded' \
      *   -d 'token=ACCESS_TOKEN&client_id=CLIENT_ID&client_secret=CLIENT_SECRET'
      * ```
@@ -503,7 +503,7 @@ interface OAuthExtensionsApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://auth.nexusbook.com/device/authorize' \
+     * curl -X POST 'https://auth.nexusbook.app/device/authorize' \
      *   -H 'Content-Type: application/x-www-form-urlencoded' \
      *   -d 'client_id=CLIENT_ID&scope=doc:read data:read'
      * ```
@@ -524,7 +524,7 @@ interface OAuthExtensionsApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://auth.nexusbook.com/device/confirm' \
+     * curl -X POST 'https://auth.nexusbook.app/device/confirm' \
      *   -H 'Authorization: Bearer USER_TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

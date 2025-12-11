@@ -29,7 +29,7 @@ using OpenAPI;
  *
  * ### 创建双向关联
  * ```bash
- * curl -X POST 'https://open.nexusbook.com/api/v1/doc/order/123/relations' \
+ * curl -X POST 'https://open.nexusbook.app/api/v1/doc/order/123/relations' \
  *   -H 'Authorization: Bearer TOKEN' \
  *   -d '{
  *     "targetDocType": "product",
@@ -344,7 +344,7 @@ interface RelationsApi {
      *
      * 示例（cURL）:
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/doc/order/123/relations' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/doc/order/123/relations' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -d '{
      *     "sourceRowId": "row-1",

@@ -108,7 +108,7 @@ interface DocumentAggregateApi {
      * 示例（cURL）:
      * ```bash
      * curl -H 'Authorization: Bearer TOKEN' \
-     *   'https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data&page=1&pageSize=20'
+     *   'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&page=1&pageSize=20'
      * ```
      */
     @get

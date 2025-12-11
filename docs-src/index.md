@@ -48,7 +48,7 @@
 #### 获取访问令牌
 
 ```bash
-curl -X POST https://auth.nexusbook.com/token \
+curl -X POST https://auth.nexusbook.app/token \
   -d 'grant_type=client_credentials' \
   -d 'client_id=YOUR_CLIENT_ID' \
   -d 'client_secret=YOUR_CLIENT_SECRET' \
@@ -59,13 +59,13 @@ curl -X POST https://auth.nexusbook.com/token \
 
 ```bash
 curl -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
-  'https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data'
+  'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data'
 ```
 
 #### 创建数据行
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1' \
   -H 'Authorization: Bearer TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
