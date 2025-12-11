@@ -556,7 +556,7 @@ interface DataApi {
      *
      * 示例（cURL）:
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \\
+     * curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1' \\
      *   -H 'Authorization: Bearer TOKEN' \\
      *   -H 'Content-Type: application/json' \\
      *   -d '{"id":"row-1","values":[{"fieldId":"name","value":{"text":"新产品"}}]}'

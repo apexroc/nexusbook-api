@@ -31,7 +31,7 @@ using OpenAPI;
  *
  * ### 创建同步配置
  * ```bash
- * curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/sync' \
+ * curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/sync' \
  *   -H 'Authorization: Bearer TOKEN' \
  *   -d '{
  *     "name": "Sync from Google Sheets",

@@ -119,7 +119,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/invitations' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/invitations' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -156,7 +156,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/invitations?status=pending' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/invitations?status=pending' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -198,7 +198,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/invitations/inv-456' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/invitations/inv-456' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -228,7 +228,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123/invitations/inv-456' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/invitations/inv-456' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -258,7 +258,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/invitations/TOKEN_STRING/accept' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/invitations/TOKEN_STRING/accept' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -282,7 +282,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/invitations/TOKEN_STRING/decline' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/invitations/TOKEN_STRING/decline' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -306,7 +306,7 @@ interface InvitationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/invitations/TOKEN_STRING' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/invitations/TOKEN_STRING' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -337,7 +337,7 @@ interface JoinRequestApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/join-requests' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -371,7 +371,7 @@ interface JoinRequestApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/join-requests?status=pending' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests?status=pending' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -413,7 +413,7 @@ interface JoinRequestApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/join-requests/req-789' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests/req-789' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -443,7 +443,7 @@ interface JoinRequestApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/join-requests/req-789/approve' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests/req-789/approve' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -484,7 +484,7 @@ interface JoinRequestApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/join-requests/req-789/reject' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests/req-789/reject' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -524,7 +524,7 @@ interface JoinRequestApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123/join-requests/req-789' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests/req-789' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */

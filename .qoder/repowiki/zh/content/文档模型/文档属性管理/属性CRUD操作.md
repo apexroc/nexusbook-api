@@ -143,8 +143,8 @@ API-->>Client : "返回 DocumentProperties 或合并视图"
   - 若未提供 requestId，返回当前持久化属性
   - 若提供 requestId，服务端会将该请求中的变更与当前属性合并，形成“叠加视图”
 - cURL示例
-  - 获取当前属性：curl -X GET "https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties"
-  - 获取叠加视图：curl -X GET "https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1"
+  - 获取当前属性：curl -X GET "https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties"
+  - 获取叠加视图：curl -X GET "https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1"
 
 章节来源
 - [api/document/core/properties.tsp](file://api/document/core/properties.tsp#L216-L233)
@@ -163,7 +163,7 @@ API-->>Client : "返回 DocumentProperties 或合并视图"
   - 通常在文档创建时调用，用于初始化属性
   - 若提供 version，服务端仍按创建语义处理（version主要用于并发控制的后续写操作）
 - cURL示例
-  - curl -X POST "https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties" -H "Content-Type: application/json" -d '{...}'
+  - curl -X POST "https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties" -H "Content-Type: application/json" -d '{...}'
 
 章节来源
 - [api/document/core/properties.tsp](file://api/document/core/properties.tsp#L234-L239)
@@ -186,7 +186,7 @@ API-->>Client : "返回 DocumentProperties 或合并视图"
   - PUT总是进入变更请求，即使未显式指定 requestId，也会创建或追加到默认请求
   - 合并后才真正生效，并生成修订（Revision）
 - cURL示例
-  - curl -X PUT "https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1" -H "Content-Type: application/json" -d '{...}'
+  - curl -X PUT "https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1" -H "Content-Type: application/json" -d '{...}'
 
 章节来源
 - [api/document/core/properties.tsp](file://api/document/core/properties.tsp#L273-L280)
@@ -212,7 +212,7 @@ API-->>Client : "返回 DocumentProperties 或合并视图"
 - 与变更请求工作流集成
   - PATCH同样进入变更请求；merge=true时，新值与现有值合并；merge=false时，新值覆盖现有值
 - cURL示例
-  - curl -X PATCH "https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1&merge=true&version=1" -H "Content-Type: application/json" -d '{"updates":[{"fieldId":"amount","value":6000.00},{"fieldId":"quantity","value":60}]}'
+  - curl -X PATCH "https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1&merge=true&version=1" -H "Content-Type: application/json" -d '{"updates":[{"fieldId":"amount","value":6000.00},{"fieldId":"quantity","value":60}]}'
 
 章节来源
 - [api/document/core/properties.tsp](file://api/document/core/properties.tsp#L339-L375)
@@ -233,7 +233,7 @@ API-->>Client : "返回 DocumentProperties 或合并视图"
   - 此操作不可逆，请谨慎调用
   - 删除后，文档将不再包含任何属性数据
 - cURL示例
-  - curl -X DELETE "https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?version=1"
+  - curl -X DELETE "https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?version=1"
 
 章节来源
 - [api/document/core/properties.tsp](file://api/document/core/properties.tsp#L433-L439)

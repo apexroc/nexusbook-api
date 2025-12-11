@@ -12,7 +12,11 @@ using OpenAPI;
  * 提供 OAuth2 和 OIDC 兼容的身份认证和授权功能。
  * Provides OAuth2 and OIDC compatible identity authentication and authorization features.
  *
- * Domain: https://auth.nexusbook.com
+ * Domain: https://auth.nexusbook.app
+ * Route Prefix: / (根路径)
+ *
+ * 此模块定义 OAuth2/OIDC 标准协议端点，包括授权、令牌、用户信息等核心功能。
+ * This module defines OAuth2/OIDC standard protocol endpoints, including authorization, token, userinfo, etc.
  *
  * 主要功能 / Main Features:
  * - OAuth2 客户端应用管理 OAuth2 client application management
@@ -533,7 +537,7 @@ namespace NexusBook.Api.Auth {
          *
          * 示例（cURL）:
          * ```bash
-         * curl -X POST 'https://auth.nexusbook.com/token' \\
+         * curl -X POST 'https://auth.nexusbook.app/token' \\
          *   -H 'Content-Type: application/x-www-form-urlencoded' \\
          *   -d 'grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&scope=doc:read data:read'
          * ```

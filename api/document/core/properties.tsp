@@ -253,7 +253,7 @@ interface DocumentPropertiesApi {
      *
      * 示例（cURL）:
      * ```bash
-     * curl -X PUT 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1' \\
+     * curl -X PUT 'https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1' \\
      *   -H 'Authorization: Bearer TOKEN' \\
      *   -H 'Content-Type: application/json' \\
      *   -d '{
@@ -311,7 +311,7 @@ interface DocumentPropertiesApi {
      *
      * 示例（cURL）- 仅更新订单金额和数量：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1&merge=true&version=1' \\
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1&merge=true&version=1' \\
      *   -H 'Authorization: Bearer TOKEN' \\
      *   -H 'Content-Type: application/json' \\
      *   -d '{

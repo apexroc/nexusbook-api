@@ -491,7 +491,7 @@ interface OAuthClientApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/oauth/clients' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/oauth/clients' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

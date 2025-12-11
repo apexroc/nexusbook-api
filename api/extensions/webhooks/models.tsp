@@ -529,7 +529,7 @@ interface WebhooksApi {
      *
      * 示例（cURL）:
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/webhooks' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/webhooks' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{

@@ -63,7 +63,7 @@ make serve
 ### 方式 1：客户端凭证流程（推荐用于服务端应用）
 
 ```bash
-curl -X POST https://auth.nexusbook.com/token \
+curl -X POST https://auth.nexusbook.app/token \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=client_credentials' \
   -d 'client_id=YOUR_CLIENT_ID' \
@@ -86,7 +86,7 @@ curl -X POST https://auth.nexusbook.com/token \
 
 1. 引导用户到授权端点：
 ```
-https://auth.nexusbook.com/authorize?
+https://auth.nexusbook.app/authorize?
   response_type=code&
   client_id=YOUR_CLIENT_ID&
   redirect_uri=YOUR_REDIRECT_URI&
@@ -96,7 +96,7 @@ https://auth.nexusbook.com/authorize?
 
 2. 用户授权后，使用授权码换取令牌：
 ```bash
-curl -X POST https://auth.nexusbook.com/token \
+curl -X POST https://auth.nexusbook.app/token \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=authorization_code' \
   -d 'code=AUTHORIZATION_CODE' \
@@ -128,7 +128,7 @@ curl -X POST https://auth.nexusbook.com/token \
 
 ```bash
 curl -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
-  'https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data&page=1&pageSize=20'
+  'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&page=1&pageSize=20'
 ```
 
 **响应示例：**
@@ -169,7 +169,7 @@ curl -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
 向产品文档中添加新产品：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -191,7 +191,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=r
 使用结构化查询 API 搜索产品：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data/query' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -213,7 +213,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/query' \
 使用统一的 BulkUpdate 接口进行混合更新（数据与属性），所有写操作必须携带 `requestId`：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '[
@@ -229,7 +229,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?reques
 通过统一接口实现数据与属性的混合更新：
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1' \
+curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '[
@@ -276,7 +276,7 @@ curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?reques
 
 ```bash
 # 获取第 2 页，每页 50 条
-curl 'https://open.nexusbook.com/api/v1/doc/product/123/data?page=2&pageSize=50' \
+curl 'https://open.nexusbook.app/api/v1/doc/product/123/data?page=2&pageSize=50' \
   -H 'Authorization: Bearer YOUR_ACCESS_TOKEN'
 ```
 

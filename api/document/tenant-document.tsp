@@ -124,7 +124,7 @@ interface OrganizationDocumentApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/doc/policy/doc-456?include=metadata,views,data' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/doc/policy/doc-456?include=metadata,views,data' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -199,7 +199,7 @@ interface OrganizationDocumentApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/documents?docType=policy&page=1&pageSize=20' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/documents?docType=policy&page=1&pageSize=20' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -272,7 +272,7 @@ interface WorkspaceDocumentApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/doc/purchaseOrder/doc-789?include=metadata,views,data' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/doc/purchaseOrder/doc-789?include=metadata,views,data' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -353,7 +353,7 @@ interface WorkspaceDocumentApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/workspaces/ws-456/documents?docType=purchaseOrder&page=1&pageSize=20' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/documents?docType=purchaseOrder&page=1&pageSize=20' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */

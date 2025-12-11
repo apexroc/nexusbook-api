@@ -184,7 +184,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -208,7 +208,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -232,7 +232,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/organizations/org-123' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/organizations/org-123' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -267,7 +267,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -291,7 +291,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/members?page=1&pageSize=20&role=admin' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/members?page=1&pageSize=20&role=admin' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -345,7 +345,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/members' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/members' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -380,7 +380,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/organizations/org-123/members/member-789' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/members/member-789' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -410,7 +410,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/organizations/org-123/members/member-789' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/organizations/org-123/members/member-789' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -450,7 +450,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/organizations/org-123/members/member-789' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/members/member-789' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -480,7 +480,7 @@ interface OrganizationApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/organizations/org-123/leave' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/leave' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */

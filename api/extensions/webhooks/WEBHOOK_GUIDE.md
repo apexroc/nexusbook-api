@@ -203,7 +203,7 @@ Webhook 提供事件驱动的通知机制，当文档发生特定变更时，系
 ### 1. 创建 Webhook
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/webhooks' \
+curl -X POST 'https://open.nexusbook.app/api/v1/webhooks' \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -367,7 +367,7 @@ if __name__ == '__main__':
 
 ```bash
 # 发送测试事件
-curl -X POST 'https://open.nexusbook.com/api/v1/webhooks/webhook-123/test' \
+curl -X POST 'https://open.nexusbook.app/api/v1/webhooks/webhook-123/test' \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -502,35 +502,35 @@ app.post('/webhook', async (req, res) => {
 ### 查看投递历史
 
 ```bash
-curl 'https://open.nexusbook.com/api/v1/webhooks/webhook-123/deliveries' \
+curl 'https://open.nexusbook.app/api/v1/webhooks/webhook-123/deliveries' \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 
 ### 查看统计信息
 
 ```bash
-curl 'https://open.nexusbook.com/api/v1/webhooks/webhook-123/stats' \
+curl 'https://open.nexusbook.app/api/v1/webhooks/webhook-123/stats' \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 
 ### 暂停 Webhook
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/webhooks/webhook-123/pause' \
+curl -X POST 'https://open.nexusbook.app/api/v1/webhooks/webhook-123/pause' \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 
 ### 恢复 Webhook
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/webhooks/webhook-123/resume' \
+curl -X POST 'https://open.nexusbook.app/api/v1/webhooks/webhook-123/resume' \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 
 ### 重新投递失败的事件
 
 ```bash
-curl -X POST 'https://open.nexusbook.com/api/v1/webhooks/webhook-123/deliveries/delivery-456/redeliver' \
+curl -X POST 'https://open.nexusbook.app/api/v1/webhooks/webhook-123/deliveries/delivery-456/redeliver' \
   -H 'Authorization: Bearer YOUR_TOKEN'
 ```
 

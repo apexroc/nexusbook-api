@@ -1,7 +1,7 @@
 ## 域名与版本
-- API 域名：`https://open.nexusbook.com/api/v1`
-- 认证域名：`https://auth.nexusbook.com`
-- OIDC 发现：`https://auth.nexusbook.com/.well-known/openid-configuration`；JWKS：`https://auth.nexusbook.com/jwks.json`
+- API 域名：`https://open.nexusbook.app/api/v1`
+- 认证域名：`https://auth.nexusbook.app`
+- OIDC 发现：`https://auth.nexusbook.app/.well-known/openid-configuration`；JWKS：`https://auth.nexusbook.app/jwks.json`
 
 ## 统一响应与错误码
 - 统一响应：`ApiResponse<T>`（始终 HTTP 200）
@@ -12,7 +12,7 @@
 
 ## 安全与鉴权（OAuth2/OIDC）
 - 授权码与客户端凭证流；`/authorize`、`/token`、`/userinfo`
-- OpenAPI 安全组件在 API 文档中引用 `authorizationUrl` 与 `tokenUrl` 指向 `auth.nexusbook.com`
+- OpenAPI 安全组件在 API 文档中引用 `authorizationUrl` 与 `tokenUrl` 指向 `auth.nexusbook.app`
 - Scopes（建议）：`doc:read`、`doc:write`、`data:read`、`data:write`、`views:manage`、`comments:write`、`approvals:manage`、`requests:manage`
 - API 以 `Authorization: Bearer <token>` 保护；必要时在端点标注所需 Scope
 

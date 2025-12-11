@@ -42,8 +42,8 @@ API使用TypeSpec定义并生成OpenAPI 3.0规范，通过Redocly提供交互式
 
 | 项目 | 说明 |
 |------|------|
-| **API基址** | `https://open.nexusbook.com/api/v1` |
-| **认证域名** | `https://auth.nexusbook.com` |
+| **API基址** | `https://open.nexusbook.app/api/v1` |
+| **认证域名** | `https://auth.nexusbook.app` |
 | **API规范** | OpenAPI 3.0 |
 | **架构风格** | RESTful |
 | **生成工具** | TypeSpec |
@@ -108,7 +108,7 @@ GET /api/v1/doc/{doc-type}/{doc-id}?include=metadata,views,data,comments,revisio
 ```bash
 # 获取产品文档的元数据、视图和数据
 curl -H 'Authorization: Bearer TOKEN' \
-  'https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data'
+  'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data'
 ```
 
 **Section sources**

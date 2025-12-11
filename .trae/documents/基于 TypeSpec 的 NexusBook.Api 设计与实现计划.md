@@ -1,6 +1,6 @@
 ## 更新目标
 - 修正斜杠乱码，统一业务路由前缀为 `/api/v1`。
-- 明确双域架构：`open.nexusbook.com`（业务 API）与 `auth.nexusbook.com`（认证/OIDC）。
+- 明确双域架构：`open.nexusbook.app`（业务 API）与 `auth.nexusbook.app`（认证/OIDC）。
 - 更正并统一 `ApiResponse` 示例与字段拼写（`sucess` → `success`）。
 - 完善 TypeSpec 目录结构、模块拆分与 Makefile 生成与预览说明。
 - 规范 Doc 顶层路由与子资源设计，并修复重复项与表述不一致。
@@ -10,10 +10,10 @@
 
 ## 结构调整与新增章节
 1. 在“技术需求”之后新增“域名与路由约定”章节：
-   - API 基址：`https://open.nexusbook.com/api/v1`
-   - Auth 基址：`https://auth.nexusbook.com`
-   - OIDC 发现：`https://auth.nexusbook.com/.well-known/openid-configuration`
-   - JWKS：`https://auth.nexusbook.com/jwks.json`
+   - API 基址：`https://open.nexusbook.app/api/v1`
+   - Auth 基址：`https://auth.nexusbook.app`
+   - OIDC 发现：`https://auth.nexusbook.app/.well-known/openid-configuration`
+   - JWKS：`https://auth.nexusbook.app/jwks.json`
 2. 在“生成要求”章节中：
    - 指定双命名空间：业务 `NexusBook.Api` 与认证 `NexusBook.Auth`
    - 更正 `ApiResponse` JSON 示例并说明多语言 `message` 字典

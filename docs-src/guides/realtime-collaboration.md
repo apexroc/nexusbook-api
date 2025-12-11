@@ -203,7 +203,7 @@ function sendUpdate(update) {
 ## 12. SSE 事件流（只读）
 
 ```bash
-curl 'https://open.nexusbook.com/api/v1/realtime/doc/product/123/events/stream'
+curl 'https://open.nexusbook.app/api/v1/realtime/doc/product/123/events/stream'
 ```
 - Content-Type: `text/event-stream`
 - 适用于只读订阅、日志/审计等场景

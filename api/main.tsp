@@ -48,10 +48,10 @@ using OpenAPI;
  * ```bash
  * # 获取聚合文档包
  * curl -H 'Authorization: Bearer TOKEN' \
- *   'https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data'
+ *   'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data'
  *
  * # 创建数据行
- * curl -X POST 'https://open.nexusbook.com/api/v1/doc/product/123/data' \
+ * curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data' \
  *   -H 'Authorization: Bearer TOKEN' \
  *   -H 'Content-Type: application/json' \
  *   -d '{"id":"row-1","values":[{"fieldId":"name","value":{"text":"新产品"}}]}'
@@ -93,7 +93,7 @@ using OpenAPI;
  *
  * 数据行使用版本号 (version) 进行并发控制。更新时需要提供当前版本号。
  */
-@server("Open", "https://open.nexusbook.com/api/v1")
+@server("Open", "https://open.nexusbook.app/api/v1")
 @service(#{ title: "NexusBook OpenAPI" })
 namespace NexusBook.Api {
 /**
@@ -101,7 +101,7 @@ namespace NexusBook.Api {
  *
  * 欢迎使用 NexusBook OpenAPI！本 API 提供完整的文档管理和数据协作能力。
  *
- * - 📚 **文档**: 完整的 API 文档请访问 https://docs.nexusbook.com
+ * - 📚 **文档**: 完整的 API 文档请访问 https://docs.nexusbook.app
  * - 🔐 **认证**: 详见本文档顶部的认证说明
  * - 🚀 **快速开始**: 查看 API 调用示例
  * - 💡 **最佳实践**: 参考错误处理和并发控制章节
@@ -121,7 +121,7 @@ namespace NexusBook.Api {
  *
  * 标准 OIDC 发现端点: /.well-known/openid-configuration
  */
-@server("Auth", "https://auth.nexusbook.com/auth")
+@server("Auth", "https://auth.nexusbook.app/auth")
 @service(#{ title: "NexusBook Auth API" })
 namespace NexusBook.Auth {
 /**

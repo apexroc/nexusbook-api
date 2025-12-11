@@ -126,7 +126,7 @@ interface UserApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/users/me' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/users/me' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -144,7 +144,7 @@ interface UserApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X PATCH 'https://open.nexusbook.com/api/v1/users/me' \
+     * curl -X PATCH 'https://open.nexusbook.app/api/v1/users/me' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -168,7 +168,7 @@ interface UserApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X POST 'https://open.nexusbook.com/api/v1/users/me/oauth/github' \
+     * curl -X POST 'https://open.nexusbook.app/api/v1/users/me/oauth/github' \
      *   -H 'Authorization: Bearer TOKEN' \
      *   -H 'Content-Type: application/json' \
      *   -d '{
@@ -202,7 +202,7 @@ interface UserApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X DELETE 'https://open.nexusbook.com/api/v1/users/me/oauth/github' \
+     * curl -X DELETE 'https://open.nexusbook.app/api/v1/users/me/oauth/github' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -226,7 +226,7 @@ interface UserApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/users/me/oauth' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/users/me/oauth' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
@@ -244,7 +244,7 @@ interface UserApi {
      *
      * 示例（cURL）：
      * ```bash
-     * curl -X GET 'https://open.nexusbook.com/api/v1/users/me/organizations?page=1&pageSize=20' \
+     * curl -X GET 'https://open.nexusbook.app/api/v1/users/me/organizations?page=1&pageSize=20' \
      *   -H 'Authorization: Bearer TOKEN'
      * ```
      */
