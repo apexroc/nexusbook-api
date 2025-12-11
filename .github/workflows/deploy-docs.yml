@@ -3,11 +3,11 @@ name: Deploy Docs to GitHub Pages
 on:
   push:
     tags:
-      - 'v*.*.*'  # 只在推送版本标签时触发
+      - 'v*.*.*'  # 只在推送版本标签时触发部署
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write  # 需要写权限以推送到 gh-pages 分支
   pages: write
   id-token: write
 
@@ -16,26 +16,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    outputs:
-      is_release: ${{ steps.check_version.outputs.is_release }}
-      version: ${{ steps.check_version.outputs.version }}
     steps:
-      - name: Checkout to main branch
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main  # 强制切换到 main 分支以满足环境保护规则
-          fetch-depth: 0  # 获取所有历史和标签
+          fetch-depth: 0  # 获取所有历史
 
       - name: Get version from tag
-        id: check_version
+        id: get_version
         run: |
-          # 从触发事件中获取标签名
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "version=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "is_release=true" >> $GITHUB_OUTPUT
-          echo "✅ 版本标签: $TAG_NAME"
+          echo "✅ 构建版本: $TAG_NAME"
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -48,18 +42,12 @@ jobs:
       - name: Build docs for GitHub Pages (with BASE_PATH)
         run: bash scripts/build-for-github.sh
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: docs
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          commit_message: 'docs: deploy ${{ steps.get_version.outputs.version }}'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
