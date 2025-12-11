@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>完整示例 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/nexusbook-api/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/nexusbook-api/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/nexusbook-api/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/nexusbook-api/index.html">首页</a>
+                    <a href="/nexusbook-api/api/" >API 参考</a>
+                    <a href="/nexusbook-api/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/nexusbook-api/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>完整示例</h1>
+<p>本指南提供完整的使用场景示例，展示如何在实际项目中使用 NexusBook API。</p>
+<h2>场景 1：订货单系统</h2>
+<h3>系统架构</h3>
+<pre><code>┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│  前端应用    │────&gt;│  后端服务     │────&gt;│ NexusBook   │
+│  (Vue.js)   │     │  (Node.js)   │     │   API       │
+└─────────────┘     └──────────────┘     └─────────────┘
+                           │
+                           ├──&gt; Webhook 通知
+                           ├──&gt; 数据验证
+                           └──&gt; 审批流程
+</code></pre>
+<h3>步骤 1：创建订货单文档</h3>
+<pre><code class="language-javascript">// 1. 初始化文档属性
+const orderProperties = {
+  orderTime: new Date().toISOString(),
+  storeName: &#39;Beijing Branch&#39;,
+  totalAmount: 0,
+  totalQuantity: 0,
+  status: &#39;draft&#39;
+};
+
+await api.post(&#39;/doc/purchaseOrder/order-001/properties&#39;, {
+  properties: orderProperties
+});
+
+// 2. 定义字段元数据
+const metadata = {
+  fields: [
+    {
+      id: &#39;productName&#39;,
+      name: &#39;产品名称&#39;,
+      type: &#39;text&#39;,
+      required: true
+    },
+    {
+      id: &#39;quantity&#39;,
+      name: &#39;数量&#39;,
+      type: &#39;number&#39;,
+      required: true,
+      validation: { min: 1 }
+    },
+    {
+      id: &#39;unitPrice&#39;,
+      name: &#39;单价&#39;,
+      type: &#39;currency&#39;,
+      required: true
+    },
+    {
+      id: &#39;total&#39;,
+      name: &#39;小计&#39;,
+      type: &#39;formula&#39;,
+      formula: &#39;quantity * unitPrice&#39;
+    }
+  ]
+};
+
+await api.put(&#39;/doc/purchaseOrder/order-001/metadata&#39;, metadata);
+</code></pre>
+<h3>步骤 2：添加产品行</h3>
+<pre><code class="language-javascript">// 批量添加订单项
+const rows = [
+  {
+    id: &#39;row-001&#39;,
+    values: [
+      { fieldId: &#39;productName&#39;, value: { text: &#39;iPhone 15&#39; } },
+      { fieldId: &#39;quantity&#39;, value: { number: 10 } },
+      { fieldId: &#39;unitPrice&#39;, value: { number: 799.99 } }
+    ]
+  },
+  {
+    id: &#39;row-002&#39;,
+    values: [
+      { fieldId: &#39;productName&#39;, value: { text: &#39;iPad Pro&#39; } },
+      { fieldId: &#39;quantity&#39;, value: { number: 5 } },
+      { fieldId: &#39;unitPrice&#39;, value: { number: 1099.99 } }
+    ]
+  }
+];
+
+await api.post(&#39;/doc/purchaseOrder/order-001/data/bulk?requestId=req-1&#39;, {
+  rows
+});
+</code></pre>
+<h3>步骤 3：创建视图</h3>
+<pre><code class="language-javascript">// 创建&quot;待处理&quot;视图
+await api.post(&#39;/doc/purchaseOrder/order-001/views&#39;, {
+  id: &#39;view-pending&#39;,
+  name: &#39;待处理订单&#39;,
+  type: &#39;table&#39;,
+  config: {
+    filters: {
+      logic: &#39;and&#39;,
+      conditions: [
+        { field: &#39;status&#39;, operator: &#39;eq&#39;, value: &#39;pending&#39; }
+      ]
+    },
+    sorts: [
+      { field: &#39;orderTime&#39;, direction: &#39;desc&#39; }
+    ]
+  }
+});
+</code></pre>
+<h3>步骤 4：配置 Webhook</h3>
+<pre><code class="language-javascript">// 订阅订单变更通知
+await api.post(&#39;/webhooks&#39;, {
+  name: &#39;订单变更通知&#39;,
+  url: &#39;https://yourapp.com/webhooks/order-changes&#39;,
+  events: [&#39;data_row_created&#39;, &#39;data_row_updated&#39;, &#39;request_merged&#39;],
+  filters: {
+    docTypes: [&#39;purchaseOrder&#39;]
+  },
+  secret: &#39;your_webhook_secret&#39;
+});
+</code></pre>
+<h3>完整代码（Node.js）</h3>
+<pre><code class="language-javascript">const axios = require(&#39;axios&#39;);
+
+class OrderManagementSystem {
+  constructor(apiUrl, accessToken) {
+    this.api = axios.create({
+      baseURL: apiUrl,
+      headers: {
+        &#39;Authorization&#39;: `Bearer ${accessToken}`,
+        &#39;Content-Type&#39;: &#39;application/json&#39;
+      }
+    });
+  }
+  
+  async createOrder(orderData) {
+    const orderId = `order-${Date.now()}`;
+    
+    // 1. 创建属性
+    await this.api.post(`/doc/purchaseOrder/${orderId}/properties`, {
+      properties: {
+        orderTime: new Date().toISOString(),
+        storeName: orderData.store,
+        status: &#39;draft&#39;
+      }
+    });
+    
+    // 2. 设置元数据
+    await this.api.put(`/doc/purchaseOrder/${orderId}/metadata`, {
+      fields: this.getOrderFields()
+    });
+    
+    // 3. 添加产品行
+    const rows = orderData.items.map((item, index) =&gt; ({
+      id: `row-${index + 1}`,
+      values: [
+        { fieldId: &#39;productName&#39;, value: { text: item.name } },
+        { fieldId: &#39;quantity&#39;, value: { number: item.quantity } },
+        { fieldId: &#39;unitPrice&#39;, value: { number: item.price } }
+      ]
+    }));
+    
+    await this.api.post(`/doc/purchaseOrder/${orderId}/data/bulk?requestId=req-1`, {
+      rows
+    });
+    
+    return orderId;
+  }
+  
+  getOrderFields() {
+    return [
+      { id: &#39;productName&#39;, name: &#39;产品名称&#39;, type: &#39;text&#39;, required: true },
+      { id: &#39;quantity&#39;, name: &#39;数量&#39;, type: &#39;number&#39;, required: true },
+      { id: &#39;unitPrice&#39;, name: &#39;单价&#39;, type: &#39;currency&#39;, required: true },
+      { id: &#39;total&#39;, name: &#39;小计&#39;, type: &#39;formula&#39;, formula: &#39;quantity * unitPrice&#39; }
+    ];
+  }
+}
+
+// 使用示例
+const oms = new OrderManagementSystem(
+  &#39;https://open.nexusbook.com/api/v1&#39;,
+  &#39;YOUR_ACCESS_TOKEN&#39;
+);
+
+const orderId = await oms.createOrder({
+  store: &#39;Beijing Branch&#39;,
+  items: [
+    { name: &#39;iPhone 15&#39;, quantity: 10, price: 799.99 },
+    { name: &#39;iPad Pro&#39;, quantity: 5, price: 1099.99 }
+  ]
+});
+
+console.log(`订单创建成功: ${orderId}`);
+</code></pre>
+<h2>场景 2：Webhook 集成</h2>
+<h3>Webhook 接收器实现</h3>
+<p><strong>Node.js + Express</strong>:</p>
+<pre><code class="language-javascript">const express = require(&#39;express&#39;);
+const crypto = require(&#39;crypto&#39;);
+
+const app = express();
+app.use(express.json());
+
+// Webhook 端点
+app.post(&#39;/webhooks/nexusbook&#39;, (req, res) =&gt; {
+  // 1. 验证签名
+  const signature = req.headers[&#39;x-nexusbook-signature&#39;];
+  const secret = process.env.WEBHOOK_SECRET;
+  
+  const hmac = crypto.createHmac(&#39;sha256&#39;, secret);
+  const expectedSignature = hmac.update(JSON.stringify(req.body)).digest(&#39;hex&#39;);
+  
+  if (signature !== expectedSignature) {
+    return res.status(401).send(&#39;Invalid signature&#39;);
+  }
+  
+  // 2. 处理事件
+  const { event, payload } = req.body;
+  
+  switch (event) {
+    case &#39;request_merged&#39;:
+      handleRequestMerged(payload);
+      break;
+    case &#39;data_row_created&#39;:
+      handleDataRowCreated(payload);
+      break;
+    case &#39;approval_approved&#39;:
+      handleApprovalApproved(payload);
+      break;
+  }
+  
+  res.status(200).send(&#39;OK&#39;);
+});
+
+function handleRequestMerged(payload) {
+  console.log(&#39;变更请求已合并:&#39;, payload.requestId);
+  // 发送通知、更新缓存等
+}
+
+app.listen(3000);
+</code></pre>
+<p><strong>Python + Flask</strong>:</p>
+<pre><code class="language-python">from flask import Flask, request, jsonify
+import hmac
+import hashlib
+import json
+
+app = Flask(__name__)
+WEBHOOK_SECRET = &#39;your_webhook_secret&#39;
+
+@app.route(&#39;/webhooks/nexusbook&#39;, methods=[&#39;POST&#39;])
+def handle_webhook():
+    # 验证签名
+    signature = request.headers.get(&#39;X-Nexusbook-Signature&#39;)
+    body = request.get_data()
+    
+    expected_signature = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        body,
+        hashlib.sha256
+    ).hexdigest()
+    
+    if signature != expected_signature:
+        return &#39;Invalid signature&#39;, 401
+    
+    # 处理事件
+    data = request.get_json()
+    event = data[&#39;event&#39;]
+    payload = data[&#39;payload&#39;]
+    
+    if event == &#39;request_merged&#39;:
+        handle_request_merged(payload)
+    elif event == &#39;data_row_created&#39;:
+        handle_data_row_created(payload)
+    
+    return &#39;OK&#39;, 200
+
+def handle_request_merged(payload):
+    print(f&quot;变更请求已合并: {payload[&#39;requestId&#39;]}&quot;)
+
+if __name__ == &#39;__main__&#39;:
+    app.run(port=3000)
+</code></pre>
+<h2>场景 3：库存管理系统</h2>
+<h3>低库存预警</h3>
+<pre><code class="language-javascript">// 1. 创建低库存视图
+await api.post(&#39;/doc/inventory/inv-001/views&#39;, {
+  id: &#39;view-low-stock&#39;,
+  name: &#39;低库存预警&#39;,
+  type: &#39;table&#39;,
+  config: {
+    filters: {
+      logic: &#39;and&#39;,
+      conditions: [
+        { field: &#39;stock&#39;, operator: &#39;lte&#39;, value: 10 }
+      ]
+    },
+    sorts: [
+      { field: &#39;stock&#39;, direction: &#39;asc&#39; }
+    ]
+  }
+});
+
+// 2. 配置 Webhook 监控库存变化
+await api.post(&#39;/webhooks&#39;, {
+  name: &#39;库存变化通知&#39;,
+  url: &#39;https://yourapp.com/webhooks/inventory&#39;,
+  events: [&#39;data_row_updated&#39;],
+  filters: {
+    docTypes: [&#39;inventory&#39;],
+    customConditions: {
+      &#39;values.stock.number&#39;: { $lte: 10 }
+    }
+  }
+});
+
+// 3. 处理低库存通知
+app.post(&#39;/webhooks/inventory&#39;, async (req, res) =&gt; {
+  const { payload } = req.body;
+  
+  if (payload.values.stock.number &lt;= 10) {
+    // 发送预警通知
+    await sendAlert({
+      type: &#39;low_stock&#39;,
+      product: payload.values.productName.text,
+      currentStock: payload.values.stock.number,
+      reorderLevel: 50
+    });
+    
+    // 自动创建采购订单
+    await createPurchaseOrder(payload);
+  }
+  
+  res.status(200).send(&#39;OK&#39;);
+});
+</code></pre>
+<h2>场景 4：数据导入导出</h2>
+<h3>批量导入</h3>
+<pre><code class="language-javascript">async function importFromCSV(filePath, docType, docId) {
+  const csv = require(&#39;csv-parser&#39;);
+  const fs = require(&#39;fs&#39;);
+  
+  const rows = [];
+  let index = 0;
+  
+  // 读取 CSV
+  fs.createReadStream(filePath)
+    .pipe(csv())
+    .on(&#39;data&#39;, (row) =&gt; {
+      rows.push({
+        id: `imported-row-${++index}`,
+        values: [
+          { fieldId: &#39;name&#39;, value: { text: row[&#39;产品名称&#39;] } },
+          { fieldId: &#39;price&#39;, value: { number: parseFloat(row[&#39;价格&#39;]) } },
+          { fieldId: &#39;stock&#39;, value: { number: parseInt(row[&#39;库存&#39;]) } }
+        ]
+      });
+    })
+    .on(&#39;end&#39;, async () =&gt; {
+      // 批量导入（每次 100 行）
+      const batchSize = 100;
+      for (let i = 0; i &lt; rows.length; i += batchSize) {
+        const batch = rows.slice(i, i + batchSize);
+        
+        await api.post(`/doc/${docType}/${docId}/data/bulk?requestId=req-1`, {
+          rows: batch
+        });
+        
+        console.log(`已导入 ${i + batch.length}/${rows.length} 行`);
+      }
+      
+      console.log(&#39;导入完成！&#39;);
+    });
+}
+</code></pre>
+<h3>批量导出</h3>
+<pre><code class="language-javascript">async function exportToCSV(docType, docId, outputPath) {
+  const { createObjectCsvWriter } = require(&#39;csv-writer&#39;);
+  
+  // 获取元数据
+  const metadata = await api.get(`/doc/${docType}/${docId}/metadata`);
+  
+  // 创建 CSV writer
+  const csvWriter = createObjectCsvWriter({
+    path: outputPath,
+    header: metadata.fields.map(f =&gt; ({
+      id: f.id,
+      title: f.name
+    }))
+  });
+  
+  // 分页获取所有数据
+  let cursor = null;
+  const allRows = [];
+  
+  do {
+    const response = await api.get(`/doc/${docType}/${docId}/data`, {
+      params: { pageSize: 100, cursor }
+    });
+    
+    const records = response.items.map(row =&gt; {
+      const record = {};
+      row.values.forEach(v =&gt; {
+        record[v.fieldId] = v.value.text || v.value.number || v.value.boolean;
+      });
+      return record;
+    });
+    
+    allRows.push(...records);
+    cursor = response.cursor;
+  } while (cursor);
+  
+  // 写入 CSV
+  await csvWriter.writeRecords(allRows);
+  console.log(`已导出 ${allRows.length} 行到 ${outputPath}`);
+}
+</code></pre>
+<h2>测试示例</h2>
+<h3>单元测试</h3>
+<pre><code class="language-javascript">const { describe, test, expect } = require(&#39;@jest/globals&#39;);
+
+describe(&#39;NexusBook API 集成&#39;, () =&gt; {
+  test(&#39;创建订货单&#39;, async () =&gt; {
+    const oms = new OrderManagementSystem(apiUrl, token);
+    
+    const orderId = await oms.createOrder({
+      store: &#39;Test Store&#39;,
+      items: [
+        { name: &#39;Product A&#39;, quantity: 5, price: 99.99 }
+      ]
+    });
+    
+    expect(orderId).toMatch(/^order-\d+$/);
+    
+    // 验证数据已创建
+    const data = await api.get(`/doc/purchaseOrder/${orderId}/data`);
+    expect(data.items).toHaveLength(1);
+    expect(data.items[0].values[0].value.text).toBe(&#39;Product A&#39;);
+  });
+});
+</code></pre>
+<h2>性能优化示例</h2>
+<h3>并行请求</h3>
+<pre><code class="language-javascript">async function loadDashboard(docType, docId) {
+  // 并行加载多个资源
+  const [metadata, views, summary] = await Promise.all([
+    api.get(`/doc/${docType}/${docId}/metadata`),
+    api.get(`/doc/${docType}/${docId}/views`),
+    api.post(`/doc/${docType}/${docId}/data/query`, {
+      aggregate: {
+        count: true,
+        sum: [&#39;totalAmount&#39;],
+        avg: [&#39;unitPrice&#39;]
+      }
+    })
+  ]);
+  
+  return { metadata, views, summary };
+}
+</code></pre>
+<h3>请求去重</h3>
+<pre><code class="language-javascript">class RequestDeduplicator {
+  constructor() {
+    this.pending = new Map();
+  }
+  
+  async fetch(key, fetcher) {
+    // 如果相同请求正在进行，直接返回
+    if (this.pending.has(key)) {
+      return this.pending.get(key);
+    }
+    
+    const promise = fetcher();
+    this.pending.set(key, promise);
+    
+    try {
+      const result = await promise;
+      return result;
+    } finally {
+      this.pending.delete(key);
+    }
+  }
+}
+
+const dedup = new RequestDeduplicator();
+
+// 多次调用只会发起一次请求
+const [result1, result2, result3] = await Promise.all([
+  dedup.fetch(&#39;metadata-123&#39;, () =&gt; api.get(&#39;/metadata&#39;)),
+  dedup.fetch(&#39;metadata-123&#39;, () =&gt; api.get(&#39;/metadata&#39;)),
+  dedup.fetch(&#39;metadata-123&#39;, () =&gt; api.get(&#39;/metadata&#39;))
+]);
+</code></pre>
+<h2>下一步</h2>
+<ul>
+<li>📖 阅读 <a href="../api/index.html">API 参考文档</a></li>
+<li>💡 阅读 <a href="best-practices.html">最佳实践</a></li>
+<li>🔧 阅读 <a href="data-operations.html">数据操作指南</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

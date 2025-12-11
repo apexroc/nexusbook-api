@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开发指南 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/nexusbook-api/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/nexusbook-api/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/nexusbook-api/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/nexusbook-api/index.html">首页</a>
+                    <a href="/nexusbook-api/api/" >API 参考</a>
+                    <a href="/nexusbook-api/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/nexusbook-api/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>开发指南</h1>
+<p>本文档介绍如何使用 TypeSpec 开发和扩展 NexusBook API。</p>
+<h2>技术栈</h2>
+<table>
+<thead>
+<tr>
+<th>技术</th>
+<th>版本</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>TypeSpec</strong></td>
+<td>1.6.0</td>
+<td>API 定义语言</td>
+</tr>
+<tr>
+<td><strong>OpenAPI</strong></td>
+<td>3.0</td>
+<td>API 规范标准</td>
+</tr>
+<tr>
+<td><strong>Redocly</strong></td>
+<td>2.12.0</td>
+<td>API 文档生成</td>
+</tr>
+</tbody></table>
+<h2>前置要求</h2>
+<ul>
+<li>Node.js 16+</li>
+<li>Make</li>
+</ul>
+<h2>快速开始</h2>
+<h3>安装依赖</h3>
+<pre><code class="language-bash"># 安装 npm 依赖
+make deps
+
+# 或者手动安装
+npm install
+</code></pre>
+<h3>生成文档</h3>
+<pre><code class="language-bash"># 生成 OpenAPI 规范
+make openapi
+
+# 构建 API 文档
+make build-docs
+
+# 构建完整文档站点
+make docs
+
+# 预览文档（浏览器访问 http://localhost:8091）
+make serve
+</code></pre>
+<h3>输出文件</h3>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>dist/openapi/@typespec/openapi3/*.yaml</code></td>
+<td>OpenAPI 规范文件</td>
+</tr>
+<tr>
+<td><code>docs/api/index.html</code></td>
+<td>Redoc 单页 API 文档</td>
+</tr>
+<tr>
+<td><code>docs/</code></td>
+<td>完整文档站点（生成）</td>
+</tr>
+<tr>
+<td><code>docs-src/</code></td>
+<td>文档源文件（Markdown）</td>
+</tr>
+<tr>
+<td><code>dist/openapi/openapi.yaml</code></td>
+<td>合并后的 OpenAPI 入口文件</td>
+</tr>
+</tbody></table>
+<h2>项目命令</h2>
+<pre><code class="language-bash"># 开发相关
+make deps          # 安装依赖
+make openapi       # 生成 OpenAPI 规范
+make build-docs    # 构建 Redoc 文档
+make serve-docs    # 预览 Redoc 文档（端口 8091）
+
+# 文档站点
+make docs          # 构建完整文档站点
+make serve         # 启动文档服务器（端口 8091）
+make clean-docs    # 清理生成的文档
+
+# 清理
+make clean         # 清理生成的文件
+</code></pre>
+<h2>添加新模块</h2>
+<h3>1. 创建模块目录</h3>
+<pre><code class="language-bash">mkdir -p api/extensions/webhooks
+</code></pre>
+<h3>2. 创建 TypeSpec 文件</h3>
+<pre><code class="language-typescript">// api/extensions/webhooks/models.tsp
+import &quot;@typespec/http&quot;;
+import &quot;../../shared/index.tsp&quot;;
+
+namespace NexusBook.Extensions.Webhooks {
+  model Webhook {
+    id: string;
+    url: string;
+    events: string[];
+  }
+  
+  @route(&quot;/webhooks&quot;)
+  interface WebhooksApi {
+    @get list(): ApiResponse&lt;Webhook[]&gt;;
+    @post create(@body webhook: Webhook): ApiResponse&lt;Webhook&gt;;
+  }
+}
+</code></pre>
+<h3>3. 创建模块入口</h3>
+<pre><code class="language-typescript">// api/extensions/webhooks/index.tsp
+import &quot;./models.tsp&quot;;
+</code></pre>
+<h3>4. 在主入口引入</h3>
+<pre><code class="language-typescript">// api/main.tsp
+import &quot;./extensions/webhooks/index.tsp&quot;;
+</code></pre>
+<h3>5. 重新生成</h3>
+<pre><code class="language-bash">make openapi
+make docs
+</code></pre>
+<h2>修改现有模块</h2>
+<ol>
+<li><strong>编辑对应的 .tsp 文件</strong></li>
+<li><strong>运行 <code>make openapi</code> 重新生成 OpenAPI</strong></li>
+<li><strong>运行 <code>make docs</code> 重新生成文档站点</strong></li>
+<li><strong>运行 <code>make serve</code> 预览变更</strong></li>
+</ol>
+<h2>编辑文档</h2>
+<h3>文档结构</h3>
+<pre><code>docs-src/              # 文档源文件（提交到 Git）
+├── guides/           # 开发指南
+├── references/       # 参考文档
+├── styles/           # 样式文件
+├── README.md         # 文档说明
+└── CONTRIBUTING.md   # 贡献指南
+
+docs/                 # 生成的文档（不提交到 Git）
+├── guides/           # 生成的指南 HTML
+├── references/       # 生成的参考 HTML
+├── styles/           # 复制的样式
+├── api/              # Redoc API 文档
+└── index.html        # 文档主页
+</code></pre>
+<h3>添加新文档</h3>
+<ol>
+<li><strong>在 <code>docs-src/guides/</code> 或 <code>docs-src/references/</code> 创建 Markdown 文件</strong></li>
+<li><strong>编辑 <code>scripts/build-docs.js</code>，添加文件到对应数组</strong></li>
+<li><strong>运行 <code>make docs</code> 生成 HTML</strong></li>
+</ol>
+<p>示例：</p>
+<pre><code class="language-javascript">// scripts/build-docs.js
+const guides = [
+  // ... 现有文档
+  { file: &#39;my-new-guide&#39;, title: &#39;新指南标题&#39; }
+];
+</code></pre>
+<h2>文档注释规范</h2>
+<h3>使用中英文双语注释</h3>
+<pre><code class="language-typescript">/**
+ * 获取文档元数据
+ *
+ * Get document metadata
+ *
+ * 返回字段定义与显示配置，供渲染与校验使用。
+ * Returns field definitions and display settings for rendering and validation.
+ */
+@get
+@summary(&quot;获取文档元数据&quot;)
+getMetadata(...): ApiResponse&lt;Metadata&gt;;
+</code></pre>
+<h3>添加示例</h3>
+<pre><code class="language-typescript">/**
+ * 创建数据行
+ *
+ * Create data row
+ *
+ * 示例（cURL）:
+ * ```bash
+ * curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true&#39; \
+ *   -H &#39;Authorization: Bearer TOKEN&#39; \
+ *   -H &#39;Content-Type: application/json&#39; \
+ *   -d &#39;{&quot;id&quot;:&quot;row-1&quot;,&quot;values&quot;:[{&quot;fieldId&quot;:&quot;name&quot;,&quot;value&quot;:{&quot;text&quot;:&quot;新产品&quot;}}]}&#39;
+ * ```
+ */
+</code></pre>
+<h2>测试 API</h2>
+<h3>使用 curl</h3>
+<pre><code class="language-bash"># 设置环境变量
+export API_BASE=&quot;https://open.nexusbook.com/api/v1&quot;
+export TOKEN=&quot;your_access_token&quot;
+
+# 测试端点
+curl -H &quot;Authorization: Bearer $TOKEN&quot; \
+  &quot;$API_BASE/doc/product/123/metadata&quot;
+</code></pre>
+<h3>使用 Postman</h3>
+<ol>
+<li>导入生成的 OpenAPI 文件</li>
+<li>配置环境变量（base_url, token）</li>
+<li>测试各个端点</li>
+</ol>
+<h2>调试技巧</h2>
+<h3>查看生成的 OpenAPI</h3>
+<pre><code class="language-bash"># 查看 API 规范
+cat dist/openapi/@typespec/openapi3/openapi.NexusBook.Api.yaml
+
+# 使用 yq 格式化查看
+yq eval dist/openapi/@typespec/openapi3/openapi.NexusBook.Api.yaml
+</code></pre>
+<h3>验证 TypeSpec 语法</h3>
+<pre><code class="language-bash">npx tsp compile api/main.tsp --no-emit
+</code></pre>
+<h3>查看编译错误</h3>
+<p>TypeSpec 编译器会提供详细的错误信息，包括：</p>
+<ul>
+<li>文件位置</li>
+<li>错误类型</li>
+<li>修复建议</li>
+</ul>
+<h2>常见问题</h2>
+<h3>Q: 如何添加新的错误码？</h3>
+<p>在 <code>api/shared/common.tsp</code> 中的 <code>ErrorCode</code> 枚举添加：</p>
+<pre><code class="language-typescript">enum ErrorCode {
+  // ... 现有错误码
+  NEW_ERROR_CODE,  // 新错误码
+}
+</code></pre>
+<h3>Q: 如何添加新的字段类型？</h3>
+<ol>
+<li>在 <code>api/shared/constants.tsp</code> 的 <code>FieldType</code> 枚举添加</li>
+<li>在 <code>api/shared/common.tsp</code> 的 <code>Value</code> union 添加对应类型</li>
+<li>重新生成 OpenAPI</li>
+</ol>
+<h3>Q: 如何修改响应格式？</h3>
+<p>修改 <code>api/shared/common.tsp</code> 中的 <code>ApiResponse</code> 模型，但建议保持向后兼容。</p>
+<h3>Q: 如何使用生成的 OpenAPI 规范？</h3>
+<p>生成的 OpenAPI 文件 (<code>dist/openapi/openapi.yaml</code>) 可以：</p>
+<ol>
+<li><p><strong>用于任意后端语言的代码生成</strong></p>
+<ul>
+<li>Python: <code>openapi-generator</code></li>
+<li>Java/Kotlin: <code>openapi-generator</code></li>
+<li>TypeScript/JavaScript: <code>openapi-typescript-codegen</code></li>
+<li>其他语言：查看 <a href="https://openapi-generator.tech/">OpenAPI Generator</a></li>
+</ul>
+</li>
+<li><p><strong>导入到 API 测试工具</strong></p>
+<ul>
+<li>Postman</li>
+<li>Insomnia</li>
+<li>Swagger UI</li>
+</ul>
+</li>
+<li><p><strong>生成客户端 SDK</strong></p>
+</li>
+</ol>
+<p>例如使用 Python：</p>
+<pre><code class="language-bash">openapi-generator-cli generate -i dist/openapi/openapi.yaml -g python -o client-python
+</code></pre>
+<h3>Q: 如何调试 TypeSpec 编译错误？</h3>
+<ol>
+<li>检查导入路径是否正确</li>
+<li>确认所有引用的类型都已定义</li>
+<li>使用 <code>--trace</code> 选项查看详细信息：<pre><code class="language-bash">npx tsp compile api/main.tsp --trace
+</code></pre>
+</li>
+</ol>
+<h3>Q: 如何优化 OpenAPI 文档生成？</h3>
+<ol>
+<li>添加详细的 <code>@summary</code> 和 <code>@doc</code> 注释</li>
+<li>使用 <code>@example</code> 提供示例</li>
+<li>为模型字段添加描述</li>
+<li>使用 <code>@deprecated</code> 标记废弃的 API</li>
+</ol>
+<h3>Q: 文档站点样式丢失怎么办？</h3>
+<p>确保 <code>docs-src/styles/main.css</code> 存在，然后运行：</p>
+<pre><code class="language-bash">make docs
+</code></pre>
+<h2>TypeSpec 最佳实践</h2>
+<h3>1. 模块组织</h3>
+<ul>
+<li>按功能划分模块（core, content, workflow）</li>
+<li>每个模块有独立的 <code>index.tsp</code> 入口</li>
+<li>相关的模型和接口放在一起</li>
+</ul>
+<h3>2. 命名规范</h3>
+<ul>
+<li><strong>Model 名称</strong>: PascalCase（如 <code>DataRow</code>, <code>Metadata</code>）</li>
+<li><strong>Interface 名称</strong>: PascalCase + Api 后缀（如 <code>DataApi</code>, <code>ViewsApi</code>）</li>
+<li><strong>字段名称</strong>: camelCase（如 <code>fieldId</code>, <code>createdAt</code>）</li>
+<li><strong>枚举值</strong>: UPPER_SNAKE_CASE（如 <code>DOC_NOT_FOUND</code>）</li>
+</ul>
+<h3>3. 类型复用</h3>
+<pre><code class="language-typescript">// 定义可复用的类型
+model PageRequest {
+  page?: int32 = 1;
+  pageSize?: int32 = 20;
+}
+
+// 在接口中使用
+@get list(...PageRequest): ApiResponse&lt;DataRow[]&gt;;
+</code></pre>
+<h3>4. 错误处理</h3>
+<p>所有接口统一返回 <code>ApiResponse&lt;T&gt;</code> 类型：</p>
+<pre><code class="language-typescript">@get
+getMetadata(): ApiResponse&lt;Metadata&gt;;
+</code></pre>
+<h3>5. 版本控制</h3>
+<ul>
+<li>在路径中包含版本号：<code>/api/v1</code></li>
+<li>重大变更时增加版本号</li>
+<li>保持向后兼容性</li>
+</ul>
+<h3>6. 文档注释</h3>
+<pre><code class="language-typescript">/**
+ * 中文说明
+ * 
+ * English description
+ */
+@summary(&quot;简短摘要&quot;)
+@doc(&quot;详细说明&quot;)
+</code></pre>
+<h2>扩展建议</h2>
+<h3>添加新的文档类型</h3>
+<ol>
+<li>实现对应的 Provider 接口</li>
+<li>注册到路由系统</li>
+<li>无需修改 TypeSpec 定义</li>
+</ol>
+<h3>添加新的字段类型</h3>
+<ol>
+<li>在 <code>FieldType</code> 枚举添加新类型</li>
+<li>在 <code>Value</code> union 添加对应的值类型</li>
+<li>更新字段类型文档</li>
+</ol>
+<h3>添加新的视图类型</h3>
+<ol>
+<li>在 <code>ViewType</code> 枚举添加新类型</li>
+<li>定义视图配置模型</li>
+<li>实现前端渲染逻辑</li>
+</ol>
+<h3>添加新的事件类型</h3>
+<ol>
+<li>在 Webhook 事件枚举添加</li>
+<li>定义事件载荷结构</li>
+<li>实现事件触发逻辑</li>
+</ol>
+<h2>贡献指南</h2>
+<h3>提交代码</h3>
+<ol>
+<li>Fork 本仓库</li>
+<li>创建特性分支 (<code>git checkout -b feature/AmazingFeature</code>)</li>
+<li>提交变更 (<code>git commit -m &#39;Add some AmazingFeature&#39;</code>)</li>
+<li>推送到分支 (<code>git push origin feature/AmazingFeature</code>)</li>
+<li>开启 Pull Request</li>
+</ol>
+<h3>代码规范</h3>
+<ul>
+<li>遵循现有的代码风格</li>
+<li>添加适当的注释（中英文）</li>
+<li>更新相关文档</li>
+<li>确保 TypeSpec 编译通过</li>
+</ul>
+<h3>提交信息规范</h3>
+<pre><code>type(scope): subject
+
+body
+
+footer
+</code></pre>
+<p><strong>类型：</strong></p>
+<ul>
+<li><code>feat</code>: 新功能</li>
+<li><code>fix</code>: 修复 bug</li>
+<li><code>docs</code>: 文档更新</li>
+<li><code>style</code>: 代码格式</li>
+<li><code>refactor</code>: 重构</li>
+<li><code>test</code>: 测试</li>
+<li><code>chore</code>: 构建/工具</li>
+</ul>
+<p><strong>示例：</strong></p>
+<pre><code>feat(api): 添加 Webhook 支持
+
+- 添加 Webhook 管理接口
+- 支持 20+ 种事件类型
+- 实现 HMAC 签名验证
+
+Closes #123
+</code></pre>
+<h2>下一步</h2>
+<ul>
+<li>查看 <a href="./architecture.md">架构设计</a> 了解系统架构</li>
+<li>查看 <a href="../references/api-reference.md">API 参考</a> 了解所有端点</li>
+<li>查看 <a href="./best-practices.md">最佳实践</a> 了解使用建议</li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

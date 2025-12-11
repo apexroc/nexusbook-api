@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国际化说明 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/nexusbook-api/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/nexusbook-api/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/nexusbook-api/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/nexusbook-api/index.html">首页</a>
+                    <a href="/nexusbook-api/api/" >API 参考</a>
+                    <a href="/nexusbook-api/guides/getting-started.html" >开发指南</a>
+                    <a href="/nexusbook-api/references/error-codes.html" class="active">参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>多语言消息系统 (Multi-Language Message System)</h1>
+<h2>概述</h2>
+<p>NexusBook API 使用灵活的多语言消息结构，支持任意语言的国际化。</p>
+<h2>数据结构</h2>
+<h3>Message 模型</h3>
+<pre><code class="language-typescript">type Message = Record&lt;string, string&gt;;
+</code></pre>
+<p>使用 ISO 639-1 语言代码作为键，消息文本作为值。</p>
+<h3>支持的语言代码</h3>
+<table>
+<thead>
+<tr>
+<th>代码</th>
+<th>语言</th>
+<th>Language</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>zh</code></td>
+<td>中文</td>
+<td>Chinese</td>
+</tr>
+<tr>
+<td><code>en</code></td>
+<td>英文</td>
+<td>English</td>
+</tr>
+<tr>
+<td><code>ja</code></td>
+<td>日语</td>
+<td>Japanese</td>
+</tr>
+<tr>
+<td><code>ko</code></td>
+<td>韩语</td>
+<td>Korean</td>
+</tr>
+<tr>
+<td><code>es</code></td>
+<td>西班牙语</td>
+<td>Spanish</td>
+</tr>
+<tr>
+<td><code>fr</code></td>
+<td>法语</td>
+<td>French</td>
+</tr>
+<tr>
+<td><code>de</code></td>
+<td>德语</td>
+<td>German</td>
+</tr>
+<tr>
+<td><code>pt</code></td>
+<td>葡萄牙语</td>
+<td>Portuguese</td>
+</tr>
+<tr>
+<td><code>ru</code></td>
+<td>俄语</td>
+<td>Russian</td>
+</tr>
+<tr>
+<td><code>ar</code></td>
+<td>阿拉伯语</td>
+<td>Arabic</td>
+</tr>
+<tr>
+<td><code>it</code></td>
+<td>意大利语</td>
+<td>Italian</td>
+</tr>
+<tr>
+<td><code>nl</code></td>
+<td>荷兰语</td>
+<td>Dutch</td>
+</tr>
+<tr>
+<td><code>pl</code></td>
+<td>波兰语</td>
+<td>Polish</td>
+</tr>
+<tr>
+<td><code>tr</code></td>
+<td>土耳其语</td>
+<td>Turkish</td>
+</tr>
+<tr>
+<td><code>vi</code></td>
+<td>越南语</td>
+<td>Vietnamese</td>
+</tr>
+<tr>
+<td><code>th</code></td>
+<td>泰语</td>
+<td>Thai</td>
+</tr>
+<tr>
+<td><code>id</code></td>
+<td>印尼语</td>
+<td>Indonesian</td>
+</tr>
+<tr>
+<td><code>ms</code></td>
+<td>马来语</td>
+<td>Malay</td>
+</tr>
+<tr>
+<td><code>hi</code></td>
+<td>印地语</td>
+<td>Hindi</td>
+</tr>
+</tbody></table>
+<h2>使用示例</h2>
+<h3>基本示例</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;USER_NOT_FOUND&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;用户未找到&quot;,
+    &quot;en&quot;: &quot;User not found&quot;
+  },
+  &quot;payload&quot;: null
+}
+</code></pre>
+<h3>多语言完整示例</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;INVALID_TOKEN&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;令牌无效或已过期&quot;,
+    &quot;en&quot;: &quot;Token is invalid or expired&quot;,
+    &quot;ja&quot;: &quot;トークンが無効または期限切れです&quot;,
+    &quot;ko&quot;: &quot;토큰이 유효하지 않거나 만료되었습니다&quot;,
+    &quot;es&quot;: &quot;El token no es válido o ha expirado&quot;,
+    &quot;fr&quot;: &quot;Le jeton est invalide ou expiré&quot;,
+    &quot;de&quot;: &quot;Token ist ungültig oder abgelaufen&quot;,
+    &quot;pt&quot;: &quot;O token é inválido ou expirou&quot;,
+    &quot;ru&quot;: &quot;Токен недействителен или истек срок действия&quot;
+  },
+  &quot;payload&quot;: null
+}
+</code></pre>
+<h3>最小示例（仅包含必要语言）</h3>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;ORG_NOT_FOUND&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;组织不存在&quot;,
+    &quot;en&quot;: &quot;Organization not found&quot;
+  },
+  &quot;payload&quot;: null
+}
+</code></pre>
+<h2>实现建议</h2>
+<h3>后端实现</h3>
+<pre><code class="language-go">// 根据错误码和用户首选语言生成消息
+func GetErrorMessage(code ErrorCode, preferredLangs []string) map[string]string {
+    messages := errorMessages[code]
+    
+    // 返回完整的多语言消息
+    return messages
+}
+
+// 错误消息字典
+var errorMessages = map[ErrorCode]map[string]string{
+    USER_NOT_FOUND: {
+        &quot;zh&quot;: &quot;用户未找到&quot;,
+        &quot;en&quot;: &quot;User not found&quot;,
+        &quot;ja&quot;: &quot;ユーザーが見つかりません&quot;,
+        &quot;es&quot;: &quot;Usuario no encontrado&quot;,
+    },
+    // ... 其他错误码
+}
+</code></pre>
+<h3>前端使用</h3>
+<pre><code class="language-typescript">// 根据用户语言偏好获取消息
+function getMessage(response: ApiResponse&lt;any&gt;): string {
+    const userLang = navigator.language.split(&#39;-&#39;)[0]; // 获取语言代码
+    
+    // 优先使用用户语言，降级到英语，最后使用任意可用语言
+    return response.message?.[userLang] 
+        || response.message?.[&#39;en&#39;] 
+        || Object.values(response.message || {})[0]
+        || &#39;Unknown error&#39;;
+}
+</code></pre>
+<h2>最佳实践</h2>
+<h3>1. 语言覆盖</h3>
+<ul>
+<li><strong>必须</strong>: 至少提供 <code>zh</code> 和 <code>en</code> 两种语言</li>
+<li><strong>推荐</strong>: 根据目标市场添加其他语言</li>
+<li><strong>可选</strong>: 可以动态扩展任意语言</li>
+</ul>
+<h3>2. 消息质量</h3>
+<ul>
+<li>保持消息简洁明了</li>
+<li>使用专业的翻译服务</li>
+<li>避免使用机器翻译的生硬表达</li>
+<li>保持各语言版本含义一致</li>
+</ul>
+<h3>3. 降级策略</h3>
+<p>客户端应实现降级逻辑：</p>
+<ol>
+<li>优先使用用户首选语言</li>
+<li>降级到英语</li>
+<li>使用任意可用语言</li>
+<li>显示错误码</li>
+</ol>
+<h3>4. 扩展性</h3>
+<p>新增语言时无需修改 API 定义，只需在后端添加翻译即可：</p>
+<pre><code class="language-go">// 添加新语言支持
+errorMessages[USER_NOT_FOUND][&quot;vi&quot;] = &quot;Không tìm thấy người dùng&quot;
+errorMessages[USER_NOT_FOUND][&quot;th&quot;] = &quot;ไม่พบผู้ใช้&quot;
+</code></pre>
+<h2>技术优势</h2>
+<ol>
+<li><strong>灵活性</strong>: 支持任意数量的语言</li>
+<li><strong>可扩展</strong>: 无需修改 API 结构即可添加新语言</li>
+<li><strong>向后兼容</strong>: 现有客户端仍可正常工作</li>
+<li><strong>国际化友好</strong>: 符合国际化最佳实践</li>
+</ol>
+<h2>迁移指南</h2>
+<h3>从固定字段迁移</h3>
+<p>如果之前使用固定的 <code>zh</code> 和 <code>en</code> 字段：</p>
+<pre><code class="language-typescript">// 旧结构
+interface OldMessage {
+  zh: string;
+  en: string;
+}
+
+// 新结构
+type NewMessage = Record&lt;string, string&gt;;
+</code></pre>
+<p>迁移代码：</p>
+<pre><code class="language-typescript">// 旧代码仍然兼容
+const message: NewMessage = {
+  zh: &quot;错误&quot;,
+  en: &quot;Error&quot;
+};
+
+// 可以添加更多语言
+const enhancedMessage: NewMessage = {
+  zh: &quot;错误&quot;,
+  en: &quot;Error&quot;,
+  ja: &quot;エラー&quot;,
+  ko: &quot;오류&quot;
+};
+</code></pre>
+<h2>参考资源</h2>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes">ISO 639-1 语言代码</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Internationalization">i18n 最佳实践</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

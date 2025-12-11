@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认证授权指南 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/nexusbook-api/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/nexusbook-api/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/nexusbook-api/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/nexusbook-api/index.html">首页</a>
+                    <a href="/nexusbook-api/api/" >API 参考</a>
+                    <a href="/nexusbook-api/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/nexusbook-api/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>认证授权指南</h1>
+<p>NexusBook API 使用 OAuth2 和 OIDC 标准进行认证和授权，提供安全可靠的访问控制机制。</p>
+<h2>OAuth2 认证流程</h2>
+<h3>客户端凭证流程（Client Credentials Flow）</h3>
+<p><strong>适用场景</strong>：服务端应用、后台任务、系统集成</p>
+<p>这是最简单的认证方式，适合不需要用户交互的场景。</p>
+<h4>流程图</h4>
+<pre><code>┌─────────┐                                  ┌──────────┐
+│  客户端  │                                  │ 授权服务器 │
+└────┬────┘                                  └────┬─────┘
+     │                                            │
+     │  POST /token                               │
+     │  grant_type=client_credentials             │
+     │  client_id=xxx                             │
+     │  client_secret=xxx                         │
+     │  scope=doc:read data:write                 │
+     ├───────────────────────────────────────────&gt;│
+     │                                            │
+     │                 access_token               │
+     │&lt;───────────────────────────────────────────┤
+     │                                            │
+</code></pre>
+<h4>示例代码</h4>
+<p><strong>cURL</strong>:</p>
+<pre><code class="language-bash">curl -X POST https://auth.nexusbook.com/token \
+  -H &#39;Content-Type: application/x-www-form-urlencoded&#39; \
+  -d &#39;grant_type=client_credentials&#39; \
+  -d &#39;client_id=your_client_id&#39; \
+  -d &#39;client_secret=your_client_secret&#39; \
+  -d &#39;scope=doc:read data:read data:write&#39;
+</code></pre>
+<p><strong>JavaScript (Node.js)</strong>:</p>
+<pre><code class="language-javascript">const axios = require(&#39;axios&#39;);
+const qs = require(&#39;querystring&#39;);
+
+async function getAccessToken() {
+  const response = await axios.post(
+    &#39;https://auth.nexusbook.com/token&#39;,
+    qs.stringify({
+      grant_type: &#39;client_credentials&#39;,
+      client_id: &#39;your_client_id&#39;,
+      client_secret: &#39;your_client_secret&#39;,
+      scope: &#39;doc:read data:read data:write&#39;
+    }),
+    {
+      headers: { &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39; }
+    }
+  );
+  
+  return response.data.access_token;
+}
+</code></pre>
+<p><strong>Python</strong>:</p>
+<pre><code class="language-python">import requests
+
+def get_access_token():
+    response = requests.post(
+        &#39;https://auth.nexusbook.com/token&#39;,
+        data={
+            &#39;grant_type&#39;: &#39;client_credentials&#39;,
+            &#39;client_id&#39;: &#39;your_client_id&#39;,
+            &#39;client_secret&#39;: &#39;your_client_secret&#39;,
+            &#39;scope&#39;: &#39;doc:read data:read data:write&#39;
+        }
+    )
+    
+    return response.json()[&#39;access_token&#39;]
+</code></pre>
+<h3>授权码流程（Authorization Code Flow）</h3>
+<p><strong>适用场景</strong>：Web 应用、移动应用（需要用户授权）</p>
+<p>这是最安全的认证方式，适合需要用户授权的场景。</p>
+<h4>流程图</h4>
+<pre><code>┌─────────┐          ┌──────────┐          ┌──────────┐
+│  用户    │          │  客户端   │          │ 授权服务器 │
+└────┬────┘          └────┬─────┘          └────┬─────┘
+     │                    │                     │
+     │  访问应用           │                     │
+     ├───────────────────&gt;│                     │
+     │                    │  重定向到授权页面     │
+     │                    ├────────────────────&gt;│
+     │                    │                     │
+     │                    │  显示授权页面         │
+     │&lt;──────────────────────────────────────────┤
+     │                    │                     │
+     │  用户授权           │                     │
+     ├────────────────────────────────────────&gt;│
+     │                    │                     │
+     │                    │  重定向+授权码        │
+     │                    │&lt;────────────────────┤
+     │                    │                     │
+     │                    │  用授权码换取Token    │
+     │                    ├────────────────────&gt;│
+     │                    │                     │
+     │                    │  access_token       │
+     │                    │&lt;────────────────────┤
+     │                    │                     │
+</code></pre>
+<h4>步骤详解</h4>
+<p><strong>步骤 1：引导用户到授权页面</strong></p>
+<pre><code class="language-javascript">// 构建授权 URL
+const authUrl = new URL(&#39;https://auth.nexusbook.com/authorize&#39;);
+authUrl.searchParams.set(&#39;response_type&#39;, &#39;code&#39;);
+authUrl.searchParams.set(&#39;client_id&#39;, &#39;your_client_id&#39;);
+authUrl.searchParams.set(&#39;redirect_uri&#39;, &#39;https://yourapp.com/callback&#39;);
+authUrl.searchParams.set(&#39;scope&#39;, &#39;doc:read data:read data:write&#39;);
+authUrl.searchParams.set(&#39;state&#39;, generateRandomState()); // CSRF 保护
+
+// 重定向用户
+window.location.href = authUrl.toString();
+</code></pre>
+<p><strong>步骤 2：处理回调并换取 Token</strong></p>
+<pre><code class="language-javascript">// 在回调端点处理
+app.get(&#39;/callback&#39;, async (req, res) =&gt; {
+  const { code, state } = req.query;
+  
+  // 验证 state 防止 CSRF
+  if (state !== expectedState) {
+    return res.status(400).send(&#39;Invalid state&#39;);
+  }
+  
+  // 用授权码换取 Token
+  const response = await axios.post(
+    &#39;https://auth.nexusbook.com/token&#39;,
+    qs.stringify({
+      grant_type: &#39;authorization_code&#39;,
+      code: code,
+      client_id: &#39;your_client_id&#39;,
+      client_secret: &#39;your_client_secret&#39;,
+      redirect_uri: &#39;https://yourapp.com/callback&#39;
+    }),
+    {
+      headers: { &#39;Content-Type&#39;: &#39;application/x-www-form-urlencoded&#39; }
+    }
+  );
+  
+  const { access_token, refresh_token } = response.data;
+  
+  // 保存 Token
+  // ...
+});
+</code></pre>
+<h2>OIDC 集成</h2>
+<h3>发现端点</h3>
+<p>获取 OIDC 配置信息：</p>
+<pre><code class="language-bash">curl https://auth.nexusbook.com/.well-known/openid-configuration
+</code></pre>
+<p><strong>响应示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;issuer&quot;: &quot;https://auth.nexusbook.com&quot;,
+  &quot;authorization_endpoint&quot;: &quot;https://auth.nexusbook.com/authorize&quot;,
+  &quot;token_endpoint&quot;: &quot;https://auth.nexusbook.com/token&quot;,
+  &quot;userinfo_endpoint&quot;: &quot;https://auth.nexusbook.com/userinfo&quot;,
+  &quot;jwks_uri&quot;: &quot;https://auth.nexusbook.com/jwks.json&quot;,
+  &quot;scopes_supported&quot;: [&quot;openid&quot;, &quot;profile&quot;, &quot;email&quot;, &quot;doc:read&quot;, &quot;data:write&quot;],
+  &quot;response_types_supported&quot;: [&quot;code&quot;, &quot;token&quot;],
+  &quot;grant_types_supported&quot;: [&quot;authorization_code&quot;, &quot;client_credentials&quot;, &quot;refresh_token&quot;]
+}
+</code></pre>
+<h3>JWKS 端点</h3>
+<p>获取 JWT 验证公钥：</p>
+<pre><code class="language-bash">curl https://auth.nexusbook.com/jwks.json
+</code></pre>
+<h3>UserInfo 端点</h3>
+<p>获取当前用户信息：</p>
+<pre><code class="language-bash">curl https://auth.nexusbook.com/userinfo \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39;
+</code></pre>
+<h2>Token 管理</h2>
+<h3>Token 结构</h3>
+<p>NexusBook 使用 JWT (JSON Web Token) 格式：</p>
+<pre><code>eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.    # Header
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6I... # Payload
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQss... # Signature
+</code></pre>
+<p><strong>解码后的 Payload</strong>：</p>
+<pre><code class="language-json">{
+  &quot;sub&quot;: &quot;user-12345&quot;,
+  &quot;client_id&quot;: &quot;your_client_id&quot;,
+  &quot;scope&quot;: &quot;doc:read data:write&quot;,
+  &quot;iat&quot;: 1638360000,
+  &quot;exp&quot;: 1638363600
+}
+</code></pre>
+<h3>Token 存储</h3>
+<p><strong>安全存储建议</strong>：</p>
+<ol>
+<li><p><strong>Web 应用</strong>：使用 HttpOnly Cookie</p>
+<pre><code class="language-javascript">res.cookie(&#39;access_token&#39;, token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: &#39;strict&#39;,
+  maxAge: 3600000 // 1 小时
+});
+</code></pre>
+</li>
+<li><p><strong>移动应用</strong>：使用安全存储（iOS Keychain、Android Keystore）</p>
+</li>
+<li><p><strong>服务端应用</strong>：环境变量或加密配置文件</p>
+</li>
+</ol>
+<p><strong>不安全的做法</strong>：</p>
+<ul>
+<li>❌ 存储在 localStorage</li>
+<li>❌ 存储在普通 Cookie（非 HttpOnly）</li>
+<li>❌ 硬编码在代码中</li>
+<li>❌ 明文保存在数据库</li>
+</ul>
+<h3>Token 刷新</h3>
+<p>使用 Refresh Token 获取新的 Access Token：</p>
+<pre><code class="language-bash">curl -X POST https://auth.nexusbook.com/token \
+  -H &#39;Content-Type: application/x-www-form-urlencoded&#39; \
+  -d &#39;grant_type=refresh_token&#39; \
+  -d &#39;refresh_token=YOUR_REFRESH_TOKEN&#39; \
+  -d &#39;client_id=your_client_id&#39; \
+  -d &#39;client_secret=your_client_secret&#39;
+</code></pre>
+<p><strong>自动刷新示例</strong>：</p>
+<pre><code class="language-javascript">class TokenManager {
+  constructor(clientId, clientSecret) {
+    this.clientId = clientId;
+    this.clientSecret = clientSecret;
+    this.accessToken = null;
+    this.refreshToken = null;
+    this.expiresAt = null;
+  }
+  
+  async getAccessToken() {
+    // 如果 Token 还有效，直接返回
+    if (this.accessToken &amp;&amp; Date.now() &lt; this.expiresAt - 60000) {
+      return this.accessToken;
+    }
+    
+    // Token 过期，使用 refresh_token 刷新
+    if (this.refreshToken) {
+      await this.refreshAccessToken();
+      return this.accessToken;
+    }
+    
+    // 没有 Token，获取新的
+    await this.fetchNewToken();
+    return this.accessToken;
+  }
+  
+  async refreshAccessToken() {
+    const response = await axios.post(&#39;https://auth.nexusbook.com/token&#39;, {
+      grant_type: &#39;refresh_token&#39;,
+      refresh_token: this.refreshToken,
+      client_id: this.clientId,
+      client_secret: this.clientSecret
+    });
+    
+    this.updateTokens(response.data);
+  }
+  
+  updateTokens(data) {
+    this.accessToken = data.access_token;
+    this.refreshToken = data.refresh_token || this.refreshToken;
+    this.expiresAt = Date.now() + (data.expires_in * 1000);
+  }
+}
+</code></pre>
+<h2>Scope 权限详解</h2>
+<h3>权限级别</h3>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>权限</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>doc:read</code></td>
+<td>文档读取</td>
+<td>读取文档属性、元数据、视图、设置</td>
+</tr>
+<tr>
+<td><code>doc:write</code></td>
+<td>文档写入</td>
+<td>创建、更新、删除文档和元数据</td>
+</tr>
+<tr>
+<td><code>data:read</code></td>
+<td>数据读取</td>
+<td>查询数据行</td>
+</tr>
+<tr>
+<td><code>data:write</code></td>
+<td>数据写入</td>
+<td>创建、更新、删除数据行</td>
+</tr>
+<tr>
+<td><code>views:manage</code></td>
+<td>视图管理</td>
+<td>创建、更新、删除视图</td>
+</tr>
+<tr>
+<td><code>comments:write</code></td>
+<td>评论管理</td>
+<td>创建、更新、删除评论</td>
+</tr>
+<tr>
+<td><code>approvals:manage</code></td>
+<td>审批管理</td>
+<td>发起和处理审批流程</td>
+</tr>
+<tr>
+<td><code>requests:manage</code></td>
+<td>请求管理</td>
+<td>创建、合并、关闭变更请求</td>
+</tr>
+<tr>
+<td><code>webhooks:manage</code></td>
+<td>Webhook 管理</td>
+<td>创建、更新、删除 Webhook</td>
+</tr>
+</tbody></table>
+<h3>权限组合</h3>
+<p><strong>只读访问</strong>：</p>
+<pre><code>scope=doc:read data:read
+</code></pre>
+<p><strong>数据管理</strong>：</p>
+<pre><code>scope=doc:read data:read data:write
+</code></pre>
+<p><strong>完全访问</strong>：</p>
+<pre><code>scope=doc:read doc:write data:read data:write views:manage comments:write approvals:manage requests:manage
+</code></pre>
+<h2>API Keys 管理</h2>
+<p>API 密钥用于服务集成与自动化任务，支持最小权限与可撤销。</p>
+<h3>创建 API Key</h3>
+<pre><code class="language-bash">curl -X POST &#39;https://auth.nexusbook.com/api-keys&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;name&quot;: &quot;CI Pipeline&quot;,
+    &quot;scopes&quot;: [&quot;doc:read&quot;, &quot;data:read&quot;],
+    &quot;expiresAt&quot;: &quot;2026-01-01T00:00:00Z&quot;
+  }&#39;
+</code></pre>
+<h3>吊销 API Key</h3>
+<pre><code class="language-bash">curl -X POST &#39;https://auth.nexusbook.com/api-keys/{keyId}/revoke&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39;
+</code></pre>
+<h3>最佳实践</h3>
+<ul>
+<li>使用最小权限的 scopes</li>
+<li>配置过期时间与 IP 白名单</li>
+<li>开启使用日志与速率限制</li>
+</ul>
+<h2>两步验证（2FA/MFA）</h2>
+<p>支持 TOTP（Authenticator）、短信、邮件与备用码。</p>
+<ul>
+<li>开启：<code>POST /auth/2fa/enable</code>（返回二维码与密钥）</li>
+<li>验证：<code>POST /auth/2fa/verify</code></li>
+<li>禁用：<code>POST /auth/2fa/disable</code></li>
+</ul>
+<h2>会话管理</h2>
+<ul>
+<li>列出会话：<code>GET /auth/sessions</code></li>
+<li>关闭会话：<code>DELETE /auth/sessions/{sessionId}</code></li>
+<li>强制退出所有：<code>POST /auth/sessions/logout-all</code></li>
+</ul>
+<h3>1. 使用 HTTPS</h3>
+<p><strong>始终使用 HTTPS</strong> 传输敏感信息：</p>
+<pre><code class="language-javascript">// ✅ 正确
+const apiUrl = &#39;https://open.nexusbook.com/api/v1/...&#39;;
+
+// ❌ 错误
+const apiUrl = &#39;http://open.nexusbook.com/api/v1/...&#39;;
+</code></pre>
+<h3>2. Scope 最小权限原则</h3>
+<p>只请求应用需要的最小权限：</p>
+<pre><code class="language-javascript">// ✅ 正确 - 只读应用只请求读权限
+scope: &#39;doc:read data:read&#39;
+
+// ❌ 错误 - 请求了不必要的写权限
+scope: &#39;doc:read doc:write data:read data:write&#39;
+</code></pre>
+<h3>3. 保护 Client Secret</h3>
+<ul>
+<li>✅ 使用环境变量</li>
+<li>✅ 使用密钥管理服务（AWS Secrets Manager、Azure Key Vault）</li>
+<li>❌ 不要提交到代码仓库</li>
+<li>❌ 不要在客户端代码中使用</li>
+</ul>
+<h2>安全最佳实践</h2>
+<p>function verifyToken(token) {
+  return new Promise((resolve, reject) =&gt; {
+    jwt.verify(token, getKey, {
+      audience: &#39;your_client_id&#39;,
+      issuer: &#39;<a href="https://auth.nexusbook.com">https://auth.nexusbook.com</a>&#39;,
+      algorithms: [&#39;RS256&#39;]
+    }, (err, decoded) =&gt; {
+      if (err) reject(err);
+      else resolve(decoded);
+    });
+  });
+}</p>
+<pre><code>
+### 5. 实施 Rate Limiting
+
+保护您的应用免受滥用：
+```javascript
+const rateLimit = require(&#39;express-rate-limit&#39;);
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 分钟
+  max: 100 // 限制 100 个请求
+});
+
+app.use(&#39;/api/&#39;, limiter);
+</code></pre>
+<h2>错误处理</h2>
+<h3>常见认证错误</h3>
+<table>
+<thead>
+<tr>
+<th>错误码</th>
+<th>说明</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>INVALID_CLIENT</code></td>
+<td>客户端凭证错误</td>
+<td>检查 client_id 和 client_secret</td>
+</tr>
+<tr>
+<td><code>INVALID_TOKEN</code></td>
+<td>Token 无效或过期</td>
+<td>刷新或重新获取 Token</td>
+</tr>
+<tr>
+<td><code>UNAUTHORIZED</code></td>
+<td>未授权</td>
+<td>确保请求头包含有效 Token</td>
+</tr>
+<tr>
+<td><code>FORBIDDEN</code></td>
+<td>权限不足</td>
+<td>请求包含所需权限的 Scope</td>
+</tr>
+<tr>
+<td><code>INVALID_SCOPE</code></td>
+<td>Scope 无效</td>
+<td>检查 Scope 拼写和可用性</td>
+</tr>
+</tbody></table>
+<h3>错误处理示例</h3>
+<pre><code class="language-javascript">async function callApi(endpoint, options = {}) {
+  try {
+    const token = await tokenManager.getAccessToken();
+    
+    const response = await axios.get(endpoint, {
+      headers: {
+        &#39;Authorization&#39;: `Bearer ${token}`,
+        ...options.headers
+      }
+    });
+    
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const { code, message } = error.response.data;
+      
+      // Token 过期，刷新后重试
+      if (code === &#39;INVALID_TOKEN&#39;) {
+        await tokenManager.refreshAccessToken();
+        return callApi(endpoint, options); // 重试
+      }
+      
+      // 权限不足
+      if (code === &#39;FORBIDDEN&#39;) {
+        throw new Error(&#39;权限不足，请联系管理员&#39;);
+      }
+      
+      // 其他错误
+      throw new Error(message.zh || message.en || &#39;未知错误&#39;);
+    }
+    
+    throw error;
+  }
+}
+</code></pre>
+<h2>下一步</h2>
+<ul>
+<li>📊 阅读 <a href="document-model.html">文档模型详解</a></li>
+<li>🔧 阅读 <a href="data-operations.html">数据操作指南</a></li>
+<li>📚 查看 <a href="../api/index.html">API 参考文档</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
