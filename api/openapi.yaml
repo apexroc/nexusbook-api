@@ -81,8 +81,11 @@ info:
     数据行使用版本号 (version) 进行并发控制。更新时需要提供当前版本号。
   version: 0.0.0
 servers:
+  - url: https://open-sit.nexusbook.com
+    description: 测试环境 (SIT)
+    variables: {}
   - url: https://open.nexusbook.app
-    description: Open API Server
+    description: 生产环境 (Production)
     variables: {}
 tags:
   - name: OAuth
