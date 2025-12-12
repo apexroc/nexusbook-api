@@ -31,15 +31,10 @@ env:
   IMAGE_NAME: ${{ github.repository }}-docs
 
 jobs:
-  # 构建 GitHub Pages 版本的文档
-  build-github-pages:
-    name: Build for GitHub Pages
+  # 构建文档（同时构建 GitHub Pages 和 K3s 两个版本）
+  build-docs:
+    name: Build API Documentation
     runs-on: ubuntu-latest
-    # 标签推送时总是执行，手动触发时根据选择执行
-    if: |
-      github.event_name == 'push' || 
-      (github.event_name == 'workflow_dispatch' && 
-       (inputs.deploy_target == 'github-pages' || inputs.deploy_target == 'both'))
     
     steps:
       - name: Checkout
@@ -66,13 +61,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build docs for GitHub Pages
+      - name: Build docs for GitHub Pages (with BASE_PATH)
         run: bash scripts/build-for-github.sh
-
-      - name: Upload GitHub Pages artifact
+        
+      - name: Upload GitHub Pages docs
         uses: actions/upload-artifact@v4
         with:
           name: github-pages-docs
+          path: ./docs
+          retention-days: 1
+
+      - name: Build docs for K3s (without BASE_PATH)
+        run: make docs
+
+      - name: Upload K3s docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: k3s-docs
           path: ./docs
           retention-days: 1
 
@@ -80,10 +85,15 @@ jobs:
   deploy-github-pages:
     name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
-    needs: build-github-pages
+    needs: build-docs
+    # 标签推送时总是执行，手动触发时根据选择执行
+    if: |
+      github.event_name == 'push' || 
+      (github.event_name == 'workflow_dispatch' && 
+       (inputs.deploy_target == 'github-pages' || inputs.deploy_target == 'both'))
     
     steps:
-      - name: Download artifact
+      - name: Download GitHub Pages docs
         uses: actions/download-artifact@v4
         with:
           name: github-pages-docs
@@ -95,14 +105,15 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           publish_branch: gh-pages
-          commit_message: 'docs: deploy ${{ needs.build-github-pages.outputs.version || github.sha }}'
+          commit_message: 'docs: deploy github pages ${{ github.sha }}'
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
-  # 构建 K3s 版本的文档
-  build-k3s-docs:
-    name: Build for K3s
+  # 推送 K3s 文档到 openapi 分支
+  push-k3s-docs:
+    name: Push K3s Docs to openapi Branch
     runs-on: ubuntu-latest
+    needs: build-docs
     # 标签推送时总是执行，手动触发时根据选择执行
     if: |
       github.event_name == 'push' || 
@@ -110,32 +121,11 @@ jobs:
        (inputs.deploy_target == 'k3s' || inputs.deploy_target == 'both'))
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Download K3s docs
+        uses: actions/download-artifact@v4
         with:
-          fetch-depth: 0
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/}
-          else
-            VERSION=$(git describe --tags --always)
-          fi
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "✅ 版本: $VERSION"
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build docs for K3s (no BASE_PATH)
-        run: make docs
+          name: k3s-docs
+          path: ./docs
 
       - name: Deploy to openapi branch
         uses: peaceiris/actions-gh-pages@v3
@@ -143,20 +133,19 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs
           publish_branch: openapi
-          commit_message: 'docs: update openapi docs ${{ steps.get_version.outputs.version || github.sha }}'
+          commit_message: 'docs: update k3s docs ${{ github.sha }}'
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
-  # 构建 Docker 镜像用于 K3s
+  # 构建并推送 Docker 镜像 (仅在手动部署到 K3s 时执行)
   build-docker-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
-    needs: build-k3s-docs  # 等待文档构建并推送到 openapi 分支
-    # 标签推送时总是执行，手动触发时根据选择执行
+    needs: push-k3s-docs  # 等待文档推送到 openapi 分支
+    # 仅在手动触发且选择 k3s 或 both 时执行
     if: |
-      github.event_name == 'push' || 
-      (github.event_name == 'workflow_dispatch' && 
-       (inputs.deploy_target == 'k3s' || inputs.deploy_target == 'both'))
+      github.event_name == 'workflow_dispatch' && 
+      (inputs.deploy_target == 'k3s' || inputs.deploy_target == 'both')
     
     outputs:
       version: ${{ steps.get_version.outputs.version }}
@@ -285,7 +274,7 @@ jobs:
   summary:
     name: Deployment Summary
     runs-on: ubuntu-latest
-    needs: [build-github-pages, build-k3s-docs, build-docker-image]
+    needs: [deploy-github-pages, push-k3s-docs]
     if: always()
     
     steps:
@@ -294,10 +283,10 @@ jobs:
           echo "## 📦 Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          if [[ "${{ needs.build-github-pages.result }}" == "success" ]]; then
+          if [[ "${{ needs.deploy-github-pages.result }}" == "success" ]]; then
             echo "✅ **GitHub Pages:** Deployed successfully" >> $GITHUB_STEP_SUMMARY
             echo "   - URL: https://apexroc.github.io/nexusbook-api" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.build-github-pages.result }}" == "skipped" ]]; then
+          elif [[ "${{ needs.deploy-github-pages.result }}" == "skipped" ]]; then
             echo "⏭️ **GitHub Pages:** Skipped" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **GitHub Pages:** Failed" >> $GITHUB_STEP_SUMMARY
@@ -305,11 +294,12 @@ jobs:
           
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          if [[ "${{ needs.build-docker-image.result }}" == "success" ]]; then
-            echo "✅ **Docker Image:** Built successfully" >> $GITHUB_STEP_SUMMARY
-            echo "   - Registry: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
-          elif [[ "${{ needs.build-docker-image.result }}" == "skipped" ]]; then
-            echo "⏭️ **Docker Image:** Skipped" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.push-k3s-docs.result }}" == "success" ]]; then
+            echo "✅ **K3s Docs:** Pushed to openapi branch" >> $GITHUB_STEP_SUMMARY
+            echo "   - Branch: openapi" >> $GITHUB_STEP_SUMMARY
+            echo "   - Ready for K3s deployment" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.push-k3s-docs.result }}" == "skipped" ]]; then
+            echo "⏭️ **K3s Docs:** Skipped" >> $GITHUB_STEP_SUMMARY
           else
-            echo "❌ **Docker Image:** Failed" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **K3s Docs:** Failed" >> $GITHUB_STEP_SUMMARY
           fi
