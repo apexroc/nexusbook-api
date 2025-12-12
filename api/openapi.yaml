@@ -82,7 +82,7 @@ info:
   version: 0.0.0
 servers:
   - url: Open
-    description: https://open.nexusbook.app/api/v1
+    description: https://open.nexusbook.app
     variables: {}
 tags:
   - name: OAuth
