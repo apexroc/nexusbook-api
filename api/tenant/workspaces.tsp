@@ -73,6 +73,15 @@ model CreateWorkspaceRequest {
      * Visibility (default: private)
      */
     visibility?: WorkspaceVisibility = WorkspaceVisibility.private;
+
+    /**
+     * 数据源引用配置
+     * Data source reference configuration
+     *
+     * 允许工作区引用其他工作区的特定 document type 数据。
+     * Allows workspace to reference specific document types from other workspaces.
+     */
+    dataSourceReferences?: DataSourceReference[];
 }
 
 /**
@@ -109,6 +118,15 @@ model UpdateWorkspaceRequest {
      * Visibility
      */
     visibility?: WorkspaceVisibility;
+
+    /**
+     * 数据源引用配置
+     * Data source reference configuration
+     *
+     * 允许工作区引用其他工作区的特定 document type 数据。
+     * Allows workspace to reference specific document types from other workspaces.
+     */
+    dataSourceReferences?: DataSourceReference[];
 }
 
 /**

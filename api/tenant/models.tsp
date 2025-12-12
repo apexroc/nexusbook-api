@@ -531,6 +531,51 @@ enum WorkspaceVisibility {
 }
 
 /**
+ * 数据源引用模式
+ * Data source reference mode
+ */
+enum DataSourceMode {
+    /**
+     * 只读模式
+     * Read-only mode
+     */
+    readonly,
+}
+
+/**
+ * 数据源引用
+ * Data source reference
+ *
+ * 用于配置 Workspace 引用其他 Workspace 的数据。
+ * Used to configure a workspace to reference data from other workspaces.
+ */
+model DataSourceReference {
+    /**
+     * 源工作区 ID
+     * Source workspace ID
+     */
+    sourceWorkspaceId: string;
+
+    /**
+     * 文档类型（如 product, supplier）
+     * Document type (e.g., product, supplier)
+     */
+    documentType: string;
+
+    /**
+     * 引用模式（默认 readonly）
+     * Reference mode (default: readonly)
+     */
+    mode?: DataSourceMode = DataSourceMode.readonly;
+
+    /**
+     * 优先级（用于排序，数字越小优先级越高）
+     * Priority (for sorting, smaller number = higher priority)
+     */
+    priority?: int32;
+}
+
+/**
  * 工作区模型
  * Workspace model
  *
@@ -597,6 +642,15 @@ model Workspace {
      * Workspace owner
      */
     ownerId: NexusBook.Api.Common.UserRef;
+
+    /**
+     * 数据源引用配置
+     * Data source reference configuration
+     *
+     * 允许工作区引用其他工作区的特定 document type 数据。
+     * Allows workspace to reference specific document types from other workspaces.
+     */
+    dataSourceReferences?: DataSourceReference[];
 
     /**
      * 工作区设置
