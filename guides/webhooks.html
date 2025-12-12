@@ -463,7 +463,7 @@
 </tbody></table>
 <h2>快速开始</h2>
 <h3>1. 创建 Webhook</h3>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/webhooks&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -617,7 +617,7 @@ if __name__ == &#39;__main__&#39;:
 </code></pre>
 <h3>3. 测试 Webhook</h3>
 <pre><code class="language-bash"># 发送测试事件
-curl -X POST &#39;https://open.nexusbook.com/api/v1/webhooks/webhook-123/test&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/test&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -718,23 +718,23 @@ function processEvent(event) {
 </code></pre>
 <h2>管理 Webhook</h2>
 <h3>查看投递历史</h3>
-<pre><code class="language-bash">curl &#39;https://open.nexusbook.com/api/v1/webhooks/webhook-123/deliveries&#39; \
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/deliveries&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
 </code></pre>
 <h3>查看统计信息</h3>
-<pre><code class="language-bash">curl &#39;https://open.nexusbook.com/api/v1/webhooks/webhook-123/stats&#39; \
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/stats&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
 </code></pre>
 <h3>暂停 Webhook</h3>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/webhooks/webhook-123/pause&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/pause&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
 </code></pre>
 <h3>恢复 Webhook</h3>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/webhooks/webhook-123/resume&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/resume&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
 </code></pre>
 <h3>重新投递失败的事件</h3>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/webhooks/webhook-123/deliveries/delivery-456/redeliver&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/deliveries/delivery-456/redeliver&#39; \
   -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
 </code></pre>
 <h2>常见问题</h2>

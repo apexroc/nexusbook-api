@@ -152,7 +152,7 @@
 <h2>CRUD 操作</h2>
 <h3>创建数据行</h3>
 <p><strong>单行创建</strong>：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -166,7 +166,7 @@
 </code></pre>
 <p><strong>批量创建（已废弃）</strong>：请改用“批量更新（BulkUpdate）”接口，支持同时更新数据与属性，且统一走 <code>requestId</code> 工作流。</p>
 <pre><code class="language-bash"># 推荐：BulkUpdate 统一接口
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;[
@@ -176,15 +176,15 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?re
 </code></pre>
 <h3>读取数据行</h3>
 <p><strong>获取单行</strong>：</p>
-<pre><code class="language-bash">curl &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001&#39; \
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <p><strong>列表查询</strong>：</p>
-<pre><code class="language-bash">curl &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?page=1&amp;pageSize=20&#39; \
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?page=1&amp;pageSize=20&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <p><strong>结构化查询</strong>：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/query&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/query&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -202,7 +202,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?re
 </code></pre>
 <h3>更新数据行</h3>
 <p><strong>全量更新</strong>：</p>
-<pre><code class="language-bash">curl -X PUT &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X PUT &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -214,7 +214,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?re
   }&#39;
 </code></pre>
 <p><strong>部分更新</strong>：</p>
-<pre><code class="language-bash">curl -X PATCH &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X PATCH &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -226,11 +226,11 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?re
 </code></pre>
 <h3>删除数据行</h3>
 <p><strong>单行删除</strong>：</p>
-<pre><code class="language-bash">curl -X DELETE &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X DELETE &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <p><strong>批量删除</strong>：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?apply=true&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?apply=true&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -343,7 +343,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?re
 <h2>并发控制</h2>
 <p>使用版本号（version）进行乐观锁控制：</p>
 <pre><code class="language-bash"># 1. 获取当前数据
-curl &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 响应
@@ -354,7 +354,7 @@ curl &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001&#39; \
 }
 
 # 2. 更新时提供版本号
-curl -X PUT &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/row-001?apply=true&#39; \
+curl -X PUT &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?apply=true&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -d &#39;{
     &quot;values&quot;: [...],

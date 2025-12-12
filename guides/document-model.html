@@ -223,7 +223,7 @@ DELETE /doc/{docType}/{docId}/properties          # 删除属性
 </code></pre>
 <h4>示例：订货单属性</h4>
 <pre><code class="language-bash"># 创建订货单属性
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -241,7 +241,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/
   }&#39;
 
 # 部分更新属性（仅更新金额和数量）
-curl -X PATCH &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/properties?merge=true&#39; \
+curl -X PATCH &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?merge=true&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -d &#39;{
     &quot;properties&quot;: {
@@ -370,7 +370,7 @@ POST   /doc/{docType}/{docId}/rows/batch-delete             # 批量删除（需
 </ul>
 <h4>示例</h4>
 <pre><code class="language-bash"># 创建一行数据（携带 requestId）
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows?requestId=req-1&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/rows?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -382,7 +382,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/
   }&#39;
 
 # 批量更新（BulkUpdate，统一格式；服务端根据 metadata 解析）
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows/batch-update?requestId=req-1&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/rows/batch-update?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;[
@@ -496,7 +496,7 @@ POST   /doc/{docType}/{docId}/comments/{commentId}/reactions # 添加反应
 </code></pre>
 <h4>示例</h4>
 <pre><code class="language-bash"># 对整个文档进行评论
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/comments&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/comments&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -d &#39;{
     &quot;content&quot;: &quot;请尽快处理这个订单&quot;,
@@ -507,7 +507,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/
   }&#39;
 
 # 对某一行进行评论
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/comments&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/comments&#39; \
   -d &#39;{
     &quot;content&quot;: &quot;这行的数量似乎有误&quot;,
     &quot;target&quot;: {
@@ -517,7 +517,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/
   }&#39;
 
 # 对某个单元格进行评论
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/comments&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/comments&#39; \
   -d &#39;{
     &quot;content&quot;: &quot;单价需要确认&quot;,
     &quot;target&quot;: {
@@ -528,14 +528,14 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/
   }&#39;
 
 # 回复某个评论（线程）
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/comments&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/comments&#39; \
   -d &#39;{
     &quot;content&quot;: &quot;我来检查一下&quot;,
     &quot;parentId&quot;: &quot;comment-001&quot;
   }&#39;
 
 # 对评论添加表情反应
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/comments/comment-001/reactions&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/comments/comment-001/reactions&#39; \
   -d &#39;{
     &quot;emoji&quot;: &quot;👍&quot;
   }&#39;
@@ -611,19 +611,19 @@ POST   /doc/{docType}/{docId}/revisions/{revId}/revert       # 回滚到指定�
 </code></pre>
 <h4>示例</h4>
 <pre><code class="language-bash"># 查看修订历史
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/revisions&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/revisions&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 对比两个修订之间的差异
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/revisions/rev-002/diff?base=rev-001&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/revisions/rev-002/diff?base=rev-001&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 查询某行的完整变更历史
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/revisions/history?targetKind=row&amp;rowId=row-001&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/revisions/history?targetKind=row&amp;rowId=row-001&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 回滚到指定修订
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/revisions/rev-001/revert&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/revisions/rev-001/revert&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -d &#39;{
     &quot;reason&quot;: &quot;恢复到之前的状态&quot;
@@ -745,7 +745,7 @@ POST   /relations/query                                # 复杂查询（按类�
 </ul>
 <h3>使用示例</h3>
 <pre><code class="language-bash"># 创建行到行的引用关系（在 Request req-1 中）
-curl -X POST &#39;https://open.nexusbook.com/api/v1/relations?requestId=req-1&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/relations?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -757,11 +757,11 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/relations?requestId=req-1&#3
   }&#39;
 
 # 查询文档的所有出边（按类型过滤）
-curl &#39;https://open.nexusbook.com/api/v1/doc/inventory/inv-001/relations?type=contains&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/inventory/inv-001/relations?type=contains&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 查询指向当前文档的入边（按行过滤）
-curl &#39;https://open.nexusbook.com/api/v1/doc/product/prod-001/relations/inbound?rowId=row-42&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/product/prod-001/relations/inbound?rowId=row-42&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <h3>关系示意图</h3>
@@ -780,15 +780,15 @@ curl &#39;https://open.nexusbook.com/api/v1/doc/product/prod-001/relations/inbou
 </ul>
 <h3>请求示例</h3>
 <pre><code class="language-bash"># 获取完整的订货单信息
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=properties,metadata,views,data,comments,revisions,settings&amp;page=1&amp;pageSize=20&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123?include=properties,metadata,views,data,comments,revisions,settings&amp;page=1&amp;pageSize=20&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 只获取元数据和数据
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=metadata,data&amp;page=1&amp;pageSize=50&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123?include=metadata,data&amp;page=1&amp;pageSize=50&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 获取属性和最近的评论/修订
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=properties,comments,revisions&amp;commentsLimit=5&amp;revisionsLimit=3&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123?include=properties,comments,revisions&amp;commentsLimit=5&amp;revisionsLimit=3&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <h3>响应示例</h3>
@@ -1027,16 +1027,16 @@ curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=
 <h2>性能考虑</h2>
 <h3>分页和限制</h3>
 <pre><code class="language-bash"># 对于大量数据，使用分页
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123/rows?page=1&amp;pageSize=100&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/rows?page=1&amp;pageSize=100&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 
 # 在聚合查询中限制评论/修订数量
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=comments,revisions&amp;commentsLimit=10&amp;revisionsLimit=5&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123?include=comments,revisions&amp;commentsLimit=10&amp;revisionsLimit=5&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <h3>选择需要的数据</h3>
 <pre><code class="language-bash"># 只获取必要的数据部分
-curl &#39;https://open.nexusbook.com/api/v1/doc/purchaseOrder/order-123?include=properties,metadata&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123?include=properties,metadata&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 # 避免获取整个数据集
 </code></pre>

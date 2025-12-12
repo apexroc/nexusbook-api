@@ -133,11 +133,11 @@
 </thead>
 <tbody><tr>
 <td><strong>API 基址</strong></td>
-<td><code>https://open.nexusbook.com/api/v1</code></td>
+<td><code>https://open.nexusbook.app/api/v1</code></td>
 </tr>
 <tr>
 <td><strong>认证域名</strong></td>
-<td><code>https://auth.nexusbook.com</code></td>
+<td><code>https://auth.nexusbook.app</code></td>
 </tr>
 <tr>
 <td><strong>API 规范</strong></td>
@@ -206,7 +206,7 @@
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 获取产品文档的元数据、视图和数据
 curl -H &#39;Authorization: Bearer TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&#39;
 </code></pre>
 <h3>2. 文档属性</h3>
 <p>管理文档级元信息（订单时间、门店、金额、数量等）。</p>
@@ -231,10 +231,10 @@ GET /api/v1/doc/{doc-type}/{doc-id}/properties/history
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 获取订货单属性
 curl -H &#39;Authorization: Bearer TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/purchase/p001/properties&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/properties&#39;
 
 # 更新订货单属性
-curl -X PATCH &#39;https://open.nexusbook.com/api/v1/doc/purchase/p001/properties?merge=true&#39; \
+curl -X PATCH &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/properties?merge=true&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -254,7 +254,7 @@ PUT /api/v1/doc/{doc-type}/{doc-id}/metadata
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 获取产品表的字段定义
 curl -H &#39;Authorization: Bearer TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/product/123/metadata&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/metadata&#39;
 </code></pre>
 <h3>4. 视图</h3>
 <p>视图管理端点，支持 8 种视图类型（Table, Gallery, Kanban, Calendar, Chart, Form, Map, Timeline）。</p>
@@ -278,7 +278,7 @@ POST /api/v1/doc/{doc-type}/{doc-id}/views/{view-id}/default
 </code></pre>
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 创建看板视图
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/project/456/views&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/project/456/views&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -317,11 +317,11 @@ DELETE /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?requestId={request-id}
 <p><strong>示例 - 简单查询：</strong></p>
 <pre><code class="language-bash"># 获取产品列表，按名称升序排序
 curl -H &#39;Authorization: Bearer TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?page=1&amp;pageSize=20&amp;sort=name:asc&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?page=1&amp;pageSize=20&amp;sort=name:asc&#39;
 </code></pre>
 <p><strong>示例 - 结构化查询：</strong></p>
 <pre><code class="language-bash"># 查询价格在 50-200 之间且状态为 active 的产品
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/query&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/query&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -339,7 +339,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/query&#
 </code></pre>
 <p><strong>示例 - 创建数据行：</strong></p>
 <pre><code class="language-bash"># 直接创建产品
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?apply=true&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?apply=true&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -395,7 +395,7 @@ DELETE /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/reactions/{emoji}
 </code></pre>
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 文档级评论
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/comments&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/comments&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -404,7 +404,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/comments&#39
   }&#39;
 
 # 单元格评论
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/comments&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/comments&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -481,14 +481,14 @@ GET /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}/export?format=json
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 查看修订详情
 curl -H &#39;Authorization: Bearer TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/product/123/revisions/rev-456&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-456&#39;
 
 # 对比两个修订的差异
 curl -H &#39;Authorization: Bearer TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/product/123/revisions/rev-456/diff?base=rev-455&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-456/diff?base=rev-455&#39;
 
 # 回滚到指定版本
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/revisions/rev-455/revert&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-455/revert&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <h3>8. 变更请求</h3>
@@ -516,7 +516,7 @@ GET /api/v1/doc/{doc-type}/{doc-id}/requests/{req-id}/conflicts
 </code></pre>
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 创建变更请求
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/requests&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/requests&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -534,7 +534,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/requests&#39
   }&#39;
 
 # 合并请求
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/requests/req-789/merge&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/requests/req-789/merge&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39;
 </code></pre>
 <h3>9. 审批</h3>
@@ -553,7 +553,7 @@ POST /api/v1/doc/{doc-type}/{doc-id}/approval/{instance-id}/decision?result=appr
 </code></pre>
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 启动审批流程
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchase/p001/approval/start&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/approval/start&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -562,7 +562,7 @@ curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchase/p001/approval/s
   }&#39;
 
 # 审批通过
-curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/purchase/p001/approval/appr-123/decision?result=approved&#39; \
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/approval/appr-123/decision?result=approved&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -582,7 +582,7 @@ PUT /api/v1/doc/{doc-type}/setting
 </code></pre>
 <p><strong>示例：</strong></p>
 <pre><code class="language-bash"># 更新文档设置
-curl -X PUT &#39;https://open.nexusbook.com/api/v1/doc/product/123/settings&#39; \
+curl -X PUT &#39;https://open.nexusbook.app/api/v1/doc/product/123/settings&#39; \
   -H &#39;Authorization: Bearer TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{

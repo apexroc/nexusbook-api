@@ -167,7 +167,7 @@ make serve
 <h2>获取访问令牌</h2>
 <p>在调用 API 之前，您需要获取访问令牌。NexusBook API 支持两种 OAuth2 认证流程：</p>
 <h3>方式 1：客户端凭证流程（推荐用于服务端应用）</h3>
-<pre><code class="language-bash">curl -X POST https://auth.nexusbook.com/token \
+<pre><code class="language-bash">curl -X POST https://auth.nexusbook.app/token \
   -H &#39;Content-Type: application/x-www-form-urlencoded&#39; \
   -d &#39;grant_type=client_credentials&#39; \
   -d &#39;client_id=YOUR_CLIENT_ID&#39; \
@@ -186,7 +186,7 @@ make serve
 <ol>
 <li>引导用户到授权端点：</li>
 </ol>
-<pre><code>https://auth.nexusbook.com/authorize?
+<pre><code>https://auth.nexusbook.app/authorize?
   response_type=code&amp;
   client_id=YOUR_CLIENT_ID&amp;
   redirect_uri=YOUR_REDIRECT_URI&amp;
@@ -196,7 +196,7 @@ make serve
 <ol start="2">
 <li>用户授权后，使用授权码换取令牌：</li>
 </ol>
-<pre><code class="language-bash">curl -X POST https://auth.nexusbook.com/token \
+<pre><code class="language-bash">curl -X POST https://auth.nexusbook.app/token \
   -H &#39;Content-Type: application/x-www-form-urlencoded&#39; \
   -d &#39;grant_type=authorization_code&#39; \
   -d &#39;code=AUTHORIZATION_CODE&#39; \
@@ -250,7 +250,7 @@ make serve
 <h3>示例 1：获取文档聚合数据</h3>
 <p>获取产品文档的完整信息（元数据、视图、数据行）：</p>
 <pre><code class="language-bash">curl -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
-  &#39;https://open.nexusbook.com/api/v1/doc/product/123?include=metadata,views,data&amp;page=1&amp;pageSize=20&#39;
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&amp;page=1&amp;pageSize=20&#39;
 </code></pre>
 <p><strong>响应示例：</strong></p>
 <pre><code class="language-json">{
@@ -284,7 +284,7 @@ make serve
 </code></pre>
 <h3>示例 2：创建数据行</h3>
 <p>向产品文档中添加新产品：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -303,7 +303,7 @@ make serve
 </ul>
 <h3>示例 3：查询数据</h3>
 <p>使用结构化查询 API 搜索产品：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/query&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/query&#39; \
   -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;{
@@ -321,7 +321,7 @@ make serve
 </code></pre>
 <h3>示例 4：批量操作（统一 BulkUpdate）</h3>
 <p>使用统一的 BulkUpdate 接口进行混合更新（数据与属性），所有写操作必须携带 <code>requestId</code>：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;[
@@ -332,7 +332,7 @@ make serve
 <p>更多说明见下文“批量更新（灵活 target/value）”。</p>
 <h2>批量更新（灵活 target/value）</h2>
 <p>通过统一接口实现数据与属性的混合更新：</p>
-<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.com/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
   -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
   -H &#39;Content-Type: application/json&#39; \
   -d &#39;[
@@ -371,7 +371,7 @@ make serve
 <h3>5. 如何进行分页？</h3>
 <p>使用 <code>page</code> 和 <code>pageSize</code> 参数：</p>
 <pre><code class="language-bash"># 获取第 2 页，每页 50 条
-curl &#39;https://open.nexusbook.com/api/v1/doc/product/123/data?page=2&amp;pageSize=50&#39; \
+curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?page=2&amp;pageSize=50&#39; \
   -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39;
 </code></pre>
 <h2>下一步</h2>
