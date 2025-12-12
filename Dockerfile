@@ -3,8 +3,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# 安装 make (Alpine 需要)
-RUN apk add --no-cache make
+# 安装构建依赖 (Alpine 需要)
+RUN apk update && apk add --no-cache make bash
 
 # 复制依赖文件
 COPY package*.json ./
