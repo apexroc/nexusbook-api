@@ -239,11 +239,9 @@ jobs:
       - name: Deploy to K3s
         run: |
           VERSION=${{ needs.build-docker-image.outputs.version }}
-          REGISTRY=${{ env.REGISTRY }}
-          IMAGE_NAME=${{ env.IMAGE_NAME }}
+          DOCKER_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$VERSION"
           
-          export DOCKER_REGISTRY="$REGISTRY"
-          export VERSION="$VERSION"
+          export DOCKER_IMAGE
           
           cat deployment/k3s-deployment.yaml | envsubst | kubectl apply -f -
 

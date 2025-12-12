@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: api-docs
-        image: ${DOCKER_REGISTRY}/nexusbook-api-docs:${VERSION}
+        image: ${DOCKER_IMAGE}
         imagePullPolicy: Always
         ports:
         - containerPort: 80
