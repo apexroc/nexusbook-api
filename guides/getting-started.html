@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速开始 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>快速开始</h1>
+<p>欢迎使用 NexusBook API！本指南将帮助您快速上手，完成第一个 API 调用。</p>
+<h2>前置要求</h2>
+<p>在开始之前，请确保您的开发环境满足以下要求：</p>
+<ul>
+<li><strong>Node.js</strong>: 16+ 版本</li>
+<li><strong>Make</strong>: 构建工具</li>
+</ul>
+<h3>检查环境</h3>
+<pre><code class="language-bash"># 检查 Node.js 版本
+node --version  # 应该 &gt;= 16
+
+# 检查 Make
+make --version
+</code></pre>
+<h2>安装依赖</h2>
+<p>克隆项目后，首先安装所需的依赖：</p>
+<pre><code class="language-bash"># 安装 TypeSpec、Redocly 等 npm 依赖
+make deps
+</code></pre>
+<p>这个命令会自动：</p>
+<ul>
+<li>安装 TypeSpec 编译器</li>
+<li>安装 Redocly CLI（用于生成 API 文档）</li>
+<li>安装 TypeSpec CLI</li>
+<li>安装 Redocly（可选，用于本地预览 API 文档）</li>
+</ul>
+<h2>生成 OpenAPI 文档</h2>
+<pre><code class="language-bash"># 从 TypeSpec 定义生成 OpenAPI 规范
+make openapi
+</code></pre>
+<p>生成的文件位于：</p>
+<ul>
+<li><code>dist/openapi/@typespec/openapi3/*.yaml</code> - OpenAPI 规范文件</li>
+</ul>
+<h2>构建和查看文档</h2>
+<pre><code class="language-bash"># 构建完整的文档站点
+make docs
+
+# 启动文档服务（默认端口 8091）
+make serve
+</code></pre>
+<p>打开浏览器访问：<code>http://localhost:8091</code></p>
+<h2>获取访问令牌</h2>
+<p>在调用 API 之前，您需要获取访问令牌。NexusBook API 支持两种 OAuth2 认证流程：</p>
+<h3>方式 1：客户端凭证流程（推荐用于服务端应用）</h3>
+<pre><code class="language-bash">curl -X POST https://auth.nexusbook.app/token \
+  -H &#39;Content-Type: application/x-www-form-urlencoded&#39; \
+  -d &#39;grant_type=client_credentials&#39; \
+  -d &#39;client_id=YOUR_CLIENT_ID&#39; \
+  -d &#39;client_secret=YOUR_CLIENT_SECRET&#39; \
+  -d &#39;scope=doc:read data:read data:write&#39;
+</code></pre>
+<p><strong>响应示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;access_token&quot;: &quot;eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...&quot;,
+  &quot;token_type&quot;: &quot;Bearer&quot;,
+  &quot;expires_in&quot;: 3600,
+  &quot;scope&quot;: &quot;doc:read data:read data:write&quot;
+}
+</code></pre>
+<h3>方式 2：授权码流程（用于 Web 应用）</h3>
+<ol>
+<li>引导用户到授权端点：</li>
+</ol>
+<pre><code>https://auth.nexusbook.app/authorize?
+  response_type=code&amp;
+  client_id=YOUR_CLIENT_ID&amp;
+  redirect_uri=YOUR_REDIRECT_URI&amp;
+  scope=doc:read data:read data:write&amp;
+  state=RANDOM_STATE
+</code></pre>
+<ol start="2">
+<li>用户授权后，使用授权码换取令牌：</li>
+</ol>
+<pre><code class="language-bash">curl -X POST https://auth.nexusbook.app/token \
+  -H &#39;Content-Type: application/x-www-form-urlencoded&#39; \
+  -d &#39;grant_type=authorization_code&#39; \
+  -d &#39;code=AUTHORIZATION_CODE&#39; \
+  -d &#39;client_id=YOUR_CLIENT_ID&#39; \
+  -d &#39;client_secret=YOUR_CLIENT_SECRET&#39; \
+  -d &#39;redirect_uri=YOUR_REDIRECT_URI&#39;
+</code></pre>
+<h3>Scope 权限说明</h3>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>doc:read</code></td>
+<td>读取文档信息（属性、元数据、视图、设置）</td>
+</tr>
+<tr>
+<td><code>doc:write</code></td>
+<td>创建和修改文档</td>
+</tr>
+<tr>
+<td><code>data:read</code></td>
+<td>读取数据行</td>
+</tr>
+<tr>
+<td><code>data:write</code></td>
+<td>创建、更新、删除数据行</td>
+</tr>
+<tr>
+<td><code>views:manage</code></td>
+<td>管理视图</td>
+</tr>
+<tr>
+<td><code>comments:write</code></td>
+<td>创建和管理评论</td>
+</tr>
+<tr>
+<td><code>approvals:manage</code></td>
+<td>管理审批流程</td>
+</tr>
+<tr>
+<td><code>requests:manage</code></td>
+<td>管理变更请求</td>
+</tr>
+</tbody></table>
+<h2>第一个 API 调用</h2>
+<p>现在您已经有了访问令牌，让我们尝试第一个 API 调用！</p>
+<h3>示例 1：获取文档聚合数据</h3>
+<p>获取产品文档的完整信息（元数据、视图、数据行）：</p>
+<pre><code class="language-bash">curl -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&amp;page=1&amp;pageSize=20&#39;
+</code></pre>
+<p><strong>响应示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;success&quot;: true,
+  &quot;payload&quot;: {
+    &quot;metadata&quot;: {
+      &quot;id&quot;: &quot;meta-001&quot;,
+      &quot;fields&quot;: [
+        {&quot;id&quot;: &quot;name&quot;, &quot;name&quot;: &quot;产品名称&quot;, &quot;type&quot;: &quot;text&quot;},
+        {&quot;id&quot;: &quot;price&quot;, &quot;name&quot;: &quot;价格&quot;, &quot;type&quot;: &quot;currency&quot;}
+      ]
+    },
+    &quot;views&quot;: [
+      {&quot;id&quot;: &quot;view-001&quot;, &quot;name&quot;: &quot;全部产品&quot;, &quot;type&quot;: &quot;table&quot;}
+    ],
+    &quot;data&quot;: {
+      &quot;items&quot;: [
+        {
+          &quot;id&quot;: &quot;row-001&quot;,
+          &quot;values&quot;: [
+            {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;iPhone 15&quot;}},
+            {&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 799.99}}
+          ]
+        }
+      ],
+      &quot;totalItems&quot;: 100,
+      &quot;pageSize&quot;: 20
+    }
+  }
+}
+</code></pre>
+<h3>示例 2：创建数据行</h3>
+<p>向产品文档中添加新产品：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;id&quot;: &quot;row-new-001&quot;,
+    &quot;values&quot;: [
+      {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;新产品&quot;}},
+      {&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 99.99}},
+      {&quot;fieldId&quot;: &quot;stock&quot;, &quot;value&quot;: {&quot;number&quot;: 100}}
+    ]
+  }&#39;
+</code></pre>
+<p><strong>参数说明：</strong></p>
+<ul>
+<li><code>requestId=req-1</code>: 所有写操作需携带 <code>requestId</code>，变更进入对应的 Request，审批后生效</li>
+<li><code>apply</code> 参数已废弃：请使用 <code>requestId</code> 工作流</li>
+</ul>
+<h3>示例 3：查询数据</h3>
+<p>使用结构化查询 API 搜索产品：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/query&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;filters&quot;: {
+      &quot;logic&quot;: &quot;and&quot;,
+      &quot;conditions&quot;: [
+        {&quot;field&quot;: &quot;status&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;active&quot;},
+        {&quot;field&quot;: &quot;price&quot;, &quot;operator&quot;: &quot;range&quot;, &quot;rangeStart&quot;: 50, &quot;rangeEnd&quot;: 200}
+      ]
+    },
+    &quot;sorts&quot;: [{&quot;field&quot;: &quot;created_at&quot;, &quot;direction&quot;: &quot;desc&quot;}],
+    &quot;page&quot;: 1,
+    &quot;pageSize&quot;: 20
+  }&#39;
+</code></pre>
+<h3>示例 4：批量操作（统一 BulkUpdate）</h3>
+<p>使用统一的 BulkUpdate 接口进行混合更新（数据与属性），所有写操作必须携带 <code>requestId</code>：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;[
+    {&quot;target&quot;: {&quot;row&quot;: &quot;row-1&quot;, &quot;field&quot;: &quot;price&quot;}, &quot;value&quot;: 99.99},
+    {&quot;target&quot;: {&quot;property&quot;: &quot;amount&quot;}, &quot;value&quot;: 5000.00}
+  ]&#39;
+</code></pre>
+<p>更多说明见下文“批量更新（灵活 target/value）”。</p>
+<h2>批量更新（灵活 target/value）</h2>
+<p>通过统一接口实现数据与属性的混合更新：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;[
+    {&quot;target&quot;: {&quot;row&quot;: &quot;row-1&quot;, &quot;field&quot;: &quot;price&quot;}, &quot;value&quot;: 99.99},
+    {&quot;target&quot;: {&quot;property&quot;: &quot;amount&quot;}, &quot;value&quot;: 5000.00}
+  ]&#39;
+</code></pre>
+<p>说明：客户端只需提供原始值，类型推断与校验由服务端根据 <code>metadata</code> 完成。</p>
+<h3>1. 如何处理认证错误？</h3>
+<p>如果收到 <code>401 Unauthorized</code> 或 <code>INVALID_TOKEN</code> 错误：</p>
+<ul>
+<li>检查 Token 是否过期（有效期通常为 1 小时）</li>
+<li>确认请求头格式：<code>Authorization: Bearer YOUR_ACCESS_TOKEN</code></li>
+<li>重新获取 Token</li>
+</ul>
+<h3>2. 如何处理权限错误？</h3>
+<p>如果收到 <code>403 Forbidden</code> 错误：</p>
+<ul>
+<li>检查 Token 的 Scope 是否包含所需权限</li>
+<li>确认您对该文档有访问权限</li>
+<li>联系管理员授予权限</li>
+</ul>
+<h3>3. 如何处理 API 限流？</h3>
+<p>如果收到 <code>429 Too Many Requests</code> 错误：</p>
+<ul>
+<li>降低请求频率</li>
+<li>使用批量操作减少请求次数</li>
+<li>查看响应头 <code>Retry-After</code> 了解何时可以重试</li>
+</ul>
+<h3>4. 如何调试 API 调用？</h3>
+<ul>
+<li>使用 <code>-v</code> 参数查看 curl 请求详情：<code>curl -v ...</code></li>
+<li>检查响应的 <code>message</code> 字段获取错误详情</li>
+<li>查看 <a href="../references/error-codes.html">错误码参考</a></li>
+</ul>
+<h3>5. 如何进行分页？</h3>
+<p>使用 <code>page</code> 和 <code>pageSize</code> 参数：</p>
+<pre><code class="language-bash"># 获取第 2 页，每页 50 条
+curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?page=2&amp;pageSize=50&#39; \
+  -H &#39;Authorization: Bearer YOUR_ACCESS_TOKEN&#39;
+</code></pre>
+<h2>下一步</h2>
+<p>恭喜！您已经完成了第一个 API 调用。接下来可以：</p>
+<ul>
+<li>📖 阅读 <a href="authentication.html">认证授权指南</a> 深入了解认证机制</li>
+<li>📊 阅读 <a href="document-model.html">文档模型详解</a> 理解核心概念</li>
+<li>🔧 阅读 <a href="data-operations.html">数据操作指南</a> 学习高级用法</li>
+<li>🔔 阅读 <a href="webhooks.html">Webhook 使用指南</a> 配置事件通知</li>
+<li>📚 查看 <a href="examples.html">完整示例</a> 了解实际应用场景</li>
+</ul>
+<h2>获取帮助</h2>
+<ul>
+<li>📚 <a href="../api/index.html">API 参考文档</a></li>
+<li>🐛 <a href="https://github.com/NexusBook/nexusbook-api/issues">问题反馈</a></li>
+<li>💬 <a href="https://github.com/NexusBook/nexusbook-api/discussions">讨论区</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

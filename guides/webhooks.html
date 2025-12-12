@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook 使用指南 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>Webhook 使用指南</h1>
+<h2>概述</h2>
+<div class="mermaid">flowchart LR
+  Event["文档事件"] --> Delivery["Webhook 投递"]
+  Delivery --> Receiver["接收端"]
+  Receiver --> Verify["签名验证"]
+  Verify --> Queue["入队/幂等校验"]
+  Queue --> Process["业务处理"]
+  Process --> Resp["快速响应 200"]</div>
+<p>Webhook 提供事件驱动的通知机制，当文档发生特定变更时，系统会自动向您配置的 URL 发送 HTTP POST 请求。</p>
+<h2>支持的事件类型</h2>
+<h3>1. Request 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>request_created</code></td>
+<td>创建变更请求</td>
+<td>用户创建新的变更请求时</td>
+</tr>
+<tr>
+<td><code>request_merged</code></td>
+<td>请求已合并</td>
+<td>变更请求被合并到主文档时</td>
+</tr>
+<tr>
+<td><code>request_closed</code></td>
+<td>请求已关闭</td>
+<td>变更请求被关闭（拒绝）时</td>
+</tr>
+<tr>
+<td><code>request_reopened</code></td>
+<td>请求重新打开</td>
+<td>已关闭的请求被重新打开时</td>
+</tr>
+</tbody></table>
+<p><strong>载荷示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;request_merged&quot;,
+  &quot;timestamp&quot;: &quot;2024-12-01T10:00:00Z&quot;,
+  &quot;webhookId&quot;: &quot;webhook-123&quot;,
+  &quot;deliveryId&quot;: &quot;delivery-456&quot;,
+  &quot;docType&quot;: &quot;product&quot;,
+  &quot;docId&quot;: &quot;123&quot;,
+  &quot;triggeredBy&quot;: &quot;user-789&quot;,
+  &quot;payload&quot;: {
+    &quot;requestId&quot;: &quot;req-001&quot;,
+    &quot;title&quot;: &quot;更新产品价格&quot;,
+    &quot;author&quot;: &quot;user-789&quot;,
+    &quot;mergedBy&quot;: &quot;user-admin&quot;,
+    &quot;mergedAt&quot;: &quot;2024-12-01T10:00:00Z&quot;,
+    &quot;revisionId&quot;: &quot;rev-100&quot;,
+    &quot;changesApplied&quot;: 5
+  }
+}
+</code></pre>
+<h3>2. Approval 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>approval_started</code></td>
+<td>审批流程开始</td>
+<td>发起审批流程时</td>
+</tr>
+<tr>
+<td><code>approval_approved</code></td>
+<td>审批通过</td>
+<td>审批流程全部通过时</td>
+</tr>
+<tr>
+<td><code>approval_rejected</code></td>
+<td>审批拒绝</td>
+<td>审批被拒绝时</td>
+</tr>
+<tr>
+<td><code>approval_canceled</code></td>
+<td>审批取消</td>
+<td>审批流程被取消时</td>
+</tr>
+<tr>
+<td><code>approval_node_completed</code></td>
+<td>审批节点完成</td>
+<td>单个审批节点完成时</td>
+</tr>
+</tbody></table>
+<p><strong>载荷示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;approval_approved&quot;,
+  &quot;timestamp&quot;: &quot;2024-12-01T11:00:00Z&quot;,
+  &quot;webhookId&quot;: &quot;webhook-123&quot;,
+  &quot;deliveryId&quot;: &quot;delivery-457&quot;,
+  &quot;docType&quot;: &quot;product&quot;,
+  &quot;docId&quot;: &quot;123&quot;,
+  &quot;triggeredBy&quot;: &quot;user-approver&quot;,
+  &quot;payload&quot;: {
+    &quot;instanceId&quot;: &quot;approval-001&quot;,
+    &quot;status&quot;: &quot;approved&quot;,
+    &quot;currentNode&quot;: &quot;final&quot;,
+    &quot;approver&quot;: &quot;user-approver&quot;,
+    &quot;decision&quot;: &quot;approve&quot;,
+    &quot;comment&quot;: &quot;批准通过&quot;,
+    &quot;completedAt&quot;: &quot;2024-12-01T11:00:00Z&quot;
+  }
+}
+</code></pre>
+<h3>3. Comment 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>comment_created</code></td>
+<td>创建评论</td>
+<td>用户创建新评论时</td>
+</tr>
+<tr>
+<td><code>comment_updated</code></td>
+<td>更新评论</td>
+<td>评论内容被修改时</td>
+</tr>
+<tr>
+<td><code>comment_deleted</code></td>
+<td>删除评论</td>
+<td>评论被删除时</td>
+</tr>
+<tr>
+<td><code>comment_resolved</code></td>
+<td>评论已解决</td>
+<td>评论被标记为已解决时</td>
+</tr>
+<tr>
+<td><code>comment_mentioned</code></td>
+<td>用户被 @提及</td>
+<td>评论中 @提及用户时</td>
+</tr>
+</tbody></table>
+<p><strong>载荷示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;comment_created&quot;,
+  &quot;timestamp&quot;: &quot;2024-12-01T12:00:00Z&quot;,
+  &quot;webhookId&quot;: &quot;webhook-123&quot;,
+  &quot;deliveryId&quot;: &quot;delivery-458&quot;,
+  &quot;docType&quot;: &quot;product&quot;,
+  &quot;docId&quot;: &quot;123&quot;,
+  &quot;triggeredBy&quot;: &quot;user-001&quot;,
+  &quot;payload&quot;: {
+    &quot;commentId&quot;: &quot;comment-001&quot;,
+    &quot;target&quot;: {
+      &quot;scope&quot;: &quot;cell&quot;,
+      &quot;rowId&quot;: &quot;row-123&quot;,
+      &quot;fieldId&quot;: &quot;price&quot;
+    },
+    &quot;content&quot;: &quot;@张三 这个价格需要确认&quot;,
+    &quot;mentions&quot;: [
+      {
+        &quot;id&quot;: &quot;user-002&quot;,
+        &quot;displayName&quot;: &quot;张三&quot;
+      }
+    ],
+    &quot;createdBy&quot;: &quot;user-001&quot;,
+    &quot;createdAt&quot;: &quot;2024-12-01T12:00:00Z&quot;
+  }
+}
+</code></pre>
+<h3>4. Metadata 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>metadata_updated</code></td>
+<td>元数据更新</td>
+<td>元数据整体更新时</td>
+</tr>
+<tr>
+<td><code>metadata_field_added</code></td>
+<td>添加字段</td>
+<td>新增字段时</td>
+</tr>
+<tr>
+<td><code>metadata_field_updated</code></td>
+<td>更新字段</td>
+<td>修改字段配置时</td>
+</tr>
+<tr>
+<td><code>metadata_field_deleted</code></td>
+<td>删除字段</td>
+<td>删除字段时</td>
+</tr>
+</tbody></table>
+<p><strong>载荷示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;metadata_field_added&quot;,
+  &quot;timestamp&quot;: &quot;2024-12-01T13:00:00Z&quot;,
+  &quot;webhookId&quot;: &quot;webhook-123&quot;,
+  &quot;deliveryId&quot;: &quot;delivery-459&quot;,
+  &quot;docType&quot;: &quot;product&quot;,
+  &quot;docId&quot;: &quot;123&quot;,
+  &quot;triggeredBy&quot;: &quot;user-admin&quot;,
+  &quot;payload&quot;: {
+    &quot;field&quot;: {
+      &quot;id&quot;: &quot;field-new&quot;,
+      &quot;name&quot;: &quot;库存数量&quot;,
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;required&quot;: true,
+      &quot;defaultValue&quot;: 0
+    },
+    &quot;updatedBy&quot;: &quot;user-admin&quot;,
+    &quot;updatedAt&quot;: &quot;2024-12-01T13:00:00Z&quot;
+  }
+}
+</code></pre>
+<h3>5. View 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>view_created</code></td>
+<td>创建视图</td>
+<td>创建新视图时</td>
+</tr>
+<tr>
+<td><code>view_updated</code></td>
+<td>更新视图</td>
+<td>修改视图配置时</td>
+</tr>
+<tr>
+<td><code>view_deleted</code></td>
+<td>删除视图</td>
+<td>删除视图时</td>
+</tr>
+<tr>
+<td><code>view_default_changed</code></td>
+<td>默认视图变更</td>
+<td>更改默认视图时</td>
+</tr>
+</tbody></table>
+<p><strong>载荷示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;view_created&quot;,
+  &quot;timestamp&quot;: &quot;2024-12-01T14:00:00Z&quot;,
+  &quot;webhookId&quot;: &quot;webhook-123&quot;,
+  &quot;deliveryId&quot;: &quot;delivery-460&quot;,
+  &quot;docType&quot;: &quot;product&quot;,
+  &quot;docId&quot;: &quot;123&quot;,
+  &quot;triggeredBy&quot;: &quot;user-001&quot;,
+  &quot;payload&quot;: {
+    &quot;viewId&quot;: &quot;view-new&quot;,
+    &quot;name&quot;: &quot;低库存产品&quot;,
+    &quot;type&quot;: &quot;table&quot;,
+    &quot;filters&quot;: {
+      &quot;logic&quot;: &quot;and&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;field&quot;: &quot;stock&quot;,
+          &quot;operator&quot;: &quot;range&quot;,
+          &quot;rangeStart&quot;: 0,
+          &quot;rangeEnd&quot;: 10
+        }
+      ]
+    },
+    &quot;createdBy&quot;: &quot;user-001&quot;,
+    &quot;createdAt&quot;: &quot;2024-12-01T14:00:00Z&quot;
+  }
+}
+</code></pre>
+<h3>6. Data 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>data_row_created</code></td>
+<td>创建数据行</td>
+<td>新增数据行时</td>
+</tr>
+<tr>
+<td><code>data_row_updated</code></td>
+<td>更新数据行</td>
+<td>修改数据行时</td>
+</tr>
+<tr>
+<td><code>data_row_deleted</code></td>
+<td>删除数据行</td>
+<td>删除数据行时</td>
+</tr>
+<tr>
+<td><code>data_bulk_operation</code></td>
+<td>批量操作</td>
+<td>批量创建/更新/删除时</td>
+</tr>
+</tbody></table>
+<h3>7. Revision 相关事件</h3>
+<table>
+<thead>
+<tr>
+<th>事件类型</th>
+<th>说明</th>
+<th>触发时机</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>revision_created</code></td>
+<td>创建修订</td>
+<td>生成新修订记录时</td>
+</tr>
+<tr>
+<td><code>revision_reverted</code></td>
+<td>修订回滚</td>
+<td>回滚到历史版本时</td>
+</tr>
+</tbody></table>
+<h2>快速开始</h2>
+<h3>1. 创建 Webhook</h3>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;name&quot;: &quot;产品变更通知&quot;,
+    &quot;description&quot;: &quot;监控产品文档的所有变更&quot;,
+    &quot;url&quot;: &quot;https://your-domain.com/webhooks/nexusbook&quot;,
+    &quot;events&quot;: [
+      &quot;request_merged&quot;,
+      &quot;approval_approved&quot;,
+      &quot;comment_created&quot;,
+      &quot;metadata_field_added&quot;,
+      &quot;view_created&quot;
+    ],
+    &quot;filters&quot;: {
+      &quot;docTypes&quot;: [&quot;product&quot;],
+      &quot;docIds&quot;: [&quot;123&quot;, &quot;456&quot;]
+    },
+    &quot;timeout&quot;: 30,
+    &quot;maxRetries&quot;: 3,
+    &quot;retryInterval&quot;: 60
+  }&#39;
+</code></pre>
+<h3>2. 接收 Webhook 事件</h3>
+<p><strong>Node.js 示例：</strong></p>
+<pre><code class="language-javascript">const express = require(&#39;express&#39;);
+const crypto = require(&#39;crypto&#39;);
+
+const app = express();
+app.use(express.json());
+
+// Webhook 密钥（从 NexusBook 获取）
+const WEBHOOK_SECRET = &#39;your_webhook_secret&#39;;
+
+// 验证签名
+function verifySignature(payload, signature) {
+  const hmac = crypto.createHmac(&#39;sha256&#39;, WEBHOOK_SECRET);
+  const digest = &#39;sha256=&#39; + hmac.update(payload).digest(&#39;hex&#39;);
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(digest)
+  );
+}
+
+app.post(&#39;/webhooks/nexusbook&#39;, (req, res) =&gt; {
+  const signature = req.headers[&#39;x-webhook-signature&#39;];
+  const payload = JSON.stringify(req.body);
+
+  // 验证签名
+  if (!verifySignature(payload, signature)) {
+    return res.status(401).send(&#39;Invalid signature&#39;);
+  }
+
+  const event = req.body;
+  console.log(&#39;Received event:&#39;, event.event);
+
+  // 处理不同类型的事件
+  switch (event.event) {
+    case &#39;request_merged&#39;:
+      handleRequestMerged(event);
+      break;
+    case &#39;approval_approved&#39;:
+      handleApprovalApproved(event);
+      break;
+    case &#39;comment_created&#39;:
+      handleCommentCreated(event);
+      break;
+    // ... 其他事件类型
+  }
+
+  // 快速响应 200，避免超时
+  res.status(200).send(&#39;OK&#39;);
+});
+
+function handleRequestMerged(event) {
+  const { requestId, title, revisionId } = event.payload;
+  console.log(`Request ${requestId} merged: ${title}`);
+  // 发送通知、更新数据库等
+}
+
+function handleApprovalApproved(event) {
+  const { instanceId, approver } = event.payload;
+  console.log(`Approval ${instanceId} approved by ${approver}`);
+  // 触发后续流程
+}
+
+function handleCommentCreated(event) {
+  const { commentId, content, mentions } = event.payload;
+  console.log(`New comment: ${content}`);
+  // 发送邮件通知被 @提及的用户
+  mentions?.forEach(user =&gt; {
+    sendEmailNotification(user.email, content);
+  });
+}
+
+app.listen(3000, () =&gt; {
+  console.log(&#39;Webhook server listening on port 3000&#39;);
+});
+</code></pre>
+<p><strong>Python 示例：</strong></p>
+<pre><code class="language-python">from flask import Flask, request, jsonify
+import hmac
+import hashlib
+
+app = Flask(__name__)
+
+WEBHOOK_SECRET = &#39;your_webhook_secret&#39;
+
+def verify_signature(payload, signature):
+    mac = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        payload.encode(),
+        hashlib.sha256
+    )
+    expected = &#39;sha256=&#39; + mac.hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+@app.route(&#39;/webhooks/nexusbook&#39;, methods=[&#39;POST&#39;])
+def webhook():
+    signature = request.headers.get(&#39;X-Webhook-Signature&#39;)
+    payload = request.get_data(as_text=True)
+    
+    if not verify_signature(payload, signature):
+        return jsonify({&#39;error&#39;: &#39;Invalid signature&#39;}), 401
+    
+    event = request.json
+    event_type = event[&#39;event&#39;]
+    
+    if event_type == &#39;request_merged&#39;:
+        handle_request_merged(event)
+    elif event_type == &#39;approval_approved&#39;:
+        handle_approval_approved(event)
+    elif event_type == &#39;comment_created&#39;:
+        handle_comment_created(event)
+    
+    return jsonify({&#39;status&#39;: &#39;ok&#39;}), 200
+
+def handle_request_merged(event):
+    request_id = event[&#39;payload&#39;][&#39;requestId&#39;]
+    print(f&#39;Request {request_id} merged&#39;)
+
+def handle_approval_approved(event):
+    instance_id = event[&#39;payload&#39;][&#39;instanceId&#39;]
+    print(f&#39;Approval {instance_id} approved&#39;)
+
+def handle_comment_created(event):
+    comment_id = event[&#39;payload&#39;][&#39;commentId&#39;]
+    print(f&#39;Comment {comment_id} created&#39;)
+
+if __name__ == &#39;__main__&#39;:
+    app.run(port=3000)
+</code></pre>
+<h3>3. 测试 Webhook</h3>
+<pre><code class="language-bash"># 发送测试事件
+curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/test&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;event&quot;: &quot;request_merged&quot;,
+    &quot;payload&quot;: {
+      &quot;requestId&quot;: &quot;test-req&quot;,
+      &quot;title&quot;: &quot;测试请求&quot;
+    }
+  }&#39;
+</code></pre>
+<h2>事件过滤</h2>
+<h3>按文档类型过滤</h3>
+<pre><code class="language-json">{
+  &quot;filters&quot;: {
+    &quot;docTypes&quot;: [&quot;product&quot;, &quot;inventory&quot;]
+  }
+}
+</code></pre>
+<h3>按文档 ID 过滤</h3>
+<pre><code class="language-json">{
+  &quot;filters&quot;: {
+    &quot;docIds&quot;: [&quot;123&quot;, &quot;456&quot;, &quot;789&quot;]
+  }
+}
+</code></pre>
+<h3>按用户过滤</h3>
+<pre><code class="language-json">{
+  &quot;filters&quot;: {
+    &quot;userIds&quot;: [&quot;user-001&quot;, &quot;user-002&quot;]
+  }
+}
+</code></pre>
+<h3>自定义条件过滤</h3>
+<pre><code class="language-json">{
+  &quot;filters&quot;: {
+    &quot;conditions&quot;: [
+      {
+        &quot;path&quot;: &quot;$.payload.status&quot;,
+        &quot;operator&quot;: &quot;eq&quot;,
+        &quot;value&quot;: &quot;urgent&quot;
+      },
+      {
+        &quot;path&quot;: &quot;$.payload.amount&quot;,
+        &quot;operator&quot;: &quot;range&quot;,
+        &quot;value&quot;: [1000, 10000]
+      }
+    ]
+  }
+}
+</code></pre>
+<h2>安全最佳实践</h2>
+<h3>1. 验证签名</h3>
+<p>始终验证 <code>X-Webhook-Signature</code> 头，确保请求来自 NexusBook：</p>
+<pre><code class="language-javascript">const signature = req.headers[&#39;x-webhook-signature&#39;];
+const isValid = verifySignature(payload, signature);
+if (!isValid) {
+  return res.status(401).send(&#39;Invalid signature&#39;);
+}
+</code></pre>
+<h3>2. 快速响应</h3>
+<p>在 30 秒内响应 200 状态码，避免超时重试：</p>
+<pre><code class="language-javascript">app.post(&#39;/webhook&#39;, async (req, res) =&gt; {
+  // 立即响应
+  res.status(200).send(&#39;OK&#39;);
+  
+  // 异步处理事件
+  processEventAsync(req.body);
+});
+</code></pre>
+<h3>3. 幂等性处理</h3>
+<p>使用 <code>deliveryId</code> 确保事件只处理一次：</p>
+<pre><code class="language-javascript">const processedDeliveries = new Set();
+
+function processEvent(event) {
+  if (processedDeliveries.has(event.deliveryId)) {
+    console.log(&#39;Event already processed&#39;);
+    return;
+  }
+  
+  // 处理事件
+  // ...
+  
+  processedDeliveries.add(event.deliveryId);
+}
+</code></pre>
+<h3>4. 错误处理</h3>
+<p>妥善处理错误，避免频繁失败导致 Webhook 被禁用：</p>
+<pre><code class="language-javascript">app.post(&#39;/webhook&#39;, async (req, res) =&gt; {
+  try {
+    await processEvent(req.body);
+    res.status(200).send(&#39;OK&#39;);
+  } catch (error) {
+    console.error(&#39;Error processing webhook:&#39;, error);
+    // 返回 200 避免重试（如果是业务逻辑错误）
+    res.status(200).send(&#39;Error logged&#39;);
+  }
+});
+</code></pre>
+<h2>管理 Webhook</h2>
+<h3>查看投递历史</h3>
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/deliveries&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
+</code></pre>
+<h3>查看统计信息</h3>
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/stats&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
+</code></pre>
+<h3>暂停 Webhook</h3>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/pause&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
+</code></pre>
+<h3>恢复 Webhook</h3>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/resume&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
+</code></pre>
+<h3>重新投递失败的事件</h3>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/webhooks/webhook-123/deliveries/delivery-456/redeliver&#39; \
+  -H &#39;Authorization: Bearer YOUR_TOKEN&#39;
+</code></pre>
+<h2>常见问题</h2>
+<h3>Q: Webhook 会重试多少次？</h3>
+<p>A: 默认重试 3 次，间隔 60 秒。可以在创建 Webhook 时自定义 <code>maxRetries</code> 和 <code>retryInterval</code>。</p>
+<h3>Q: 如何确保事件不会丢失？</h3>
+<p>A: 系统会持久化所有投递记录，即使 Webhook 暂时失败，也可以通过投递历史查看并手动重新投递。</p>
+<h3>Q: 可以接收历史事件吗？</h3>
+<p>A: Webhook 只推送创建后发生的新事件。如需历史数据，请使用 API 查询。</p>
+<h3>Q: 如何调试 Webhook？</h3>
+<p>A: </p>
+<ol>
+<li>使用测试端点发送测试事件</li>
+<li>查看投递历史和详细日志</li>
+<li>使用 webhook.site 等工具接收和查看请求</li>
+</ol>
+<h3>Q: Webhook URL 必须是 HTTPS 吗？</h3>
+<p>A: 生产环境强烈建议使用 HTTPS，确保数据传输安全。开发环境可以使用 HTTP。</p>
+<h2>使用场景示例</h2>
+<h3>1. 自动通知团队</h3>
+<p>当重要变更被合并时，自动发送 Slack/钉钉通知：</p>
+<pre><code class="language-javascript">function handleRequestMerged(event) {
+  const { title, mergedBy } = event.payload;
+  sendSlackNotification({
+    channel: &#39;#product-updates&#39;,
+    text: `🎉 ${mergedBy} 合并了变更: ${title}`
+  });
+}
+</code></pre>
+<h3>2. 触发 CI/CD 流程</h3>
+<p>元数据变更时自动触发部署：</p>
+<pre><code class="language-javascript">function handleMetadataUpdated(event) {
+  triggerCICD({
+    pipeline: &#39;deploy-schema&#39;,
+    params: {
+      docType: event.docType,
+      docId: event.docId
+    }
+  });
+}
+</code></pre>
+<h3>3. 同步到其他系统</h3>
+<p>数据变更时同步到 ERP/CRM 系统：</p>
+<pre><code class="language-javascript">function handleDataRowUpdated(event) {
+  const { rowId, values } = event.payload;
+  syncToERP({
+    id: rowId,
+    data: values
+  });
+}
+</code></pre>
+<h3>4. 审计日志</h3>
+<p>记录所有重要操作到审计系统：</p>
+<pre><code class="language-javascript">function handleAnyEvent(event) {
+  auditLog.record({
+    event: event.event,
+    user: event.triggeredBy,
+    timestamp: event.timestamp,
+    details: event.payload
+  });
+}
+</code></pre>
+<h2>与 SSE 事件流的对比与选择</h2>
+<ul>
+<li><strong>Webhook（推送）</strong>：由服务器向你配置的 URL 主动发送 HTTP POST；适合触发下游流程、跨系统集成、离线处理；支持失败重试与投递历史。</li>
+<li><strong>SSE（拉取只读流）</strong>：客户端与 <code>GET /doc/{docType}/{docId}/events/stream</code> 建立长连接，持续接收只读事件流；适合看板/仪表盘的近实时更新；由客户端维护连接与断线重连。</li>
+<li><strong>选择建议</strong>：<ul>
+<li><strong>服务端到服务端集成</strong>、需可靠投递与重试 → 优先 Webhook。</li>
+<li><strong>前端实时展示</strong> 或 <strong>轻量监听</strong> → 优先 SSE。</li>
+<li>二者可同时使用：Webhook 驱动流程，SSE 提供页面实时状态。</li>
+</ul>
+</li>
+</ul>
+<h2>签名验证细节与防重放</h2>
+<ul>
+<li><strong>签名算法</strong>：<code>HMAC-SHA256(secret, timestamp + &#39;.&#39; + rawPayload)</code>；HTTP 头：<code>X-Webhook-Signature</code>、<code>X-Webhook-Timestamp</code>（毫秒）。</li>
+<li><strong>防重放</strong>：校验 <code>timestamp</code> 与当前时间的偏差（建议 ≤ 300 秒）；签名必须使用<strong>原始请求体</strong>（raw body），避免 JSON 重排导致验签失败。</li>
+</ul>
+<pre><code class="language-javascript">const crypto = require(&#39;crypto&#39;);
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+
+function safeEqual(a, b) {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+function verifyWebhook(req) {
+  const signature = req.headers[&#39;x-webhook-signature&#39;];
+  const timestamp = req.headers[&#39;x-webhook-timestamp&#39;];
+  const raw = req.rawBody || JSON.stringify(req.body); // 确保使用原始载荷
+
+  const base = `${timestamp}.${raw}`;
+  const expected = &#39;sha256=&#39; + crypto.createHmac(&#39;sha256&#39;, WEBHOOK_SECRET).update(base).digest(&#39;hex&#39;);
+
+  // 防重放窗口（5分钟）
+  const skew = Math.abs(Date.now() - Number(timestamp));
+  if (skew &gt; 300000) return false;
+
+  return safeEqual(expected, signature);
+}
+</code></pre>
+<h2>重试策略建议</h2>
+<ul>
+<li><strong>指数退避 + 抖动</strong>：在 <code>retryInterval</code> 基础上引入指数退避（如 60s → 120s → 240s）并加入随机抖动，避免突发拥塞；最大重试次数由 <code>maxRetries</code> 控制。</li>
+<li><strong>幂等性</strong>：以 <code>deliveryId</code> 为幂等键，使用持久化存储（DB/Redis）记录已处理投递，确保“至多一次”。</li>
+<li><strong>响应约定</strong>：<ul>
+<li>业务可重试错误返回非 2xx（如 429/503）以触发重试；</li>
+<li>业务逻辑错误但不需重试，返回 200 并记录错误日志。</li>
+</ul>
+</li>
+</ul>
+<h2>事件过滤最佳实践</h2>
+<ul>
+<li>尽量精确：限定 <code>docTypes</code>、<code>docIds</code> 与 <code>userIds</code>，减少无关流量。</li>
+<li>使用条件匹配：通过 <code>filters.conditions</code> 对载荷进行路径匹配与范围判断，降低下游处理压力。</li>
+<li>在 URL 层级进行隔离：为不同事件类别使用不同的 Webhook 接收端点，方便权限与速率限制。</li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实时协同开发指南 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>实时协同开发指南</h1>
+<blockquote>
+<p>本指南详细说明 NexusBook 的实时协同（Realtime Collaboration）如何接入，包括 WebSocket 握手、消息格式、增量同步（Yjs）、Awareness、锁定机制、断线重连与后备 HTTP 接口等。</p>
+</blockquote>
+<h2>1. 总览</h2>
+<div class="mermaid">flowchart LR
+  Client["客户端"] -->|GET connect| Connect["连接信息"]
+  Connect -->|wsUrl| WS["WebSocket"]
+  Connect -->|sseUrl| SSE["SSE 只读流"]
+  WS --> Auth["auth"]
+  Auth --> Sub["subscribe_doc"]
+  Sub --> Yjs["yjs_update"]
+  Sub --> Aware["awareness_update"]
+  Client --> Lock["lock_request/lock_release"]
+  WS --> Err["error"]</div>
+<ul>
+<li><strong>传输协议</strong>：WebSocket（推荐）；HTTP 备用端点用于断线或低配环境</li>
+<li><strong>CRDT 引擎</strong>：Yjs（Y.Doc/Y.Map/Y.Array）</li>
+<li><strong>状态共享</strong>：Awareness（光标、选区、用户颜色等）</li>
+<li><strong>冲突控制</strong>：Cell Lock（单元格锁定）</li>
+<li><strong>持久化</strong>：Yjs 快照（State Vector + Update）</li>
+</ul>
+<h2>2.1 连接信息字段</h2>
+<p><code>GET /realtime/doc/{docType}/{docId}/connect</code> 响应：</p>
+<ul>
+<li><code>wsUrl</code>：完整 WS 连接地址</li>
+<li><code>wsHost/wsPath/port/protocols</code>：用于独立端口或代理部署</li>
+<li><code>sseUrl</code>：只读事件流地址（<code>text/event-stream</code>）</li>
+<li><code>token/expiresAt</code>：短期连接令牌与过期时间</li>
+</ul>
+<ol>
+<li>调用获取连接信息接口：<ul>
+<li><code>GET /realtime/doc/{docType}/{docId}/connect</code></li>
+<li>返回：<code>wsUrl</code>、<code>token</code>（短期连接令牌）、<code>expiresAt</code></li>
+</ul>
+</li>
+<li>建立 WebSocket 连接：<code>new WebSocket(wsUrl)</code></li>
+<li>发送认证消息（客户端 → 服务端）：<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;auth&quot;,
+  &quot;seq&quot;: 1,
+  &quot;payload&quot;: { &quot;token&quot;: &quot;Bearer {ACCESS_TOKEN}&quot; },
+  &quot;timestamp&quot;: &quot;2025-12-05T12:00:00Z&quot;
+}
+</code></pre>
+</li>
+<li>服务端返回成功（<code>pong</code>）或失败（<code>error</code>）：<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;pong&quot;,
+  &quot;seq&quot;: 1001,
+  &quot;ack&quot;: 1,
+  &quot;sessionId&quot;: &quot;sess-abc&quot;,
+  &quot;userId&quot;: &quot;user-123&quot;,
+  &quot;timestamp&quot;: &quot;2025-12-05T12:00:00Z&quot;
+}
+</code></pre>
+</li>
+</ol>
+<h2>3. 消息格式（WebSocket）</h2>
+<p>消息类型枚举定义见 <code>api/document/realtime/messages.tsp</code>：<code>RealtimeMessageKind</code></p>
+<ul>
+<li><code>auth</code>：认证（客户端 → 服务端）</li>
+<li><code>subscribe_doc</code> / <code>unsubscribe_doc</code>：订阅/取消订阅文档（客户端 → 服务端）</li>
+<li><code>yjs_update</code>：Yjs 增量更新（双向）</li>
+<li><code>awareness_update</code>：Awareness 状态更新（双向）</li>
+<li><code>lock_request</code> / <code>lock_release</code>：单元格锁定/释放（客户端 → 服务端）</li>
+<li><code>ping</code> / <code>pong</code>：心跳（双向）</li>
+<li><code>error</code>：错误（服务端 → 客户端）</li>
+</ul>
+<h3>3.1 客户端消息帧（RealtimeClientMessage）</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;yjs_update&quot;,
+  &quot;seq&quot;: 12,
+  &quot;docType&quot;: &quot;product&quot;,
+  &quot;docId&quot;: &quot;123&quot;,
+  &quot;payload&quot;: { &quot;update&quot;: &quot;BASE64_YJS_UPDATE&quot;, &quot;clientVersion&quot;: 88 },
+  &quot;timestamp&quot;: &quot;2025-12-05T12:00:12Z&quot;
+}
+</code></pre>
+<h3>3.2 服务端消息帧（RealtimeServerMessage）</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;awareness_update&quot;,
+  &quot;seq&quot;: 2203,
+  &quot;payload&quot;: { &quot;awareness&quot;: { &quot;cursor&quot;: { &quot;rowId&quot;: &quot;row-1&quot;, &quot;fieldId&quot;: &quot;name&quot; }, &quot;color&quot;: &quot;#007AFF&quot; } },
+  &quot;timestamp&quot;: &quot;2025-12-05T12:01:03Z&quot;
+}
+</code></pre>
+<h3>3.3 错误消息（ErrorPayload）</h3>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;error&quot;,
+  &quot;seq&quot;: 3002,
+  &quot;ack&quot;: 12,
+  &quot;payload&quot;: { &quot;code&quot;: &quot;invalid_payload&quot;, &quot;message&quot;: &quot;Missing update&quot; },
+  &quot;timestamp&quot;: &quot;2025-12-05T12:01:30Z&quot;
+}
+</code></pre>
+<h2>4. 文档订阅与初始化</h2>
+<ol>
+<li>订阅文档：<pre><code class="language-json">{ &quot;kind&quot;: &quot;subscribe_doc&quot;, &quot;seq&quot;: 2, &quot;payload&quot;: { &quot;docType&quot;: &quot;product&quot;, &quot;docId&quot;: &quot;123&quot; } }
+</code></pre>
+</li>
+<li>初始化（HTTP 后备）<ul>
+<li>获取快照：<code>GET /realtime/doc/{docType}/{docId}/snapshot</code></li>
+<li>快照历史：<code>GET /realtime/doc/{docType}/{docId}/snapshots</code></li>
+</ul>
+</li>
+</ol>
+<h2>5. Yjs 增量同步</h2>
+<ul>
+<li>发送增量更新（客户端 → 服务端）：<code>kind = yjs_update</code></li>
+<li>服务端广播给同订阅者：<code>kind = yjs_update</code></li>
+<li>推荐在客户端合并：<code>Y.applyUpdate(doc, update)</code></li>
+</ul>
+<p>注意：update 为二进制数据，需用 Base64 编解码。</p>
+<h2>6. Awareness 状态</h2>
+<ul>
+<li>更新：<code>kind = awareness_update</code>，payload 中包含 <code>cursor/selection/color</code> 等</li>
+<li>服务端广播给其他在线用户</li>
+<li>与锁定机制结合：当 <code>editingCell</code> 与锁状态冲突时，服务端返回错误或拒绝广播</li>
+</ul>
+<h2>7. 单元格锁定（冲突控制）</h2>
+<ul>
+<li>请求锁定（HTTP 或 WS）<ul>
+<li>HTTP：<code>POST /realtime/doc/{docType}/{docId}/lock</code></li>
+<li>WS：<code>kind = lock_request</code>，payload <code>rowId/fieldId/duration/autoRenew</code></li>
+</ul>
+</li>
+<li>释放锁定<ul>
+<li>HTTP：<code>DELETE /realtime/doc/{docType}/{docId}/unlock/{lockId}</code></li>
+<li>WS：<code>kind = lock_release</code></li>
+</ul>
+</li>
+<li>查询锁定：<code>GET /realtime/doc/{docType}/{docId}/locks</code></li>
+</ul>
+<h2>8. 断线重连与后备策略</h2>
+<div class="mermaid">flowchart LR
+  Ping["ping/pong 心跳"] -->|断线| Retry["指数退避重连"]
+  Retry -->|失败| Fallback["HTTP 后备 (apply-update / awareness)"]
+  Retry -->|成功| Resume["拉取快照对齐状态向量"]</div>
+<ul>
+<li>心跳：<code>ping/pong</code>，间隔建议 15s</li>
+<li>断线重连：指数退避（1s/2s/4s…，最大 30s），最多 10 次</li>
+<li>后备 HTTP：在 WS 不可用时，使用：<ul>
+<li><code>POST /realtime/doc/{docType}/{docId}/apply-update</code></li>
+<li><code>POST /realtime/doc/{docType}/{docId}/awareness</code></li>
+</ul>
+</li>
+<li>快照恢复：重连后拉取最新快照并对齐状态向量（State Vector）</li>
+</ul>
+<h2>9. 安全与权限</h2>
+<ul>
+<li>认证：<code>auth</code> 消息携带 Bearer Token 或短期连接令牌（<code>connect</code> 接口返回）</li>
+<li>Scopes 建议：<ul>
+<li><code>document:collab:read</code>（订阅、快照、事件）</li>
+<li><code>document:collab:write</code>（yjs_update、awareness_update、锁定）</li>
+</ul>
+</li>
+<li>速率限制与会话上限：<ul>
+<li>每用户最大会话数（如：5）</li>
+<li>每秒最大消息数（如：30）</li>
+</ul>
+</li>
+</ul>
+<h2>10. 与审批工作流的关系</h2>
+<ul>
+<li>实时协同产生的变更在服务端转为 <strong>变更请求（Request）</strong> 的候选变更</li>
+<li>审批通过后生效；拒绝则回滚或保留为草稿</li>
+<li>建议在事件历史中标注 <code>data_changed</code> 与 Request 关联 ID</li>
+</ul>
+<h2>11. 客户端示例（伪代码）</h2>
+<pre><code class="language-javascript">const ws = new WebSocket(wsUrl);
+ws.onopen = () =&gt; {
+  ws.send(JSON.stringify({ kind: &#39;auth&#39;, seq: 1, payload: { token } }));
+  ws.send(JSON.stringify({ kind: &#39;subscribe_doc&#39;, seq: 2, payload: { docType, docId } }));
+};
+
+ws.onmessage = (evt) =&gt; {
+  const msg = JSON.parse(evt.data);
+  switch (msg.kind) {
+    case &#39;yjs_update&#39;:
+      Y.applyUpdate(doc, base64ToUint8Array(msg.payload.update));
+      break;
+    case &#39;awareness_update&#39;:
+      updateAwareness(msg.payload.awareness);
+      break;
+    case &#39;error&#39;:
+      console.error(&#39;Realtime error:&#39;, msg.payload);
+      break;
+  }
+};
+
+function sendUpdate(update) {
+  ws.send(JSON.stringify({ kind: &#39;yjs_update&#39;, seq: nextSeq(), docType, docId, payload: { update: uint8ArrayToBase64(update) } }));
+}
+</code></pre>
+<h2>12. SSE 事件流（只读）</h2>
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/realtime/doc/product/123/events/stream&#39;
+</code></pre>
+<ul>
+<li>Content-Type: <code>text/event-stream</code></li>
+<li>适用于只读订阅、日志/审计等场景</li>
+</ul>
+<p>如需我把该指南加入侧边栏“核心概念”，我已配置 <code>redocly.yaml</code> 的 sidebars，构建后即可从左侧导航进入本页。</p>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最佳实践 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>最佳实践</h1>
+<p>本指南总结了使用 NexusBook API 的最佳实践，帮助您构建高效、可靠的应用。</p>
+<h2>属性设计</h2>
+<h3>命名规范</h3>
+<p>✅ <strong>推荐</strong>：</p>
+<pre><code class="language-json">{
+  &quot;orderTime&quot;: &quot;2024-12-01T10:00:00Z&quot;,
+  &quot;storeName&quot;: &quot;Beijing Branch&quot;,
+  &quot;totalAmount&quot;: 5000.00
+}
+</code></pre>
+<p>❌ <strong>不推荐</strong>：</p>
+<pre><code class="language-json">{
+  &quot;time&quot;: &quot;2024-12-01T10:00:00Z&quot;,  // 不够描述性
+  &quot;s_name&quot;: &quot;Beijing Branch&quot;,      // 使用了下划线
+  &quot;amt&quot;: 5000.00                    // 过度缩写
+}
+</code></pre>
+<h3>结构设计</h3>
+<p>✅ <strong>推荐</strong>：扁平化结构</p>
+<pre><code class="language-json">{
+  &quot;shipping_city&quot;: &quot;Beijing&quot;,
+  &quot;shipping_address&quot;: &quot;123 Main St&quot;,
+  &quot;billing_city&quot;: &quot;Shanghai&quot;,
+  &quot;billing_address&quot;: &quot;456 Park Ave&quot;
+}
+</code></pre>
+<p>❌ <strong>不推荐</strong>：过度嵌套</p>
+<pre><code class="language-json">{
+  &quot;shipping&quot;: {
+    &quot;address&quot;: {
+      &quot;city&quot;: &quot;Beijing&quot;,
+      &quot;street&quot;: &quot;123 Main St&quot;
+    }
+  }
+}
+</code></pre>
+<h2>元数据设计</h2>
+<h3>字段定义规范</h3>
+<p>✅ <strong>推荐</strong>：</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;productName&quot;,
+  &quot;name&quot;: &quot;产品名称&quot;,
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;required&quot;: true,
+  &quot;description&quot;: &quot;产品的完整名称&quot;,
+  &quot;validation&quot;: {
+    &quot;minLength&quot;: 1,
+    &quot;maxLength&quot;: 200
+  }
+}
+</code></pre>
+<h3>避免频繁修改元数据</h3>
+<p>元数据变更会影响已有数据，应该：</p>
+<ul>
+<li>充分规划字段结构</li>
+<li>使用版本迁移策略</li>
+<li>提供数据迁移脚本</li>
+</ul>
+<h2>数据操作</h2>
+<h3>批量操作优先</h3>
+<p>✅ <strong>推荐</strong>：</p>
+<pre><code class="language-javascript">// 批量创建 100 行
+await api.post(&#39;/data/bulk?requestId=req-1&#39;, {
+  rows: Array.from({length: 100}, (_, i) =&gt; ({
+    id: `row-${i}`,
+    values: [...]
+  }))
+});
+</code></pre>
+<p>❌ <strong>不推荐</strong>：</p>
+<pre><code class="language-javascript">// 循环创建 100 次
+for (let i = 0; i &lt; 100; i++) {
+  await api.post(&#39;/data?apply=true&#39;, {
+    id: `row-${i}`,
+    values: [...]
+  });
+}
+</code></pre>
+<h3>并发控制</h3>
+<p>始终使用版本号：</p>
+<pre><code class="language-javascript">async function updateRow(rowId, newValues) {
+  // 1. 获取最新数据
+  const row = await api.get(`/data/${rowId}`);
+  
+  // 2. 更新时提供版本号
+  await api.put(`/data/${rowId}?requestId=req-1`, {
+    values: newValues,
+    version: row.version
+  });
+}
+</code></pre>
+<h3>错误处理</h3>
+<pre><code class="language-javascript">async function safeUpdate(rowId, newValues) {
+  const maxRetries = 3;
+  
+  for (let i = 0; i &lt; maxRetries; i++) {
+    try {
+      const row = await api.get(`/data/${rowId}`);
+      await api.put(`/data/${rowId}?requestId=req-1`, {
+        values: newValues,
+        version: row.version
+      });
+      return; // 成功
+    } catch (error) {
+      if (error.code === &#39;VERSION_CONFLICT&#39; &amp;&amp; i &lt; maxRetries - 1) {
+        // 版本冲突，重试
+        continue;
+      }
+      throw error; // 其他错误或达到重试上限
+    }
+  }
+}
+</code></pre>
+<h2>评论协作</h2>
+<h3>精确定位</h3>
+<p>✅ <strong>推荐</strong>：明确指定评论位置</p>
+<pre><code class="language-javascript">// 针对特定单元格
+await api.post(&#39;/comments&#39;, {
+  target: {
+    scope: &#39;cell&#39;,
+    rowId: &#39;row-001&#39;,
+    fieldId: &#39;price&#39;
+  },
+  content: &#39;这个价格需要确认&#39;
+});
+</code></pre>
+<h3>使用 @提及</h3>
+<pre><code class="language-javascript">await api.post(&#39;/comments&#39;, {
+  target: { scope: &#39;document&#39; },
+  content: &#39;@张三 @李四 请review这个订单&#39;,
+  mentions: [&#39;user-123&#39;, &#39;user-456&#39;]
+});
+</code></pre>
+<h3>及时标记已解决</h3>
+<pre><code class="language-javascript">// 问题解决后标记
+await api.post(`/comments/${commentId}/resolve`);
+</code></pre>
+<h2>版本控制</h2>
+<h3>修订说明编写</h3>
+<p>✅ <strong>推荐</strong>：</p>
+<pre><code class="language-javascript">await api.post(&#39;/requests&#39;, {
+  title: &#39;更新产品价格&#39;,
+  description: &#39;根据供应商调价通知，更新以下产品价格：\n- iPhone 15: 799.99 → 749.99\n- iPad Pro: 1099.99 → 999.99&#39;,
+  changes: [...]
+});
+</code></pre>
+<p>❌ <strong>不推荐</strong>：</p>
+<pre><code class="language-javascript">await api.post(&#39;/requests&#39;, {
+  title: &#39;更新&#39;,
+  description: &#39;修改了一些数据&#39;,
+  changes: [...]
+});
+</code></pre>
+<h3>历史审计</h3>
+<p>定期检查修订历史：</p>
+<pre><code class="language-javascript">// 查看特定行的变更历史
+const history = await api.get(&#39;/revisions/history&#39;, {
+  params: {
+    targetKind: &#39;row&#39;,
+    rowId: &#39;row-001&#39;
+  }
+});
+</code></pre>
+<h2>性能优化</h2>
+<h3>分页策略</h3>
+<pre><code class="language-javascript">// ✅ 合理的分页大小
+const pageSize = 50;
+
+// 游标分页（用于深分页）
+async function* fetchAllData() {
+  let cursor = null;
+  
+  do {
+    const response = await api.get(&#39;/data&#39;, {
+      params: { pageSize, cursor }
+    });
+    
+    yield response.items;
+    cursor = response.cursor;
+  } while (cursor);
+}
+</code></pre>
+<h3>按需加载</h3>
+<pre><code class="language-javascript">// ✅ 只获取需要的部分
+const doc = await api.get(&#39;/doc/product/123&#39;, {
+  params: {
+    include: &#39;metadata,data&#39;,  // 不包括 comments 和 revisions
+    pageSize: 20
+  }
+});
+
+// ❌ 获取所有数据
+const doc = await api.get(&#39;/doc/product/123&#39;, {
+  params: {
+    include: &#39;metadata,views,data,comments,revisions,settings&#39;
+  }
+});
+</code></pre>
+<h3>缓存策略</h3>
+<pre><code class="language-javascript">class ApiClient {
+  constructor() {
+    this.cache = new Map();
+    this.cacheTTL = 60000; // 1 分钟
+  }
+  
+  async getMetadata(docType, docId) {
+    const key = `metadata:${docType}:${docId}`;
+    const cached = this.cache.get(key);
+    
+    if (cached &amp;&amp; Date.now() - cached.time &lt; this.cacheTTL) {
+      return cached.data;
+    }
+    
+    const data = await api.get(`/doc/${docType}/${docId}/metadata`);
+    this.cache.set(key, { data, time: Date.now() });
+    
+    return data;
+  }
+}
+</code></pre>
+<h2>安全建议</h2>
+<h3>权限控制</h3>
+<pre><code class="language-javascript">// ✅ 最小权限原则
+const token = await getToken({
+  scope: &#39;doc:read data:read&#39;  // 只读应用只请求读权限
+});
+
+// ❌ 请求不必要的权限
+const token = await getToken({
+  scope: &#39;doc:read doc:write data:read data:write approvals:manage&#39;
+});
+</code></pre>
+<h3>数据验证</h3>
+<pre><code class="language-javascript">function validateRowData(values) {
+  const errors = [];
+  
+  values.forEach(fieldValue =&gt; {
+    // 验证必填字段
+    if (field.required &amp;&amp; !fieldValue.value) {
+      errors.push(`${field.name} 是必填字段`);
+    }
+    
+    // 验证数据类型
+    if (field.type === &#39;number&#39;) {
+      if (typeof fieldValue.value.number !== &#39;number&#39;) {
+        errors.push(`${field.name} 必须是数字`);
+      }
+    }
+    
+    // 验证范围
+    if (field.validation?.min !== undefined) {
+      if (fieldValue.value.number &lt; field.validation.min) {
+        errors.push(`${field.name} 不能小于 ${field.validation.min}`);
+      }
+    }
+  });
+  
+  return errors;
+}
+</code></pre>
+<h3>日志记录</h3>
+<pre><code class="language-javascript">class AuditLogger {
+  async logApiCall(method, endpoint, user, response) {
+    await db.insert(&#39;audit_logs&#39;, {
+      timestamp: new Date(),
+      user: user.id,
+      method,
+      endpoint,
+      success: response.success,
+      errorCode: response.code,
+      ipAddress: request.ip
+    });
+  }
+}
+</code></pre>
+<h2>测试建议</h2>
+<h3>单元测试</h3>
+<pre><code class="language-javascript">describe(&#39;数据行 CRUD&#39;, () =&gt; {
+  test(&#39;创建数据行&#39;, async () =&gt; {
+    const row = {
+      id: &#39;test-row-001&#39;,
+      values: [
+        { fieldId: &#39;name&#39;, value: { text: &#39;测试产品&#39; } }
+      ]
+    };
+    
+    const response = await api.post(&#39;/data?apply=true&#39;, row);
+    
+    expect(response.success).toBe(true);
+    expect(response.payload.id).toBe(&#39;test-row-001&#39;);
+  });
+  
+  test(&#39;并发冲突处理&#39;, async () =&gt; {
+    const row = await api.get(&#39;/data/row-001&#39;);
+    
+    // 模拟另一个用户更新
+    await api.put(&#39;/data/row-001?requestId=req-1&#39;, {
+      values: [...],
+      version: row.version
+    });
+    
+    // 当前更新应该失败
+    await expect(
+      api.put(&#39;/data/row-001?apply=true&#39;, {
+        values: [...],
+        version: row.version
+      })
+    ).rejects.toThrow(&#39;VERSION_CONFLICT&#39;);
+  });
+});
+</code></pre>
+<h3>集成测试</h3>
+<pre><code class="language-javascript">describe(&#39;订货单工作流&#39;, () =&gt; {
+  test(&#39;完整流程&#39;, async () =&gt; {
+    // 1. 创建订货单
+    const doc = await api.post(&#39;/doc/purchaseOrder&#39;, {...});
+    
+    // 2. 添加产品行
+    await api.post(`/doc/purchaseOrder/${doc.id}/data/bulk?apply=true`, {
+      rows: [...]
+    });
+    
+    // 3. 添加评论
+    await api.post(`/doc/purchaseOrder/${doc.id}/comments`, {
+      content: &#39;请尽快处理&#39;
+    });
+    
+    // 4. 发起审批
+    const approval = await api.post(`/doc/purchaseOrder/${doc.id}/approval/start`);
+    
+    // 5. 审批通过
+    await api.post(`/doc/purchaseOrder/${doc.id}/approval/${approval.id}/decision`, {
+      result: &#39;approved&#39;
+    });
+    
+    // 验证最终状态
+    const finalDoc = await api.get(`/doc/purchaseOrder/${doc.id}`);
+    expect(finalDoc.status).toBe(&#39;approved&#39;);
+  });
+});
+</code></pre>
+<h2>监控和告警</h2>
+<h3>性能监控</h3>
+<pre><code class="language-javascript">class PerformanceMonitor {
+  async trackApiCall(apiCall) {
+    const start = Date.now();
+    
+    try {
+      const result = await apiCall();
+      const duration = Date.now() - start;
+      
+      // 记录响应时间
+      metrics.histogram(&#39;api.response_time&#39;, duration, {
+        endpoint: apiCall.endpoint,
+        method: apiCall.method
+      });
+      
+      // 慢查询告警
+      if (duration &gt; 3000) {
+        logger.warn(&#39;Slow API call&#39;, {
+          endpoint: apiCall.endpoint,
+          duration
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      // 错误率监控
+      metrics.increment(&#39;api.errors&#39;, {
+        endpoint: apiCall.endpoint,
+        errorCode: error.code
+      });
+      
+      throw error;
+    }
+  }
+}
+</code></pre>
+<h2>总结</h2>
+<p>遵循这些最佳实践，可以帮助您：</p>
+<ul>
+<li>✅ 提高应用性能和响应速度</li>
+<li>✅ 增强数据一致性和可靠性</li>
+<li>✅ 简化错误处理和调试</li>
+<li>✅ 提升代码可维护性</li>
+<li>✅ 保障系统安全性</li>
+</ul>
+<h2>下一步</h2>
+<ul>
+<li>📚 查看 <a href="examples.html">完整示例</a></li>
+<li>📖 阅读 <a href="../api/index.html">API 参考文档</a></li>
+<li>🔧 阅读 <a href="data-operations.html">数据操作指南</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

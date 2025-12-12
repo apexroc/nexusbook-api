@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据操作指南 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>数据操作指南</h1>
+<p>本指南介绍如何使用 NexusBook API 进行数据行的增删改查操作。</p>
+<h2>数据行基本概念</h2>
+<p>数据行（Row）是文档的核心内容，每一行包含多个字段值。</p>
+<h3>数据行结构</h3>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;row-001&quot;,              // 行 ID（唯一标识）
+  &quot;values&quot;: [                   // 字段值数组
+    {
+      &quot;fieldId&quot;: &quot;name&quot;,        // 字段 ID
+      &quot;value&quot;: {                // 字段值（根据字段类型不同）
+        &quot;text&quot;: &quot;产品名称&quot;
+      }
+    },
+    {
+      &quot;fieldId&quot;: &quot;price&quot;,
+      &quot;value&quot;: {
+        &quot;number&quot;: 99.99
+      }
+    }
+  ],
+  &quot;version&quot;: 1,                 // 版本号（用于并发控制）
+  &quot;createdAt&quot;: &quot;2024-12-01T10:00:00Z&quot;,
+  &quot;createdBy&quot;: &quot;user-123&quot;,
+  &quot;updatedAt&quot;: &quot;2024-12-01T11:00:00Z&quot;,
+  &quot;updatedBy&quot;: &quot;user-456&quot;
+}
+</code></pre>
+<h2>CRUD 操作</h2>
+<h3>创建数据行</h3>
+<p><strong>单行创建</strong>：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;id&quot;: &quot;row-001&quot;,
+    &quot;values&quot;: [
+      {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;iPhone 15&quot;}},
+      {&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 799.99}},
+      {&quot;fieldId&quot;: &quot;stock&quot;, &quot;value&quot;: {&quot;number&quot;: 100}}
+    ]
+  }&#39;
+</code></pre>
+<p><strong>批量创建（已废弃）</strong>：请改用“批量更新（BulkUpdate）”接口，支持同时更新数据与属性，且统一走 <code>requestId</code> 工作流。</p>
+<pre><code class="language-bash"># 推荐：BulkUpdate 统一接口
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;[
+    {&quot;target&quot;: {&quot;row&quot;: &quot;row-001&quot;}, &quot;value&quot;: {&quot;name&quot;: &quot;iPhone 15&quot;, &quot;price&quot;: 799.99, &quot;stock&quot;: 100}},
+    {&quot;target&quot;: {&quot;row&quot;: &quot;row-002&quot;}, &quot;value&quot;: {&quot;name&quot;: &quot;iPad Pro&quot;, &quot;price&quot;: 1099.99, &quot;stock&quot;: 50}}
+  ]&#39;
+</code></pre>
+<h3>读取数据行</h3>
+<p><strong>获取单行</strong>：</p>
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39;
+</code></pre>
+<p><strong>列表查询</strong>：</p>
+<pre><code class="language-bash">curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?page=1&amp;pageSize=20&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39;
+</code></pre>
+<p><strong>结构化查询</strong>：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/query&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;filters&quot;: {
+      &quot;logic&quot;: &quot;and&quot;,
+      &quot;conditions&quot;: [
+        {&quot;field&quot;: &quot;status&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;active&quot;},
+        {&quot;field&quot;: &quot;price&quot;, &quot;operator&quot;: &quot;gte&quot;, &quot;value&quot;: 100}
+      ]
+    },
+    &quot;sorts&quot;: [{&quot;field&quot;: &quot;price&quot;, &quot;direction&quot;: &quot;desc&quot;}],
+    &quot;page&quot;: 1,
+    &quot;pageSize&quot;: 50
+  }&#39;
+</code></pre>
+<h3>更新数据行</h3>
+<p><strong>全量更新</strong>：</p>
+<pre><code class="language-bash">curl -X PUT &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;values&quot;: [
+      {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;iPhone 15 Pro&quot;}},
+      {&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 999.99}}
+    ],
+    &quot;version&quot;: 1
+  }&#39;
+</code></pre>
+<p><strong>部分更新</strong>：</p>
+<pre><code class="language-bash">curl -X PATCH &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;values&quot;: [
+      {&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 899.99}}
+    ],
+    &quot;version&quot;: 1
+  }&#39;
+</code></pre>
+<h3>删除数据行</h3>
+<p><strong>单行删除</strong>：</p>
+<pre><code class="language-bash">curl -X DELETE &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?requestId=req-1&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39;
+</code></pre>
+<p><strong>批量删除</strong>：</p>
+<pre><code class="language-bash">curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/bulk?apply=true&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;delete&quot;: [&quot;row-001&quot;, &quot;row-002&quot;, &quot;row-003&quot;]
+  }&#39;
+</code></pre>
+<h2>批量更新（灵活 target/value）</h2>
+<div class="mermaid">flowchart LR
+  A["客户端 BulkUpdate[]"] --> B["服务端解析 metadata"]
+  B --> C{target 路由}
+  C --> C1["row + field"]
+  C --> C2["rows + field"]
+  C --> C3["property"]
+  C --> C4["properties"]
+  C1 --> D1["更新 Data 单元格"]
+  C2 --> D2["批量更新多行字段"]
+  C3 --> D3["更新 Properties 单值"]
+  C4 --> D4["更新 Properties 对象"]
+  D1 --> E["写入 Request"]
+  D2 --> E
+  D3 --> E
+  D4 --> E
+  E --> F["审批合并"]</div>
+<ul>
+<li>统一接口：<code>POST /api/v1/doc/{docType}/{docId}/data/bulk?requestId=req-1</code></li>
+<li>模型：<code>BulkUpdate[]</code>，其中 <code>target: {}</code> 为灵活结构，<code>value: unknown</code></li>
+</ul>
+<p>示例：</p>
+<pre><code class="language-json">[
+  {&quot;target&quot;: {&quot;row&quot;: &quot;row-1&quot;, &quot;field&quot;: &quot;price&quot;}, &quot;value&quot;: 99.99},
+  {&quot;target&quot;: {&quot;row&quot;: &quot;row-2&quot;}, &quot;value&quot;: {&quot;name&quot;: &quot;iPhone 15&quot;, &quot;stock&quot;: 50}},
+  {&quot;target&quot;: {&quot;rows&quot;: [&quot;row-3&quot;,&quot;row-4&quot;], &quot;field&quot;: &quot;status&quot;}, &quot;value&quot;: &quot;active&quot;},
+  {&quot;target&quot;: {&quot;property&quot;: &quot;amount&quot;}, &quot;value&quot;: 5000.00},
+  {&quot;target&quot;: {&quot;properties&quot;: true}, &quot;value&quot;: {&quot;amount&quot;: 5000, &quot;quantity&quot;: 100}}
+]
+</code></pre>
+<p>说明：</p>
+<ul>
+<li>客户端只需提供原始值（数字/字符串/布尔/对象/数组），服务端根据 <code>metadata</code> 自动解析与校验。</li>
+<li>支持数据与属性在一次请求中混合更新。</li>
+</ul>
+<h2>字段值类型映射</h2>
+<p>不同的字段类型对应不同的值格式：</p>
+<table>
+<thead>
+<tr>
+<th>字段类型</th>
+<th>值类型</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>text</td>
+<td>string</td>
+<td><code>{&quot;text&quot;: &quot;文本内容&quot;}</code></td>
+</tr>
+<tr>
+<td>number</td>
+<td>float64</td>
+<td><code>{&quot;number&quot;: 123.45}</code></td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>boolean</td>
+<td><code>{&quot;boolean&quot;: true}</code></td>
+</tr>
+<tr>
+<td>date</td>
+<td>string (ISO 8601)</td>
+<td><code>{&quot;date&quot;: &quot;2024-12-01&quot;}</code></td>
+</tr>
+<tr>
+<td>datetime</td>
+<td>string (ISO 8601)</td>
+<td><code>{&quot;datetime&quot;: &quot;2024-12-01T10:00:00Z&quot;}</code></td>
+</tr>
+<tr>
+<td>single_select</td>
+<td>SelectOption</td>
+<td><code>{&quot;selectOption&quot;: {&quot;id&quot;: &quot;opt-1&quot;, &quot;name&quot;: &quot;选项A&quot;}}</code></td>
+</tr>
+<tr>
+<td>multi_select</td>
+<td>SelectOption[]</td>
+<td><code>{&quot;selectOptions&quot;: [{&quot;id&quot;: &quot;opt-1&quot;}, {&quot;id&quot;: &quot;opt-2&quot;}]}</code></td>
+</tr>
+</tbody></table>
+<p>完整的字段类型参考见：<a href="../references/field-types.html">字段类型参考</a></p>
+<h2>变更请求工作流（requestId）</h2>
+<p>所有写操作（创建/更新/删除/批量更新）必须携带 <code>requestId</code> 参数，系统会将变更写入对应的变更请求（Request）。多人协同在同一个 Request 上进行，审批通过后变更才生效。</p>
+<h3>为什么需要 requestId</h3>
+<ul>
+<li>保障数据可审计与可回滚</li>
+<li>支持协同编辑与冲突解决</li>
+<li>与修订历史、审批流程联动</li>
+</ul>
+<h3>默认 Request 与协作</h3>
+<ul>
+<li>如果未显式提供 <code>requestId</code>，系统可创建默认的临时 Request（实现依赖服务端策略）</li>
+<li>建议客户端明确传入 <code>requestId</code> 以便协作追踪</li>
+</ul>
+<h3>（已废弃）apply 参数</h3>
+<blockquote>
+<p>说明：<code>apply</code> 参数已不再支持，全部写操作统一通过 <code>requestId</code> 工作流进行。请在写接口中附带 <code>?requestId=...</code> 或在请求体中包含 <code>{&quot;requestId&quot;:&quot;...&quot;}</code>。</p>
+</blockquote>
+<ul>
+<li>统一入口：<code>POST /doc/{docType}/{docId}/data/bulk?requestId=req-1</code></li>
+<li>示例参见上文“批量更新（BulkUpdate）格式”和各写操作示例</li>
+</ul>
+<h2>并发控制</h2>
+<p>使用版本号（version）进行乐观锁控制：</p>
+<pre><code class="language-bash"># 1. 获取当前数据
+curl &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39;
+
+# 响应
+{
+  &quot;id&quot;: &quot;row-001&quot;,
+  &quot;values&quot;: [...],
+  &quot;version&quot;: 5
+}
+
+# 2. 更新时提供版本号
+curl -X PUT &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/row-001?apply=true&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -d &#39;{
+    &quot;values&quot;: [...],
+    &quot;version&quot;: 5  // 必须匹配当前版本
+  }&#39;
+</code></pre>
+<p><strong>冲突处理</strong>：</p>
+<p>如果版本不匹配，API 返回错误：</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;VERSION_CONFLICT&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;数据已被其他用户修改，请刷新后重试&quot;,
+    &quot;en&quot;: &quot;Data has been modified by another user, please refresh and retry&quot;
+  }
+}
+</code></pre>
+<h2>性能优化建议</h2>
+<h3>1. 优先使用批量操作</h3>
+<pre><code class="language-bash"># ❌ 不推荐：循环调用 100 次
+for i in {1..100}; do
+  curl -X POST &#39;.../data?apply=true&#39; -d &quot;{...row $i...}&quot;
+done
+
+# ✅ 推荐：一次批量创建 100 行
+curl -X POST &#39;.../data/bulk?apply=true&#39; -d &#39;{
+  &quot;rows&quot;: [
+    {...row 1...},
+    {...row 2...},
+    ...
+    {...row 100...}
+  ]
+}&#39;
+</code></pre>
+<h3>2. 合理设置分页大小</h3>
+<pre><code class="language-bash"># ❌ 太小：请求次数过多
+curl &#39;.../data?page=1&amp;pageSize=10&#39;
+
+# ❌ 太大：响应时间长
+curl &#39;.../data?page=1&amp;pageSize=1000&#39;
+
+# ✅ 推荐：20-100 之间
+curl &#39;.../data?page=1&amp;pageSize=50&#39;
+</code></pre>
+<h3>3. 只查询需要的字段</h3>
+<pre><code class="language-bash"># ❌ 查询所有字段
+curl &#39;.../data/query&#39; -d &#39;{
+  &quot;fields&quot;: [&quot;*&quot;]
+}&#39;
+
+# ✅ 只查询需要的字段
+curl &#39;.../data/query&#39; -d &#39;{
+  &quot;fields&quot;: [&quot;id&quot;, &quot;name&quot;, &quot;price&quot;, &quot;stock&quot;]
+}&#39;
+</code></pre>
+<h3>4. 使用过滤减少数据量</h3>
+<pre><code class="language-bash"># ❌ 获取所有数据后在客户端过滤
+curl &#39;.../data?pageSize=1000&#39;
+
+# ✅ 在服务端过滤
+curl -X POST &#39;.../data/query&#39; -d &#39;{
+  &quot;filters&quot;: {
+    &quot;logic&quot;: &quot;and&quot;,
+    &quot;conditions&quot;: [
+      {&quot;field&quot;: &quot;status&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;active&quot;}
+    ]
+  }
+}&#39;
+</code></pre>
+<h2>常见问题</h2>
+<h3>1. 如何处理大数据量？</h3>
+<p>使用游标分页：</p>
+<pre><code class="language-bash"># 首次请求
+curl &#39;.../data?pageSize=100&#39;
+
+# 响应包含 cursor
+{
+  &quot;items&quot;: [...],
+  &quot;cursor&quot;: &quot;eyJpZCI6InJvdy0xMDAifQ==&quot;,
+  &quot;hasMore&quot;: true
+}
+
+# 下一页
+curl &#39;.../data?pageSize=100&amp;cursor=eyJpZCI6InJvdy0xMDAifQ==&#39;
+</code></pre>
+<h3>2. 如何处理复杂查询？</h3>
+<p>使用嵌套过滤条件：</p>
+<pre><code class="language-bash">curl -X POST &#39;.../data/query&#39; -d &#39;{
+  &quot;filters&quot;: {
+    &quot;logic&quot;: &quot;or&quot;,
+    &quot;conditions&quot;: [
+      {
+        &quot;logic&quot;: &quot;and&quot;,
+        &quot;conditions&quot;: [
+          {&quot;field&quot;: &quot;category&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;electronics&quot;},
+          {&quot;field&quot;: &quot;price&quot;, &quot;operator&quot;: &quot;gte&quot;, &quot;value&quot;: 1000}
+        ]
+      },
+      {
+        &quot;field&quot;: &quot;featured&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: true
+      }
+    ]
+  }
+}&#39;
+</code></pre>
+<h3>3. 如何导出数据？</h3>
+<pre><code class="language-bash"># 导出为 JSON
+curl &#39;.../data/export?format=json&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  &gt; data.json
+
+# 导出为 CSV
+curl &#39;.../data/export?format=csv&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  &gt; data.csv
+</code></pre>
+<h2>下一步</h2>
+<ul>
+<li>📊 阅读 <a href="document-model.html">文档模型详解</a></li>
+<li>🔔 阅读 <a href="webhooks.html">Webhook 使用指南</a></li>
+<li>💡 阅读 <a href="best-practices.html">最佳实践</a></li>
+<li>📚 查看 <a href="examples.html">完整示例</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

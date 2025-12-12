@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 参考手册 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" >开发指南</a>
+                    <a href="/references/error-codes.html" class="active">参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>API 参考手册</h1>
+<p>完整的 NexusBook API 端点参考文档。</p>
+<h2>基本信息</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>API 基址</strong></td>
+<td><code>https://open.nexusbook.app/api/v1</code></td>
+</tr>
+<tr>
+<td><strong>认证域名</strong></td>
+<td><code>https://auth.nexusbook.app</code></td>
+</tr>
+<tr>
+<td><strong>API 规范</strong></td>
+<td>OpenAPI 3.0</td>
+</tr>
+<tr>
+<td><strong>架构风格</strong></td>
+<td>RESTful</td>
+</tr>
+</tbody></table>
+<h2>统一响应格式</h2>
+<p>所有 API 返回统一的 <code>ApiResponse&lt;T&gt;</code> 结构：</p>
+<pre><code class="language-typescript">{
+  success: boolean,           // 是否成功
+  code?: ErrorCode,          // 错误码（失败时）
+  message?: Record&lt;string, string&gt;,  // 多语言消息（灵活的语言代码映射）
+  payload?: T | null         // 实际数据载荷
+}
+</code></pre>
+<h3>多语言消息说明</h3>
+<p><code>message</code> 字段使用 ISO 639-1 语言代码作为键，支持任意语言扩展。常用语言代码：</p>
+<ul>
+<li><code>zh</code>: 中文</li>
+<li><code>en</code>: English</li>
+<li><code>ja</code>: 日本語</li>
+<li><code>ko</code>: 한국어</li>
+<li><code>es</code>: Español</li>
+<li><code>fr</code>: Français</li>
+<li><code>de</code>: Deutsch</li>
+<li><code>pt</code>: Português</li>
+<li><code>ru</code>: Русский</li>
+<li><code>ar</code>: العربية</li>
+</ul>
+<p><strong>示例：</strong></p>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;DOC_NOT_FOUND&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;文档不存在&quot;,
+    &quot;en&quot;: &quot;Document not found&quot;,
+    &quot;ja&quot;: &quot;ドキュメントが見つかりません&quot;
+  },
+  &quot;payload&quot;: null
+}
+</code></pre>
+<h2>核心端点</h2>
+<h3>1. 聚合查询</h3>
+<pre><code class="language-http">GET /api/v1/doc/{doc-type}/{doc-id}?include=metadata,views,data,comments,revisions,settings
+</code></pre>
+<p>一次性获取文档所需的多种数据，支持按需加载。</p>
+<p><strong>查询参数：</strong></p>
+<ul>
+<li><code>include</code> - 包含的数据部分（逗号分隔）<ul>
+<li><code>metadata</code> - 字段定义</li>
+<li><code>views</code> - 视图列表</li>
+<li><code>data</code> - 数据行</li>
+<li><code>comments</code> - 评论</li>
+<li><code>revisions</code> - 修订历史</li>
+<li><code>settings</code> - 设置</li>
+</ul>
+</li>
+<li><code>viewId</code> - 指定视图 ID</li>
+<li><code>page</code>, <code>pageSize</code> - 分页参数</li>
+<li><code>commentsLimit</code>, <code>revisionsLimit</code> - 限制数量</li>
+</ul>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 获取产品文档的元数据、视图和数据
+curl -H &#39;Authorization: Bearer TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&#39;
+</code></pre>
+<h3>2. 文档属性</h3>
+<p>管理文档级元信息（订单时间、门店、金额、数量等）。</p>
+<pre><code class="language-http"># 获取文档属性
+GET /api/v1/doc/{doc-type}/{doc-id}/properties
+
+# 创建文档属性
+POST /api/v1/doc/{doc-type}/{doc-id}/properties
+
+# 完全替换文档属性
+PUT /api/v1/doc/{doc-type}/{doc-id}/properties
+
+# 部分更新文档属性
+PATCH /api/v1/doc/{doc-type}/{doc-id}/properties?merge=true&amp;version=1
+
+# 删除文档属性
+DELETE /api/v1/doc/{doc-type}/{doc-id}/properties
+
+# 获取属性历史
+GET /api/v1/doc/{doc-type}/{doc-id}/properties/history
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 获取订货单属性
+curl -H &#39;Authorization: Bearer TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/properties&#39;
+
+# 更新订货单属性
+curl -X PATCH &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/properties?merge=true&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;orderDate&quot;: &quot;2024-12-01&quot;,
+    &quot;storeName&quot;: &quot;北京旗舰店&quot;,
+    &quot;totalAmount&quot;: 12345.67
+  }&#39;
+</code></pre>
+<h3>3. 元数据</h3>
+<p>管理字段定义、类型和验证配置。</p>
+<pre><code class="language-http"># 获取元数据
+GET /api/v1/doc/{doc-type}/{doc-id}/metadata
+
+# 更新元数据
+PUT /api/v1/doc/{doc-type}/{doc-id}/metadata
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 获取产品表的字段定义
+curl -H &#39;Authorization: Bearer TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/metadata&#39;
+</code></pre>
+<h3>4. 视图</h3>
+<p>视图管理端点，支持 8 种视图类型（Table, Gallery, Kanban, Calendar, Chart, Form, Map, Timeline）。</p>
+<pre><code class="language-http"># 获取视图列表
+GET /api/v1/doc/{doc-type}/{doc-id}/views
+
+# 创建视图
+POST /api/v1/doc/{doc-type}/{doc-id}/views
+
+# 获取单个视图
+GET /api/v1/doc/{doc-type}/{doc-id}/views/{view-id}
+
+# 更新视图
+PUT /api/v1/doc/{doc-type}/{doc-id}/views/{view-id}
+
+# 删除视图
+DELETE /api/v1/doc/{doc-type}/{doc-id}/views/{view-id}
+
+# 设置默认视图
+POST /api/v1/doc/{doc-type}/{doc-id}/views/{view-id}/default
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 创建看板视图
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/project/456/views&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;name&quot;: &quot;项目看板&quot;,
+    &quot;type&quot;: &quot;kanban&quot;,
+    &quot;config&quot;: {
+      &quot;groupByField&quot;: &quot;status&quot;,
+      &quot;displayFields&quot;: [&quot;name&quot;, &quot;assignee&quot;, &quot;dueDate&quot;]
+    }
+  }&#39;
+</code></pre>
+<h1>数据</h1>
+<p>数据行的 CRUD 操作，支持简单查询和结构化查询。</p>
+<pre><code class="language-http"># 列表查询（简单）
+GET /api/v1/doc/{doc-type}/{doc-id}/data?page=1&amp;pageSize=20&amp;sort=name:asc
+
+# 结构化查询
+POST /api/v1/doc/{doc-type}/{doc-id}/data/query
+
+# 创建数据行（所有写操作需携带 requestId）
+POST /api/v1/doc/{doc-type}/{doc-id}/data?requestId={request-id}
+
+# 批量更新（target/value）
+POST /api/v1/doc/{doc-type}/{doc-id}/data/bulk?requestId={request-id}
+
+# 获取单行
+GET /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}
+
+# 更新数据行
+PUT /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?requestId={request-id}
+
+# 删除数据行
+DELETE /api/v1/doc/{doc-type}/{doc-id}/data/{row-id}?requestId={request-id}
+</code></pre>
+<p><strong>说明：</strong> 所有写操作统一通过 <code>requestId</code> 进入变更请求工作流，<code>apply</code> 参数已废弃。</p>
+<p><strong>示例 - 简单查询：</strong></p>
+<pre><code class="language-bash"># 获取产品列表，按名称升序排序
+curl -H &#39;Authorization: Bearer TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?page=1&amp;pageSize=20&amp;sort=name:asc&#39;
+</code></pre>
+<p><strong>示例 - 结构化查询：</strong></p>
+<pre><code class="language-bash"># 查询价格在 50-200 之间且状态为 active 的产品
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data/query&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;filters&quot;: {
+      &quot;logic&quot;: &quot;and&quot;,
+      &quot;conditions&quot;: [
+        {&quot;field&quot;: &quot;status&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;active&quot;},
+        {&quot;field&quot;: &quot;price&quot;, &quot;operator&quot;: &quot;range&quot;, &quot;rangeStart&quot;: 50, &quot;rangeEnd&quot;: 200}
+      ]
+    },
+    &quot;sorts&quot;: [{&quot;field&quot;: &quot;created_at&quot;, &quot;direction&quot;: &quot;desc&quot;}],
+    &quot;page&quot;: 1,
+    &quot;pageSize&quot;: 20
+  }&#39;
+</code></pre>
+<p><strong>示例 - 创建数据行：</strong></p>
+<pre><code class="language-bash"># 直接创建产品
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/data?apply=true&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;id&quot;: &quot;row-1&quot;,
+    &quot;values&quot;: [
+      {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;新产品&quot;}},
+      {&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 99.99}},
+      {&quot;fieldId&quot;: &quot;status&quot;, &quot;value&quot;: {&quot;selectOption&quot;: {&quot;id&quot;: &quot;active&quot;}}}
+    ]
+  }&#39;
+</code></pre>
+<h3>6. 评论（统一接口）</h3>
+<p>支持在文档、字段、行、单元格等任何位置进行评论。</p>
+<pre><code class="language-http"># 列表（支持按位置过滤）
+GET /api/v1/doc/{doc-type}/{doc-id}/comments?scope=document|field|row|cell&amp;fieldId=&amp;rowId=
+
+# 创建评论
+POST /api/v1/doc/{doc-type}/{doc-id}/comments
+
+# 获取单个评论
+GET /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}
+
+# 更新评论
+PUT /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}
+
+# 删除评论
+DELETE /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}
+
+# 置顶评论
+POST /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/pin
+
+# 取消置顶
+POST /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/unpin
+
+# 标记为已解决
+POST /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/resolve
+
+# 取消已解决
+POST /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/unresolve
+
+# 添加表情反应
+POST /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/reactions?emoji=👍
+
+# 删除表情反应
+DELETE /api/v1/doc/{doc-type}/{doc-id}/comments/{comment-id}/reactions/{emoji}
+</code></pre>
+<p><strong>评论位置定位：</strong></p>
+<pre><code class="language-typescript">CommentTarget {
+  scope: &quot;document&quot; | &quot;field&quot; | &quot;row&quot; | &quot;cell&quot;,
+  fieldId?: string,  // scope 为 field 或 cell 时
+  rowId?: string     // scope 为 row 或 cell 时
+}
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 文档级评论
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/comments&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;target&quot;: {&quot;scope&quot;: &quot;document&quot;},
+    &quot;content&quot;: &quot;这个产品目录需要更新&quot;
+  }&#39;
+
+# 单元格评论
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/comments&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;target&quot;: {
+      &quot;scope&quot;: &quot;cell&quot;,
+      &quot;rowId&quot;: &quot;row-123&quot;,
+      &quot;fieldId&quot;: &quot;price&quot;
+    },
+    &quot;content&quot;: &quot;这个价格看起来不对，请核实&quot;
+  }&#39;
+</code></pre>
+<h3>8. 实时协同（Realtime）</h3>
+<ul>
+<li>获取连接信息：<code>GET /realtime/doc/{docType}/{docId}/connect</code>（返回 <code>wsUrl/wsHost/wsPath/port/protocols/sseUrl</code> 与 <code>token</code>）</li>
+<li>在线用户：<code>GET /realtime/doc/{docType}/{docId}/users</code></li>
+<li>锁定/解锁/锁列表：<code>POST /lock</code>、<code>DELETE /unlock/{lockId}</code>、<code>GET /locks</code></li>
+<li>Yjs 快照：<code>GET/POST /snapshot</code>、<code>GET /snapshots</code></li>
+<li>更新（后备）：<code>POST /apply-update</code>、<code>POST /awareness</code></li>
+<li>事件历史：<code>GET /events</code></li>
+<li>断开所有会话：<code>POST /disconnect-all</code></li>
+<li>消息结构：<code>GET /realtime/messages/schema</code></li>
+<li>SSE 流：<code>GET /realtime/doc/{docType}/{docId}/events/stream</code>（<code>text/event-stream</code>）</li>
+</ul>
+<p><strong>握手示例（WebSocket）</strong></p>
+<pre><code class="language-json">{
+  &quot;kind&quot;: &quot;auth&quot;,
+  &quot;seq&quot;: 1,
+  &quot;payload&quot;: { &quot;token&quot;: &quot;Bearer {ACCESS_TOKEN}&quot; }
+}
+</code></pre>
+<p>完整的版本控制和变更追踪。</p>
+<pre><code class="language-http"># 获取修订列表
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions
+
+# 获取单个修订
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}
+
+# 获取修订的变更操作
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}/operations
+
+# 对比两个修订
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}/diff?base={base-rev-id}
+
+# 获取特定目标的历史
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions/history?targetKind=row&amp;rowId={row-id}
+
+# 回滚到指定修订
+POST /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}/revert
+
+# 获取修订关联的请求
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}/request
+
+# 导出修订数据
+GET /api/v1/doc/{doc-type}/{doc-id}/revisions/{rev-id}/export?format=json
+</code></pre>
+<p><strong>修订变更操作：</strong></p>
+<pre><code class="language-typescript">ChangeOperation {
+  id: string,
+  type: &quot;row-create&quot; | &quot;row-update&quot; | &quot;row-delete&quot; 
+      | &quot;field-create&quot; | &quot;field-update&quot; | &quot;field-delete&quot;
+      | &quot;metadata-update&quot; | &quot;settings-update&quot;,
+  target: {
+    kind: &quot;row&quot; | &quot;field&quot; | &quot;metadata&quot; | &quot;settings&quot;,
+    rowId?: string,
+    fieldId?: string
+  },
+  oldValue?: unknown,  // 更新和删除时
+  newValue?: unknown,  // 创建和更新时
+  operator?: string,
+  timestamp?: string,
+  note?: string
+}
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 查看修订详情
+curl -H &#39;Authorization: Bearer TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-456&#39;
+
+# 对比两个修订的差异
+curl -H &#39;Authorization: Bearer TOKEN&#39; \
+  &#39;https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-456/diff?base=rev-455&#39;
+
+# 回滚到指定版本
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/revisions/rev-455/revert&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39;
+</code></pre>
+<h3>8. 变更请求</h3>
+<p>类似 Git Pull Request 的变更管理机制。</p>
+<pre><code class="language-http"># 获取请求列表
+GET /api/v1/doc/{doc-type}/{doc-id}/requests
+
+# 创建请求
+POST /api/v1/doc/{doc-type}/{doc-id}/requests
+
+# 获取单个请求
+GET /api/v1/doc/{doc-type}/{doc-id}/requests/{req-id}
+
+# 合并请求
+POST /api/v1/doc/{doc-type}/{doc-id}/requests/{req-id}/merge
+
+# 关闭请求
+POST /api/v1/doc/{doc-type}/{doc-id}/requests/{req-id}/close
+
+# 重新打开请求
+POST /api/v1/doc/{doc-type}/{doc-id}/requests/{req-id}/reopen
+
+# 获取冲突
+GET /api/v1/doc/{doc-type}/{doc-id}/requests/{req-id}/conflicts
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 创建变更请求
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/requests&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;title&quot;: &quot;更新产品价格&quot;,
+    &quot;description&quot;: &quot;年度价格调整&quot;,
+    &quot;changes&quot;: [
+      {
+        &quot;type&quot;: &quot;row-update&quot;,
+        &quot;target&quot;: {&quot;kind&quot;: &quot;row&quot;, &quot;rowId&quot;: &quot;row-123&quot;},
+        &quot;newValue&quot;: {
+          &quot;values&quot;: [{&quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: {&quot;number&quot;: 119.99}}]
+        }
+      }
+    ]
+  }&#39;
+
+# 合并请求
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/product/123/requests/req-789/merge&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39;
+</code></pre>
+<h3>9. 审批</h3>
+<p>多层级、多人审批流程。</p>
+<pre><code class="language-http"># 获取审批配置
+GET /api/v1/doc/{doc-type}/{doc-id}/approval
+
+# 启动审批流程
+POST /api/v1/doc/{doc-type}/{doc-id}/approval/start
+
+# 获取审批实例
+GET /api/v1/doc/{doc-type}/{doc-id}/approval/{instance-id}
+
+# 提交审批决策
+POST /api/v1/doc/{doc-type}/{doc-id}/approval/{instance-id}/decision?result=approved|rejected
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 启动审批流程
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/approval/start&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;requestId&quot;: &quot;req-789&quot;,
+    &quot;flowId&quot;: &quot;purchase-approval-flow&quot;
+  }&#39;
+
+# 审批通过
+curl -X POST &#39;https://open.nexusbook.app/api/v1/doc/purchase/p001/approval/appr-123/decision?result=approved&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;comment&quot;: &quot;订单已审核通过&quot;,
+    &quot;signature&quot;: &quot;张三&quot;
+  }&#39;
+</code></pre>
+<h3>10. 设置</h3>
+<p>文档和类型级别的配置。</p>
+<pre><code class="language-http"># 文档级设置
+GET /api/v1/doc/{doc-type}/{doc-id}/settings
+PUT /api/v1/doc/{doc-type}/{doc-id}/settings
+
+# 类型级设置
+GET /api/v1/doc/{doc-type}/setting
+PUT /api/v1/doc/{doc-type}/setting
+</code></pre>
+<p><strong>示例：</strong></p>
+<pre><code class="language-bash"># 更新文档设置
+curl -X PUT &#39;https://open.nexusbook.app/api/v1/doc/product/123/settings&#39; \
+  -H &#39;Authorization: Bearer TOKEN&#39; \
+  -H &#39;Content-Type: application/json&#39; \
+  -d &#39;{
+    &quot;permissions&quot;: {
+      &quot;allowComment&quot;: true,
+      &quot;requireApproval&quot;: false
+    },
+    &quot;notifications&quot;: {
+      &quot;emailOnChange&quot;: true
+    }
+  }&#39;
+</code></pre>
+<h3>11. 认证</h3>
+<p>OAuth2 和 OIDC 标准认证端点。</p>
+<pre><code class="language-http"># 授权端点
+GET /auth/authorize
+
+# 令牌颁发
+POST /auth/token
+
+# 用户信息
+GET /auth/userinfo
+
+# OIDC 发现
+GET /auth/.well-known/openid-configuration
+
+# 公钥集合
+GET /auth/jwks.json
+</code></pre>
+<p>详细的认证流程请查看 <a href="../guides/authentication.md">认证授权指南</a>。</p>
+<h3>12. Webhooks</h3>
+<p>事件驱动的通知机制。</p>
+<pre><code class="language-http"># Webhook 管理
+GET    /api/v1/webhooks
+POST   /api/v1/webhooks
+GET    /api/v1/webhooks/{webhook-id}
+PUT    /api/v1/webhooks/{webhook-id}
+DELETE /api/v1/webhooks/{webhook-id}
+
+# Webhook 操作
+POST   /api/v1/webhooks/{webhook-id}/pause
+POST   /api/v1/webhooks/{webhook-id}/resume
+POST   /api/v1/webhooks/{webhook-id}/test
+POST   /api/v1/webhooks/{webhook-id}/regenerate-secret
+
+# 投递管理
+GET    /api/v1/webhooks/{webhook-id}/deliveries
+GET    /api/v1/webhooks/{webhook-id}/deliveries/{delivery-id}
+POST   /api/v1/webhooks/{webhook-id}/deliveries/{delivery-id}/redeliver
+
+# 统计信息
+GET    /api/v1/webhooks/{webhook-id}/stats
+</code></pre>
+<p>详细的 Webhook 使用方法请查看 <a href="../guides/webhooks.md">Webhook 使用指南</a>。</p>
+<h2>查询与过滤</h2>
+<h3>过滤操作符</h3>
+<pre><code class="language-typescript">FilterOp = 
+  | &quot;eq&quot;           // 等于
+  | &quot;ne&quot;           // 不等于
+  | &quot;in&quot;           // 包含于
+  | &quot;range&quot;        // 区间
+  | &quot;contains&quot;     // 包含
+  | &quot;is_empty&quot;     // 为空
+  | &quot;is_not_empty&quot; // 不为空
+</code></pre>
+<h3>过滤组合</h3>
+<pre><code class="language-typescript">FilterGroup {
+  logic: &quot;and&quot; | &quot;or&quot;,
+  conditions: Filter[],
+  groups: FilterGroup[]  // 支持嵌套
+}
+</code></pre>
+<h3>排序</h3>
+<pre><code class="language-typescript">Sort {
+  field: string,
+  direction: &quot;asc&quot; | &quot;desc&quot;
+}
+</code></pre>
+<h3>分组与聚合</h3>
+<pre><code class="language-typescript">GroupBy {
+  fields: string[],
+  aggregations: Aggregation[]
+}
+
+Aggregation {
+  kind: &quot;count&quot; | &quot;sum&quot; | &quot;avg&quot; | &quot;min&quot; | &quot;max&quot;,
+  field: string
+}
+</code></pre>
+<h2>错误码</h2>
+<p>查看 <a href="./error-codes.md">错误码参考</a> 获取完整的错误码列表和说明。</p>
+<h2>字段类型</h2>
+<p>查看 <a href="./field-types.md">字段类型参考</a> 获取所有支持的字段类型和值类型映射。</p>
+<h2>下一步</h2>
+<ul>
+<li>查看 <a href="../guides/getting-started.md">快速开始指南</a> 开始使用 API</li>
+<li>查看 <a href="../guides/data-operations.md">数据操作指南</a> 学习高级查询</li>
+<li>查看 <a href="../guides/best-practices.md">最佳实践</a> 了解使用建议</li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

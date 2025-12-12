@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>架构设计 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>架构设计</h1>
+<p>本文档详细介绍 NexusBook API 的架构设计、目录结构和设计原则。</p>
+<h2>Document 核心概念架构</h2>
+<div class="mermaid">graph TB
+    subgraph "Document 文档抽象"
+        Doc["📄 Document<br/>{doc-type}/{doc-id}"]
+        
+        subgraph "核心数据层 Core Data"
+            Props["🏷️ Properties<br/>文档属性<br/><small>订单时间、门店、金额</small>"]
+            Meta["📋 Metadata<br/>字段定义<br/><small>25+ 字段类型</small>"]
+            Views["👁️ Views<br/>视图配置<br/><small>8 种视图类型</small>"]
+            Data["📊 Data<br/>数据行<br/><small>结构化数据</small>"]
+            Settings["⚙️ Settings<br/>配置<br/><small>文档/类型级</small>"]
+        end
+        
+        subgraph "协作层 Collaboration"
+            Comments["💬 Comments<br/>评论系统<br/><small>文档/字段/行/单元格</small>"]
+        end
+        
+        subgraph "工作流层 Workflow"
+            Requests["📝 Requests<br/>变更请求<br/><small>类似 Git PR</small>"]
+            Revisions["📜 Revisions<br/>修订历史<br/><small>完整变更追踪</small>"]
+            Approvals["✅ Approvals<br/>审批流程<br/><small>多层级审批</small>"]
+        end
+    end
+    
+    subgraph "查询能力 Query Engine"
+        Filter["🔍 Filter<br/>过滤器<br/><small>嵌套逻辑</small>"]
+        Sort["📶 Sort<br/>排序<br/><small>多字段</small>"]
+        Group["📊 Group<br/>分组聚合<br/><small>5 种聚合函数</small>"]
+        Aggregate["🎯 Aggregate<br/>聚合查询<br/><small>一次获取多种数据</small>"]
+    end
+    
+    subgraph "认证授权 Auth"
+        OAuth["🔐 OAuth2/OIDC<br/>标准认证"]
+        Token["🎫 JWT Token<br/>令牌管理"]
+        Scope["🔑 Scopes<br/>权限控制"]
+    end
+    
+    Doc --> Props
+    Doc --> Meta
+    Doc --> Views
+    Doc --> Data
+    Doc --> Settings
+    Doc --> Comments
+    Doc --> Requests
+    Doc --> Revisions
+    Doc --> Approvals
+    
+    Data --> Filter
+    Data --> Sort
+    Data --> Group
+    Doc --> Aggregate
+    
+    Requests -->|合并生成| Revisions
+    Requests -->|可选| Approvals
+    Data -->|默认生成| Requests
+    %% Removed apply=true edge
+    
+    OAuth --> Token
+    Token --> Scope
+    Scope --> Doc</div>
+<p><strong>核心概念说明：</strong></p>
+<ul>
+<li><strong>Document</strong> - 统一的文档抽象，支持多种业务类型（订货单、产品、库存等）</li>
+<li><strong>核心数据层</strong> - Properties（文档属性）、Metadata（字段定义）、Views（视图）、Data（数据行）、Settings（配置）</li>
+<li><strong>协作层</strong> - Comments 支持在文档任何位置进行评论和讨论</li>
+<li><strong>工作流层</strong> - Requests（变更请求）→ Revisions（修订历史）+ Approvals（审批流程）</li>
+<li><strong>查询能力</strong> - 强大的过滤、排序、分组和聚合查询</li>
+<li><strong>认证授权</strong> - OAuth2/OIDC 标准认证，基于 Scope 的权限控制</li>
+</ul>
+<h2>租户数据核心概念架构</h2>
+<p>NexusBook 采用多租户 SaaS 架构，通过 Organization（组织）和 Workspace（工作区）实现数据隔离和权限管理，设计理念参考 Miro 的协作模式。</p>
+<div class="mermaid">graph TB
+    subgraph "多租户架构 Multi-Tenant Architecture"
+        User["👤 User<br/>用户<br/><small>独立实体</small>"]
+        
+        subgraph "Organization 组织（租户）"
+            Org["🏢 Organization<br/>组织/租户<br/><small>数据隔离边界</small>"]
+            OrgMember["👥 Organization Members<br/>组织成员<br/><small>owner/admin/member/guest</small>"]
+            
+            subgraph "共享工作区 Shared Workspace"
+                MasterWS["📚 主数据中心<br/>Master Data Workspace<br/><small>visibility: public</small>"]
+                MasterDoc1["📄 产品目录<br/><small>product</small>"]
+                MasterDoc2["📄 供应商名录<br/><small>supplier</small>"]
+                MasterDoc3["📄 标准菜谱<br/><small>recipe</small>"]
+            end
+            
+            subgraph "业务工作区 Business Workspaces"
+                WS1["🍜 朝阳餐厅<br/>Workspace<br/><small>visibility: private</small>"]
+                WS2["🛍️ 海淀超市<br/>Workspace<br/><small>visibility: private</small>"]
+                WS3["🚚 绿源供应商<br/>Workspace<br/><small>visibility: private</small>"]
+            end
+            
+            WSMember["👥 Workspace Members<br/>工作区成员<br/><small>owner/editor/viewer</small>"]
+            
+            Invite["✉️ Invitation<br/>邀请机制<br/><small>邮箱邀请</small>"]
+            JoinReq["📝 Join Request<br/>加入申请<br/><small>用户主动申请</small>"]
+        end
+        
+        subgraph "业务文档 Business Documents"
+            Doc1["📄 订货单<br/><small>purchase</small>"]
+            Doc2["📄 库存表<br/><small>inventory</small>"]
+            Doc3["📄 销售记录<br/><small>sales</small>"]
+        end
+    end
+    
+    User -->|注册时自动创建| Org
+    User -->|owner| Org
+    User -->|加入| OrgMember
+    
+    Org -->|包含| MasterWS
+    Org -->|包含1-N| WS1
+    Org -->|包含1-N| WS2
+    Org -->|包含1-N| WS3
+    
+    MasterWS -->|管理共享数据| MasterDoc1
+    MasterWS -->|管理共享数据| MasterDoc2
+    MasterWS -->|管理共享数据| MasterDoc3
+    
+    OrgMember -->|需显式加入| WSMember
+    
+    Org -->|邀请用户| Invite
+    Org -->|接受申请| JoinReq
+    
+    WS1 -->|管理业务数据| Doc1
+    WS2 -->|管理业务数据| Doc2
+    WS3 -->|管理业务数据| Doc3
+    
+    Doc1 -.->|relation字段引用| MasterDoc1
+    Doc2 -.->|relation字段引用| MasterDoc1
+    Doc3 -.->|relation字段引用| MasterDoc2
+    
+    style Org fill:#e1f5ff
+    style MasterWS fill:#d4edda
+    style WS1 fill:#fff4e6
+    style WS2 fill:#fff4e6
+    style WS3 fill:#fff4e6
+    style User fill:#f0f0f0
+    style MasterDoc1 fill:#c3e6cb
+    style MasterDoc2 fill:#c3e6cb
+    style MasterDoc3 fill:#c3e6cb</div>
+<h3>核心概念说明</h3>
+<h4>1. User（用户）- 独立身份实体</h4>
+<ul>
+<li><strong>独立性</strong>：用户是系统中的独立实体，不依附于任何组织</li>
+<li><strong>自动组织</strong>：用户注册时，系统自动创建一个 Personal 类型的 Organization，用户成为该组织的 owner</li>
+<li><strong>多组织成员</strong>：一个用户可以同时是多个 Organization 的成员</li>
+<li><strong>身份验证</strong>：支持邮箱/密码、OAuth 第三方登录（Google、GitHub、微信、钉钉、飞书）</li>
+</ul>
+<h4>2. Organization（组织）- 租户边界</h4>
+<ul>
+<li><strong>租户隔离</strong>：Organization 是数据隔离的基本单元，类似 Miro 的 Team</li>
+<li><strong>组织类型</strong>：<ul>
+<li><code>personal</code>：个人组织（用户注册时自动创建）</li>
+<li><code>team</code>：团队组织</li>
+<li><code>enterprise</code>：企业组织</li>
+</ul>
+</li>
+<li><strong>成员角色</strong>：<ul>
+<li><code>owner</code>：组织拥有者，拥有所有权限（包括删除组织、转让所有权）</li>
+<li><code>admin</code>：管理员，可管理成员、工作区、组织设置</li>
+<li><code>member</code>：普通成员，可访问被授权的工作区</li>
+<li><code>guest</code>：访客，仅能访问特定资源</li>
+</ul>
+</li>
+<li><strong>默认工作区</strong>：创建组织时自动创建一个默认 Workspace</li>
+</ul>
+<h4>3. Workspace（工作区）- 业务容器</h4>
+<p>Workspace 分为两种类型：<strong>共享工作区</strong>和<strong>业务工作区</strong>。</p>
+<p><strong>📚 共享工作区（主数据中心）</strong>：</p>
+<ul>
+<li><strong>特殊标识</strong>：<code>visibility: public</code>，组织内所有成员可见</li>
+<li><strong>主要职责</strong>：存放组织级共享主数据，供多个业务工作区引用</li>
+<li><strong>典型数据</strong>：<ul>
+<li>产品目录：餐饮集团的所有菜品信息</li>
+<li>供应商名录：全部合作供应商的联系信息</li>
+<li>标准菜谱：集团统一的菜品制作标准</li>
+<li>质量标准、标准操作流程等</li>
+</ul>
+</li>
+<li><strong>权限控制</strong>：<ul>
+<li>数据管理员：<code>editor</code>（可编辑主数据）</li>
+<li>业务人员：<code>viewer</code>（只读访问，不能修改）</li>
+</ul>
+</li>
+</ul>
+<p><strong>🍜 业务工作区</strong>：</p>
+<ul>
+<li><strong>业务隔离</strong>：Workspace 是实际业务开展的容器，承载供应链管理的各种业务</li>
+<li><strong>现实映射</strong>：<ul>
+<li>🍜 餐厅：每家餐厅的独立运营管理（朝阳餐厅、西城餐厅等）</li>
+<li>🛍️ 超市：超市的采购与库存管理（海淀超市、西单超市等）</li>
+<li>🚚 供应商：供应商的订单与发货管理（绿源供应商、丰收农场等）</li>
+<li>🏭 仓库：仓库的进出库管理</li>
+</ul>
+</li>
+<li><strong>显式加入</strong>：组织成员需要被显式添加到 Workspace 才能访问其中的内容</li>
+<li><strong>成员角色</strong>：<ul>
+<li><code>owner</code>：工作区负责人，可管理工作区和成员</li>
+<li><code>editor</code>：编辑者，可创建和编辑文档</li>
+<li><code>viewer</code>：查看者，只读权限</li>
+</ul>
+</li>
+<li><strong>可见性控制</strong>：<ul>
+<li><code>public</code>：组织内所有成员可见</li>
+<li><code>private</code>：仅成员可见（建议业务工作区使用）</li>
+</ul>
+</li>
+</ul>
+<h4>4. Workspace 与 Document 的关系</h4>
+<p><strong>一对多关系</strong>：一个 Workspace 可以包含多个 Document</p>
+<p><strong>共享工作区的 Document</strong>：</p>
+<ul>
+<li>产品目录 Document（<code>product</code> 类型）</li>
+<li>供应商名录 Document（<code>supplier</code> 类型）</li>
+<li>标准菜谱 Document（<code>recipe</code> 类型）</li>
+</ul>
+<p><strong>业务工作区的 Document</strong>：</p>
+<ul>
+<li>订货单 Document（<code>purchase</code> 类型）</li>
+<li>库存表 Document（<code>inventory</code> 类型）</li>
+<li>销售记录 Document（<code>sales</code> 类型）</li>
+<li>发货单 Document（<code>shipment</code> 类型）</li>
+</ul>
+<p><strong>跨 Workspace 数据引用</strong>：</p>
+<ul>
+<li>业务工作区的 Document 可以通过 <code>relation</code> 字段类型引用共享工作区的主数据</li>
+<li>例如：餐厅的订货单中的“产品”字段关联到主数据中心的“产品目录”</li>
+<li>实现数据一致性：主数据更新后，所有引用处自动生效</li>
+</ul>
+<p><strong>权限继承</strong>：Document 的访问权限基于 Workspace 成员权限</p>
+<h4>5. 成员管理机制</h4>
+<p><strong>邀请流程（Invitation）</strong>：</p>
+<div class="mermaid">sequenceDiagram
+    participant Admin as 👤 管理员<br/>(owner/admin)
+    participant System as 🌐 系统
+    participant User as 👤 被邀请用户
+    participant Email as 📧 邮件
+
+    Admin->>System: POST /organizations/{id}/invitations<br/>创建邀请
+    System->>Email: 发送邀请邮件（包含令牌链接）
+    Email->>User: 接收邮件
+    User->>System: POST /invitations/{token}/accept<br/>接受邀请
+    System->>System: 创建 OrganizationMember
+    System-->>User: 成功加入组织
+    
+    Note over Admin,User: 管理员可以撤销未接受的邀请<br/>DELETE /invitations/{id}</div>
+<p><strong>加入申请流程（Join Request）</strong>：</p>
+<div class="mermaid">sequenceDiagram
+    participant User as 👤 申请用户
+    participant System as 🌐 系统
+    participant Admin as 👤 管理员<br/>(owner/admin)
+
+    User->>System: POST /organizations/{id}/join-requests<br/>提交申请
+    System->>Admin: 通知有新申请
+    Admin->>System: GET /join-requests<br/>查看申请列表
+    
+    alt 批准申请
+        Admin->>System: POST /join-requests/{id}/approve<br/>批准
+        System->>System: 创建 OrganizationMember
+        System-->>User: 通知申请通过
+    else 拒绝申请
+        Admin->>System: POST /join-requests/{id}/reject<br/>拒绝
+        System-->>User: 通知申请被拒绝（含原因）
+    end
+    
+    Note over User,Admin: 用户可以取消自己的申请<br/>DELETE /join-requests/{id}</div>
+<h4>6. 角色权限矩阵</h4>
+<p><strong>Organization 角色权限</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>owner</th>
+<th>admin</th>
+<th>member</th>
+<th>guest</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>查看组织信息</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>更新组织设置</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>删除组织</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>邀请成员</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>管理成员角色</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>移除成员</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>创建工作区</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>管理工作区</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+</tbody></table>
+<p><strong>Workspace 角色权限</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>owner</th>
+<th>editor</th>
+<th>viewer</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>查看工作区</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>查看文档</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>创建文档</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>编辑文档</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>删除文档</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>管理成员</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>工作区设置</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+</tr>
+</tbody></table>
+<h4>7. 数据隔离与安全</h4>
+<p><strong>隔离层级</strong>：</p>
+<pre><code>Organization（租户级隔离）
+  └── Workspace（业务级隔离）
+        └── Document（文档级隔离）
+              ├── Properties（文档属性）
+              ├── Metadata（字段定义）
+              ├── Data（数据行）
+              └── Views（视图配置）
+</code></pre>
+<p><strong>权限校验流程</strong>：</p>
+<ol>
+<li><strong>用户身份验证</strong>：验证 JWT Token</li>
+<li><strong>组织成员检查</strong>：确认用户是该 Organization 的成员</li>
+<li><strong>工作区权限检查</strong>：确认用户在该 Workspace 中的角色</li>
+<li><strong>操作权限验证</strong>：根据角色验证是否有权限执行操作</li>
+<li><strong>数据访问控制</strong>：仅返回用户有权访问的数据</li>
+</ol>
+<h3>典型使用场景</h3>
+<h4>场景 1：新用户注册</h4>
+<pre><code class="language-bash"># 1. 用户注册
+POST /api/v1/auth/register
+{
+  &quot;email&quot;: &quot;user@example.com&quot;,
+  &quot;password&quot;: &quot;******&quot;,
+  &quot;displayName&quot;: &quot;张三&quot;
+}
+
+# 系统自动执行：
+# - 创建 User 记录
+# - 创建个人 Organization（type: personal）
+# - 创建默认 Workspace
+# - 设置用户为 Organization owner
+</code></pre>
+<h4>场景 2：创建团队组织</h4>
+<pre><code class="language-bash"># 2. 创建餐饮集团组织
+POST /api/v1/organizations
+{
+  &quot;name&quot;: &quot;鲜食餐饮集团&quot;,
+  &quot;slug&quot;: &quot;fresh-dining&quot;,
+  &quot;type&quot;: &quot;enterprise&quot;,
+  &quot;description&quot;: &quot;餐饮集团供应链管理&quot;
+}
+
+# 返回：
+# - Organization ID
+# - 自动创建默认 Workspace
+# - 创建者成为 owner
+</code></pre>
+<h4>场景 3：创建主数据中心</h4>
+<pre><code class="language-bash"># 3. 创建共享的主数据工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  &quot;name&quot;: &quot;📚 主数据中心&quot;,
+  &quot;slug&quot;: &quot;master-data&quot;,
+  &quot;description&quot;: &quot;集团共享主数据管理&quot;,
+  &quot;visibility&quot;: &quot;public&quot;,  // 组织内所有成员可见
+  &quot;settings&quot;: {
+    &quot;isShared&quot;: true,      // 自定义标识：共享工作区
+    &quot;isMasterData&quot;: true   // 自定义标识：主数据工作区
+  }
+}
+
+# 4. 添加数据管理员（可编辑主数据）
+POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
+{
+  &quot;userId&quot;: &quot;admin-user-id&quot;,
+  &quot;role&quot;: &quot;editor&quot;  // 有权编辑产品目录
+}
+
+# 5. 在主数据中心创建产品目录
+POST /api/v1/doc/product/create
+{
+  &quot;workspaceId&quot;: &quot;{masterDataWsId}&quot;,
+  &quot;name&quot;: &quot;集团产品目录&quot;,
+  &quot;metadata&quot;: {
+    &quot;fields&quot;: [
+      {&quot;id&quot;: &quot;name&quot;, &quot;name&quot;: &quot;菜品名称&quot;, &quot;type&quot;: &quot;text&quot;},
+      {&quot;id&quot;: &quot;category&quot;, &quot;name&quot;: &quot;类别&quot;, &quot;type&quot;: &quot;single_select&quot;},
+      {&quot;id&quot;: &quot;unit_price&quot;, &quot;name&quot;: &quot;标准价格&quot;, &quot;type&quot;: &quot;currency&quot;},
+      {&quot;id&quot;: &quot;unit&quot;, &quot;name&quot;: &quot;计量单位&quot;, &quot;type&quot;: &quot;text&quot;}
+    ]
+  }
+}
+
+# 6. 添加产品数据
+POST /api/v1/doc/product/{productDocId}/data
+{
+  &quot;values&quot;: [
+    {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;宫保鸡丁&quot;}},
+    {&quot;fieldId&quot;: &quot;category&quot;, &quot;value&quot;: {&quot;selectOption&quot;: {&quot;id&quot;: &quot;main-course&quot;}}},
+    {&quot;fieldId&quot;: &quot;unit_price&quot;, &quot;value&quot;: {&quot;currency&quot;: 48.00}},
+    {&quot;fieldId&quot;: &quot;unit&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;份&quot;}}
+  ]
+}
+</code></pre>
+<h4>场景 4：邀请团队成员</h4>
+<pre><code class="language-bash"># 7. 邀请成员加入组织
+POST /api/v1/organizations/{orgId}/invitations
+{
+  &quot;email&quot;: &quot;manager@example.com&quot;,
+  &quot;role&quot;: &quot;admin&quot;,
+  &quot;message&quot;: &quot;欢迎加入餐饮集团管理团队！&quot;
+}
+
+# 8. 被邀请人接受邀请
+POST /api/v1/invitations/{token}/accept
+
+# 9. 将餐厅经理加入主数据中心（viewer 角色）
+POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
+{
+  &quot;userId&quot;: &quot;manager-user-id&quot;,
+  &quot;role&quot;: &quot;viewer&quot;  // 只读访问，不能修改主数据
+}
+</code></pre>
+<h4>场景 5：创建业务工作区</h4>
+<pre><code class="language-bash"># 10a. 创建餐厅工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  &quot;name&quot;: &quot;🍜 朝阳餐厅&quot;,
+  &quot;slug&quot;: &quot;chaoyang-restaurant&quot;,
+  &quot;description&quot;: &quot;朝阳店运营管理&quot;,
+  &quot;visibility&quot;: &quot;private&quot;
+}
+
+# 10b. 创建超市工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  &quot;name&quot;: &quot;🛍️ 海淀超市&quot;,
+  &quot;slug&quot;: &quot;haidian-supermarket&quot;,
+  &quot;description&quot;: &quot;海淀店采购与库存管理&quot;,
+  &quot;visibility&quot;: &quot;private&quot;
+}
+
+# 10c. 创建供应商工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  &quot;name&quot;: &quot;🚚 绿源供应商&quot;,
+  &quot;slug&quot;: &quot;greensource-supplier&quot;,
+  &quot;description&quot;: &quot;绿源供应商订单管理&quot;,
+  &quot;visibility&quot;: &quot;private&quot;
+}
+
+# 11. 添加餐厅经理到工作区
+POST /api/v1/organizations/{orgId}/workspaces/{restaurantWsId}/members
+{
+  &quot;userId&quot;: &quot;restaurant-manager-id&quot;,
+  &quot;role&quot;: &quot;owner&quot;  // 餐厅负责人
+}
+
+# 12. 添加超市采购员到工作区
+POST /api/v1/organizations/{orgId}/workspaces/{supermarketWsId}/members
+{
+  &quot;userId&quot;: &quot;purchaser-user-id&quot;,
+  &quot;role&quot;: &quot;editor&quot;  // 可编辑订货单
+}
+</code></pre>
+<h4>场景 6：创建订货单并引用主数据</h4>
+<pre><code class="language-bash"># 13. 在餐厅工作区创建订货单
+POST /api/v1/doc/purchase/create
+{
+  &quot;workspaceId&quot;: &quot;{restaurantWsId}&quot;,
+  &quot;name&quot;: &quot;2024年12月订货单&quot;,
+  &quot;metadata&quot;: {
+    &quot;fields&quot;: [
+      {
+        &quot;id&quot;: &quot;product&quot;,
+        &quot;name&quot;: &quot;产品&quot;,
+        &quot;type&quot;: &quot;relation&quot;,
+        &quot;config&quot;: {
+          // 关联到主数据中心的产品目录
+          &quot;targetWorkspace&quot;: &quot;{masterDataWsId}&quot;,
+          &quot;targetDocument&quot;: &quot;{productDocId}&quot;,
+          &quot;displayFields&quot;: [&quot;name&quot;, &quot;category&quot;, &quot;unit_price&quot;]
+        }
+      },
+      {&quot;id&quot;: &quot;quantity&quot;, &quot;name&quot;: &quot;数量&quot;, &quot;type&quot;: &quot;number&quot;},
+      {&quot;id&quot;: &quot;total_price&quot;, &quot;name&quot;: &quot;总价&quot;, &quot;type&quot;: &quot;currency&quot;}
+    ]
+  }
+}
+
+# 14. 添加订货数据（引用主数据）
+POST /api/v1/doc/purchase/{purchaseDocId}/data
+{
+  &quot;values&quot;: [
+    {
+      &quot;fieldId&quot;: &quot;product&quot;,
+      &quot;value&quot;: {
+        &quot;relation&quot;: {
+          // 跨 Workspace 引用主数据中心的产品
+          &quot;workspaceId&quot;: &quot;{masterDataWsId}&quot;,
+          &quot;documentId&quot;: &quot;{productDocId}&quot;,
+          &quot;rowId&quot;: &quot;product-001&quot;  // 宫保鸡丁
+        }
+      }
+    },
+    {&quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: {&quot;number&quot;: 50}},
+    {&quot;fieldId&quot;: &quot;total_price&quot;, &quot;value&quot;: {&quot;currency&quot;: 2400.00}}
+  ]
+}
+
+# 优势：
+# - 产品信息统一维护，主数据中心更新后所有引用处自动生效
+# - 避免多处重复录入相同产品，保证数据一致性
+# - 集团级产品价格调整时，所有餐厅的订货单自动同步
+</code></pre>
+<h4>场景 7：查看共享数据</h4>
+<h3>架构优势</h3>
+<ol>
+<li><strong>灵活的组织结构</strong>：支持个人、团队、企业多种组织类型</li>
+<li><strong>细粒度权限控制</strong>：Organization 和 Workspace 双层角色体系</li>
+<li><strong>业务隔离</strong>：不同业务（餐厅、超市、供应商、仓库）独立管理</li>
+<li><strong>协作友好</strong>：完善的邀请和申请机制</li>
+<li><strong>可扩展性</strong>：支持无限扩展 Workspace 和 Document</li>
+<li><strong>主数据管理</strong>：通过共享 Workspace 实现组织级主数据统一管理</li>
+<li><strong>数据一致性</strong>：跨 Workspace 引用机制，主数据更新自动同步到所有引用处</li>
+</ol>
+<h2>目录结构</h2>
+<pre><code>api/
+├── main.tsp                    # 顶层入口
+│
+├── shared/                     # 共享基础模块
+│   ├── common.tsp             # 通用类型（ApiResponse, Filter, Value...）
+│   ├── constants.tsp          # 枚举定义
+│   └── index.tsp              # 模块入口
+│
+├── auth/                       # 认证模块
+│   ├── models.tsp             # OAuth2/OIDC 模型
+│   └── index.tsp              # 模块入口
+│
+└── document/                   # 文档模块
+    ├── core/                  # 核心数据模型
+    │   ├── metadata.tsp       # 字段定义
+    │   ├── data.tsp           # 数据行管理
+    │   ├── properties.tsp     # 文档属性
+    │   ├── views.tsp          # 视图配置
+    │   ├── settings.tsp       # 设置
+    │   └── index.tsp
+    │
+    ├── content/               # 内容协作
+    │   ├── comments.tsp       # 评论系统
+    │   └── index.tsp
+    │
+    ├── workflow/              # 工作流管理
+    │   ├── approvals.tsp      # 审批流程
+    │   ├── requests.tsp       # 变更请求
+    │   ├── revisions.tsp      # 修订历史
+    │   └── index.tsp
+    │
+    ├── aggregate/             # 聚合查询
+    │   └── index.tsp
+    │
+    ├── operations/            # 预留目录
+    └── index.tsp
+</code></pre>
+<h2>架构层次</h2>
+<div class="mermaid">graph TB
+    subgraph "顶层 Top Level"
+        Main["📄 main.tsp<br/>顶层入口"]
+    end
+    
+    subgraph "基础层 Foundation Layer"
+        Shared["📦 shared/<br/>共享基础模块"]
+        Common["common.tsp<br/>通用类型"]
+        Constants["constants.tsp<br/>枚举定义"]
+        
+        Shared --> Common
+        Shared --> Constants
+    end
+    
+    subgraph "认证层 Auth Layer"
+        Auth["🔐 auth/<br/>认证模块"]
+        AuthModels["models.tsp<br/>OAuth2/OIDC"]
+        
+        Auth --> AuthModels
+    end
+    
+    subgraph "业务层 Business Layer"
+        Document["📚 document/<br/>文档模块"]
+        
+        subgraph "核心 Core"
+            Core["core/"]
+            Metadata["metadata.tsp"]
+            Data["data.tsp"]
+            Properties["properties.tsp"]
+            Views["views.tsp"]
+            Settings["settings.tsp"]
+            
+            Core --> Metadata
+            Core --> Data
+            Core --> Properties
+            Core --> Views
+            Core --> Settings
+        end
+        
+        subgraph "协作 Content"
+            Content["content/"]
+            Comments["comments.tsp"]
+            
+            Content --> Comments
+        end
+        
+        subgraph "工作流 Workflow"
+            Workflow["workflow/"]
+            Approvals["approvals.tsp"]
+            Requests["requests.tsp"]
+            Revisions["revisions.tsp"]
+            
+            Workflow --> Approvals
+            Workflow --> Requests
+            Workflow --> Revisions
+        end
+        
+        subgraph "聚合 Aggregate"
+            Aggregate["aggregate/"]
+            AggregateAPI["index.tsp"]
+            
+            Aggregate --> AggregateAPI
+        end
+        
+        Document --> Core
+        Document --> Content
+        Document --> Workflow
+        Document --> Aggregate
+    end
+    
+    subgraph "扩展层 Extension Layer"
+        Extensions["🔌 extensions/<br/>扩展模块<br/><small>预留</small>"]
+        Integrations["integrations/"]
+        Webhooks["webhooks/"]
+        
+        Extensions -.-> Integrations
+        Extensions -.-> Webhooks
+    end
+    
+    Main --> Shared
+    Main --> Auth
+    Main --> Document
+    Main -.-> Extensions
+    
+    Auth --> Shared
+    Document --> Shared
+    Extensions -.-> Shared
+    
+    Core --> Shared
+    Content --> Shared
+    Workflow --> Shared
+    Aggregate --> Shared
+    
+    Workflow --> Core
+    Aggregate --> Core
+    Aggregate --> Content
+    Aggregate --> Workflow</div>
+<p><strong>依赖关系说明：</strong></p>
+<ul>
+<li><strong>实线箭头</strong> - 直接依赖关系</li>
+<li><strong>虚线箭头</strong> - 预留/可选依赖</li>
+<li><strong>颜色分层</strong> - 蓝色（顶层）→ 橙色（基础）→ 粉色（认证）→ 绿色（业务）→ 紫色（扩展）</li>
+</ul>
+<p><strong>依赖原则：</strong></p>
+<ol>
+<li><strong>单向依赖</strong> - 上层依赖下层，下层不依赖上层</li>
+<li><strong>基础优先</strong> - 所有模块都依赖 shared 基础层</li>
+<li><strong>模块独立</strong> - 同层模块之间尽量独立</li>
+<li><strong>聚合组合</strong> - aggregate 模块组合其他模块的功能</li>
+</ol>
+<h2>设计原则</h2>
+<ol>
+<li><strong>分层架构</strong> - 清晰的 4 层结构（shared → auth → document → extensions）</li>
+<li><strong>单一职责</strong> - 每个模块功能明确，职责单一</li>
+<li><strong>依赖管理</strong> - 明确的依赖关系，避免循环依赖</li>
+<li><strong>可扩展性</strong> - 预留扩展目录，支持动态扩展</li>
+<li><strong>模块化</strong> - 高内聚低耦合，便于维护和测试</li>
+</ol>
+<h2>模块职责</h2>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>职责</th>
+<th>主要内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>shared</strong></td>
+<td>基础设施</td>
+<td>通用类型、错误码、过滤器、聚合函数</td>
+</tr>
+<tr>
+<td><strong>auth</strong></td>
+<td>认证授权</td>
+<td>OAuth2、OIDC、JWT、用户信息</td>
+</tr>
+<tr>
+<td><strong>document/core</strong></td>
+<td>核心数据</td>
+<td>元数据、数据行、属性、视图、设置</td>
+</tr>
+<tr>
+<td><strong>document/content</strong></td>
+<td>内容协作</td>
+<td>评论系统</td>
+</tr>
+<tr>
+<td><strong>document/workflow</strong></td>
+<td>工作流</td>
+<td>审批、请求、修订</td>
+</tr>
+<tr>
+<td><strong>document/aggregate</strong></td>
+<td>聚合查询</td>
+<td>一次性获取多种数据</td>
+</tr>
+<tr>
+<td><strong>extensions</strong></td>
+<td>扩展功能</td>
+<td>集成、Webhooks（预留）</td>
+</tr>
+</tbody></table>
+<h2>数据流与工作流</h2>
+<div class="mermaid">sequenceDiagram
+    participant User as 👤 用户
+    participant API as 🌐 API
+    participant Request as 📝 Request
+    participant Approval as ✅ Approval
+    participant Revision as 📜 Revision
+    participant Data as 📊 Data Store
+
+    Note over User,Data: 场景 1: 直接应用变更 (apply=true)
+    User->>API: POST /data?apply=true
+    API->>Data: 直接写入数据
+    API->>Revision: 生成修订记录
+    Revision-->>User: 返回修订 ID
+    
+    Note over User,Data: 场景 2: 创建变更请求（默认）
+    User->>API: POST /data
+    API->>Request: 创建 Request
+    Request-->>User: 返回 Request ID
+    
+    Note over User,Data: 场景 3: 多人协作编辑
+    User->>Request: 添加/修改变更
+    User->>Request: 继续编辑
+    Note over Request: 多个用户可以<br/>在同一 Request 中<br/>协作编辑
+    
+    Note over User,Data: 场景 4: 审批流程
+    User->>API: POST /requests/{id}/merge
+    API->>Approval: 触发审批流程
+    Approval->>Approval: 多层级审批
+    alt 审批通过
+        Approval->>Request: 批准合并
+        Request->>Data: 应用变更
+        Request->>Revision: 生成修订
+        Revision-->>User: 完成
+    else 审批拒绝
+        Approval->>Request: 拒绝
+        Request-->>User: 需要修改
+    end
+    
+    Note over User,Data: 场景 5: 版本对比与回滚
+    User->>API: GET /revisions/{id}/diff?base={base-id}
+    API-->>User: 返回差异
+    User->>API: POST /revisions/{id}/revert
+    API->>Request: 创建回滚 Request
+    Request->>Data: 应用回滚
+    API->>Revision: 生成回滚修订
+    Revision-->>User: 完成回滚</div>
+<p><strong>工作流说明：</strong></p>
+<ol>
+<li><strong>直接应用</strong> - 使用 <code>?apply=true</code> 参数直接写入数据并生成修订</li>
+<li><strong>变更请求</strong> - 默认创建 Request，支持多人协作编辑</li>
+<li><strong>审批流程</strong> - 可选的多层级审批机制</li>
+<li><strong>修订追踪</strong> - 所有变更都会生成修订记录</li>
+<li><strong>版本回滚</strong> - 支持对比和回滚到任意历史版本</li>
+</ol>
+<h2>字段类型与值类型映射</h2>
+<div class="mermaid">graph LR
+    subgraph "字段类型 Field Types"
+        F1["text<br/>long_text"]
+        F2["number<br/>currency<br/>percent"]
+        F3["boolean"]
+        F4["date<br/>datetime"]
+        F5["duration"]
+        F6["single_select"]
+        F7["multi_select"]
+        F8["rating"]
+        F9["attachment"]
+        F10["user"]
+        F11["collaborator"]
+        F12["relation"]
+        F13["lookup<br/>rollup<br/>formula"]
+    end
+    
+    subgraph "值类型 Value Types"
+        V1["string"]
+        V2["float64"]
+        V3["boolean"]
+        V4["string<br/><small>ISO 8601</small>"]
+        V5["int64<br/><small>毫秒</small>"]
+        V6["SelectOption"]
+        V7["SelectOption[]"]
+        V8["int32<br/><small>1-5</small>"]
+        V9["Attachment[]"]
+        V10["UserRef"]
+        V11["CollaboratorRef"]
+        V12["RelationRef[]"]
+        V13["<small>动态类型</small>"]
+    end
+    
+    F1 --> V1
+    F2 --> V2
+    F3 --> V3
+    F4 --> V4
+    F5 --> V5
+    F6 --> V6
+    F7 --> V7
+    F8 --> V8
+    F9 --> V9
+    F10 --> V10
+    F11 --> V11
+    F12 --> V12
+    F13 --> V13</div>
+<h2>文档类型路由</h2>
+<p><strong>Provider 模式：</strong></p>
+<pre><code>/api/v1/doc/{doc-type}/{doc-id}
+              ↓
+        Provider 解析
+              ↓
+    ┌─────────┼─────────┐
+    ▼         ▼         ▼
+ Product  Purchase   Invoice
+ Provider  Provider  Provider
+</code></pre>
+<p><strong>扩展新类型：</strong></p>
+<ul>
+<li>实现对应的 Provider</li>
+<li>注册到路由系统</li>
+<li>无需修改 API 定义</li>
+</ul>
+<h2>资源抽象</h2>
+<pre><code>Doc: {doc-type} + {doc-id}
+  ├── properties    # 文档属性（订单时间、门店、金额等）
+  ├── metadata      # 字段定义
+  ├── views         # 视图配置
+  ├── data          # 数据行
+  ├── comments      # 评论
+  ├── revisions     # 修订历史
+  ├── requests      # 变更请求
+  ├── approval      # 审批流程
+  └── settings      # 设置
+</code></pre>
+<h2>下一步</h2>
+<ul>
+<li>查看 <a href="../references/api-reference.md">API 参考文档</a> 了解详细的 API 端点</li>
+<li>查看 <a href="./development.md">开发指南</a> 了解如何扩展和修改 API</li>
+<li>查看 <a href="./data-operations.md">数据操作指南</a> 了解查询和过滤功能</li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

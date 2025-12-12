@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>字段类型参考 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" >开发指南</a>
+                    <a href="/references/error-codes.html" class="active">参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>字段类型参考</h1>
+<p>NexusBook 支持 25+ 种字段类型，满足各种数据管理需求。</p>
+<h2>字段类型总览</h2>
+<table>
+<thead>
+<tr>
+<th>分类</th>
+<th>字段类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>基础类型</td>
+<td>text, long_text, number, currency, percent, boolean</td>
+<td>常用基础数据类型</td>
+</tr>
+<tr>
+<td>日期时间</td>
+<td>date, datetime, duration</td>
+<td>时间相关类型</td>
+</tr>
+<tr>
+<td>选择类型</td>
+<td>single_select, multi_select, rating</td>
+<td>选项和评分</td>
+</tr>
+<tr>
+<td>关联类型</td>
+<td>attachment, user, collaborator, relation</td>
+<td>关联和引用</td>
+</tr>
+<tr>
+<td>计算类型</td>
+<td>lookup, rollup, formula, auto_number</td>
+<td>自动计算字段</td>
+</tr>
+<tr>
+<td>系统字段</td>
+<td>created_time, updated_time, created_by, updated_by</td>
+<td>系统自动维护</td>
+</tr>
+</tbody></table>
+<h2>基础类型</h2>
+<h3>text（文本）</h3>
+<p><strong>用途</strong>：短文本，如名称、标题、标签</p>
+<p><strong>值类型</strong>：<code>{&quot;text&quot;: string}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;productName&quot;,
+  &quot;value&quot;: {&quot;text&quot;: &quot;iPhone 15&quot;}
+}
+</code></pre>
+<p><strong>配置选项</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;validation&quot;: {
+    &quot;minLength&quot;: 1,
+    &quot;maxLength&quot;: 200,
+    &quot;pattern&quot;: &quot;^[a-zA-Z0-9\\s]+$&quot;
+  }
+}
+</code></pre>
+<h3>long_text（长文本）</h3>
+<p><strong>用途</strong>：多行文本，如描述、备注</p>
+<p><strong>值类型</strong>：<code>{&quot;text&quot;: string}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;description&quot;,
+  &quot;value&quot;: {&quot;text&quot;: &quot;这是一段很长的产品描述...&quot;}
+}
+</code></pre>
+<h3>number（数字）</h3>
+<p><strong>用途</strong>：数值，如数量、金额</p>
+<p><strong>值类型</strong>：<code>{&quot;number&quot;: float64}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;quantity&quot;,
+  &quot;value&quot;: {&quot;number&quot;: 100}
+}
+</code></pre>
+<p><strong>配置选项</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;number&quot;,
+  &quot;validation&quot;: {
+    &quot;min&quot;: 0,
+    &quot;max&quot;: 9999,
+    &quot;precision&quot;: 2
+  }
+}
+</code></pre>
+<h3>currency（货币）</h3>
+<p><strong>用途</strong>：货币金额，自动格式化</p>
+<p><strong>值类型</strong>：<code>{&quot;number&quot;: float64}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;price&quot;,
+  &quot;value&quot;: {&quot;number&quot;: 99.99}
+}
+</code></pre>
+<p><strong>配置选项</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;currency&quot;,
+  &quot;currencyCode&quot;: &quot;CNY&quot;,
+  &quot;precision&quot;: 2
+}
+</code></pre>
+<h3>percent（百分比）</h3>
+<p><strong>用途</strong>：百分比数值</p>
+<p><strong>值类型</strong>：<code>{&quot;number&quot;: float64}</code>（存储为小数，如 0.85 表示 85%）</p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;discount&quot;,
+  &quot;value&quot;: {&quot;number&quot;: 0.15}  // 15%
+}
+</code></pre>
+<h3>boolean（布尔值）</h3>
+<p><strong>用途</strong>：是/否、真/假</p>
+<p><strong>值类型</strong>：<code>{&quot;boolean&quot;: boolean}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;isActive&quot;,
+  &quot;value&quot;: {&quot;boolean&quot;: true}
+}
+</code></pre>
+<h2>日期时间类型</h2>
+<h3>date（日期）</h3>
+<p><strong>用途</strong>：日期（不含时间）</p>
+<p><strong>值类型</strong>：<code>{&quot;date&quot;: string}</code>（ISO 8601 格式）</p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;dueDate&quot;,
+  &quot;value&quot;: {&quot;date&quot;: &quot;2024-12-01&quot;}
+}
+</code></pre>
+<h3>datetime（日期时间）</h3>
+<p><strong>用途</strong>：完整的日期和时间</p>
+<p><strong>值类型</strong>：<code>{&quot;datetime&quot;: string}</code>（ISO 8601 格式）</p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;createdAt&quot;,
+  &quot;value&quot;: {&quot;datetime&quot;: &quot;2024-12-01T10:30:00Z&quot;}
+}
+</code></pre>
+<h3>duration（时长）</h3>
+<p><strong>用途</strong>：时间段</p>
+<p><strong>值类型</strong>：<code>{&quot;duration&quot;: int64}</code>（毫秒）</p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;processingTime&quot;,
+  &quot;value&quot;: {&quot;duration&quot;: 3600000}  // 1 小时
+}
+</code></pre>
+<h2>选择类型</h2>
+<h3>single_select（单选）</h3>
+<p><strong>用途</strong>：从预定义选项中选择一个</p>
+<p><strong>值类型</strong>：<code>{&quot;selectOption&quot;: SelectOption}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;status&quot;,
+  &quot;value&quot;: {
+    &quot;selectOption&quot;: {
+      &quot;id&quot;: &quot;opt-active&quot;,
+      &quot;name&quot;: &quot;Active&quot;,
+      &quot;color&quot;: &quot;#28a745&quot;
+    }
+  }
+}
+</code></pre>
+<p><strong>配置选项</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;single_select&quot;,
+  &quot;options&quot;: [
+    {&quot;id&quot;: &quot;opt-active&quot;, &quot;name&quot;: &quot;Active&quot;, &quot;color&quot;: &quot;#28a745&quot;},
+    {&quot;id&quot;: &quot;opt-inactive&quot;, &quot;name&quot;: &quot;Inactive&quot;, &quot;color&quot;: &quot;#dc3545&quot;}
+  ]
+}
+</code></pre>
+<h3>multi_select（多选）</h3>
+<p><strong>用途</strong>：从预定义选项中选择多个</p>
+<p><strong>值类型</strong>：<code>{&quot;selectOptions&quot;: SelectOption[]}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;tags&quot;,
+  &quot;value&quot;: {
+    &quot;selectOptions&quot;: [
+      {&quot;id&quot;: &quot;tag-1&quot;, &quot;name&quot;: &quot;Electronics&quot;},
+      {&quot;id&quot;: &quot;tag-2&quot;, &quot;name&quot;: &quot;Featured&quot;}
+    ]
+  }
+}
+</code></pre>
+<h3>rating（评分）</h3>
+<p><strong>用途</strong>：星级评分</p>
+<p><strong>值类型</strong>：<code>{&quot;rating&quot;: int32}</code>（1-5）</p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;quality&quot;,
+  &quot;value&quot;: {&quot;rating&quot;: 4}
+}
+</code></pre>
+<h2>关联类型</h2>
+<h3>attachment（附件）</h3>
+<p><strong>用途</strong>：文件附件</p>
+<p><strong>值类型</strong>：<code>{&quot;attachments&quot;: Attachment[]}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;documents&quot;,
+  &quot;value&quot;: {
+    &quot;attachments&quot;: [
+      {
+        &quot;id&quot;: &quot;file-1&quot;,
+        &quot;name&quot;: &quot;invoice.pdf&quot;,
+        &quot;url&quot;: &quot;https://...&quot;,
+        &quot;size&quot;: 1024000,
+        &quot;mimeType&quot;: &quot;application/pdf&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<h3>user（用户）</h3>
+<p><strong>用途</strong>：单个用户引用</p>
+<p><strong>值类型</strong>：<code>{&quot;user&quot;: UserRef}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;assignee&quot;,
+  &quot;value&quot;: {
+    &quot;user&quot;: {
+      &quot;id&quot;: &quot;user-123&quot;,
+      &quot;name&quot;: &quot;张三&quot;,
+      &quot;email&quot;: &quot;zhangsan@example.com&quot;
+    }
+  }
+}
+</code></pre>
+<h3>collaborator（协作者）</h3>
+<p><strong>用途</strong>：多个用户引用</p>
+<p><strong>值类型</strong>：<code>{&quot;collaborators&quot;: UserRef[]}</code></p>
+<h3>relation（关联）</h3>
+<p><strong>用途</strong>：关联到其他文档的数据行</p>
+<p><strong>值类型</strong>：<code>{&quot;relations&quot;: RelationRef[]}</code></p>
+<p><strong>示例</strong>：</p>
+<pre><code class="language-json">{
+  &quot;fieldId&quot;: &quot;relatedProducts&quot;,
+  &quot;value&quot;: {
+    &quot;relations&quot;: [
+      {&quot;docType&quot;: &quot;product&quot;, &quot;docId&quot;: &quot;123&quot;, &quot;rowId&quot;: &quot;row-1&quot;},
+      {&quot;docType&quot;: &quot;product&quot;, &quot;docId&quot;: &quot;123&quot;, &quot;rowId&quot;: &quot;row-2&quot;}
+    ]
+  }
+}
+</code></pre>
+<h2>计算类型</h2>
+<h3>lookup（查找）</h3>
+<p><strong>用途</strong>：从关联记录中查找值</p>
+<p><strong>配置</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;lookup&quot;,
+  &quot;relationField&quot;: &quot;relatedProduct&quot;,
+  &quot;lookupField&quot;: &quot;price&quot;
+}
+</code></pre>
+<h3>rollup（汇总）</h3>
+<p><strong>用途</strong>：对关联记录进行聚合计算</p>
+<p><strong>配置</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;rollup&quot;,
+  &quot;relationField&quot;: &quot;orderItems&quot;,
+  &quot;rollupField&quot;: &quot;total&quot;,
+  &quot;aggregateFunction&quot;: &quot;sum&quot;
+}
+</code></pre>
+<p><strong>聚合函数</strong>：</p>
+<ul>
+<li><code>count</code> - 计数</li>
+<li><code>sum</code> - 求和</li>
+<li><code>avg</code> - 平均值</li>
+<li><code>min</code> - 最小值</li>
+<li><code>max</code> - 最大值</li>
+</ul>
+<h3>formula（公式）</h3>
+<p><strong>用途</strong>：根据公式计算</p>
+<p><strong>配置</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;formula&quot;,
+  &quot;formula&quot;: &quot;quantity * unitPrice&quot;
+}
+</code></pre>
+<p><strong>支持的运算符</strong>：</p>
+<ul>
+<li>算术：<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>%</code></li>
+<li>比较：<code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>, <code>==</code>, <code>!=</code></li>
+<li>逻辑：<code>&amp;&amp;</code>, <code>||</code>, <code>!</code></li>
+<li>函数：<code>SUM()</code>, <code>AVG()</code>, <code>IF()</code>, <code>ROUND()</code></li>
+</ul>
+<h3>auto_number（自动编号）</h3>
+<p><strong>用途</strong>：自动递增的序列号</p>
+<p><strong>值类型</strong>：<code>{&quot;number&quot;: int64}</code></p>
+<p><strong>配置</strong>：</p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;auto_number&quot;,
+  &quot;prefix&quot;: &quot;INV-&quot;,
+  &quot;digits&quot;: 6,
+  &quot;startFrom&quot;: 1
+}
+</code></pre>
+<p><strong>生成示例</strong>：<code>INV-000001</code>, <code>INV-000002</code>, ...</p>
+<h2>系统字段</h2>
+<p>这些字段由系统自动维护，不可手动修改。</p>
+<h3>created_time（创建时间）</h3>
+<p><strong>值类型</strong>：<code>{&quot;datetime&quot;: string}</code></p>
+<h3>updated_time（更新时间）</h3>
+<p><strong>值类型</strong>：<code>{&quot;datetime&quot;: string}</code></p>
+<h3>created_by（创建人）</h3>
+<p><strong>值类型</strong>：<code>{&quot;user&quot;: UserRef}</code></p>
+<h3>updated_by（最后更新人）</h3>
+<p><strong>值类型</strong>：<code>{&quot;user&quot;: UserRef}</code></p>
+<h2>字段配置通用选项</h2>
+<p>所有字段类型都支持以下配置：</p>
+<pre><code class="language-json">{
+  &quot;id&quot;: &quot;fieldId&quot;,
+  &quot;name&quot;: &quot;字段名称&quot;,
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;description&quot;: &quot;字段说明&quot;,
+  &quot;required&quot;: false,
+  &quot;unique&quot;: false,
+  &quot;readonly&quot;: false,
+  &quot;defaultValue&quot;: null,
+  &quot;validation&quot;: {}
+}
+</code></pre>
+<h3>配置说明</h3>
+<ul>
+<li><strong>id</strong>: 字段唯一标识符</li>
+<li><strong>name</strong>: 显示名称</li>
+<li><strong>type</strong>: 字段类型</li>
+<li><strong>description</strong>: 字段说明</li>
+<li><strong>required</strong>: 是否必填</li>
+<li><strong>unique</strong>: 是否唯一</li>
+<li><strong>readonly</strong>: 是否只读</li>
+<li><strong>defaultValue</strong>: 默认值</li>
+<li><strong>validation</strong>: 验证规则</li>
+</ul>
+<h2>值类型映射表</h2>
+<table>
+<thead>
+<tr>
+<th>字段类型</th>
+<th>JSON 值格式</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>text / long_text</td>
+<td><code>{&quot;text&quot;: &quot;...&quot;}</code></td>
+<td><code>{&quot;text&quot;: &quot;Hello&quot;}</code></td>
+</tr>
+<tr>
+<td>number / currency / percent</td>
+<td><code>{&quot;number&quot;: 123.45}</code></td>
+<td><code>{&quot;number&quot;: 99.99}</code></td>
+</tr>
+<tr>
+<td>boolean</td>
+<td><code>{&quot;boolean&quot;: true}</code></td>
+<td><code>{&quot;boolean&quot;: false}</code></td>
+</tr>
+<tr>
+<td>date</td>
+<td><code>{&quot;date&quot;: &quot;2024-12-01&quot;}</code></td>
+<td><code>{&quot;date&quot;: &quot;2024-12-01&quot;}</code></td>
+</tr>
+<tr>
+<td>datetime</td>
+<td><code>{&quot;datetime&quot;: &quot;...Z&quot;}</code></td>
+<td><code>{&quot;datetime&quot;: &quot;2024-12-01T10:00:00Z&quot;}</code></td>
+</tr>
+<tr>
+<td>duration</td>
+<td><code>{&quot;duration&quot;: 3600000}</code></td>
+<td><code>{&quot;duration&quot;: 3600000}</code></td>
+</tr>
+<tr>
+<td>single_select</td>
+<td><code>{&quot;selectOption&quot;: {...}}</code></td>
+<td><code>{&quot;selectOption&quot;: {&quot;id&quot;: &quot;opt-1&quot;}}</code></td>
+</tr>
+<tr>
+<td>multi_select</td>
+<td><code>{&quot;selectOptions&quot;: [{...}]}</code></td>
+<td><code>{&quot;selectOptions&quot;: [{&quot;id&quot;: &quot;opt-1&quot;}]}</code></td>
+</tr>
+<tr>
+<td>rating</td>
+<td><code>{&quot;rating&quot;: 4}</code></td>
+<td><code>{&quot;rating&quot;: 5}</code></td>
+</tr>
+<tr>
+<td>attachment</td>
+<td><code>{&quot;attachments&quot;: [{...}]}</code></td>
+<td><code>{&quot;attachments&quot;: [{&quot;id&quot;: &quot;file-1&quot;}]}</code></td>
+</tr>
+<tr>
+<td>user</td>
+<td><code>{&quot;user&quot;: {...}}</code></td>
+<td><code>{&quot;user&quot;: {&quot;id&quot;: &quot;user-123&quot;}}</code></td>
+</tr>
+<tr>
+<td>collaborator</td>
+<td><code>{&quot;collaborators&quot;: [{...}]}</code></td>
+<td><code>{&quot;collaborators&quot;: [{&quot;id&quot;: &quot;user-1&quot;}]}</code></td>
+</tr>
+<tr>
+<td>relation</td>
+<td><code>{&quot;relations&quot;: [{...}]}</code></td>
+<td><code>{&quot;relations&quot;: [{&quot;rowId&quot;: &quot;row-1&quot;}]}</code></td>
+</tr>
+</tbody></table>
+<h2>下一步</h2>
+<ul>
+<li>📖 阅读 <a href="../guides/data-operations.html">数据操作指南</a></li>
+<li>📊 阅读 <a href="../guides/document-model.html">文档模型详解</a></li>
+<li>💡 阅读 <a href="../guides/best-practices.html">最佳实践</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

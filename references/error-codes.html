@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错误码参考 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" >开发指南</a>
+                    <a href="/references/error-codes.html" class="active">参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>错误码参考</h1>
+<p>本文档列出了 NexusBook API 所有可能返回的错误码及其说明。</p>
+<h2>错误响应格式</h2>
+<p>所有错误响应遵循统一格式：</p>
+<pre><code class="language-json">{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;ERROR_CODE&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;错误信息（中文）&quot;,
+    &quot;en&quot;: &quot;Error message (English)&quot;
+  },
+  &quot;payload&quot;: null
+}
+</code></pre>
+<h2>HTTP 状态码映射</h2>
+<table>
+<thead>
+<tr>
+<th>HTTP 状态码</th>
+<th>说明</th>
+<th>示例错误码</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>400</td>
+<td>请求参数错误</td>
+<td><code>INVALID_PARAMETER</code>, <code>VALIDATION_ERROR</code></td>
+</tr>
+<tr>
+<td>401</td>
+<td>未认证</td>
+<td><code>INVALID_TOKEN</code>, <code>UNAUTHORIZED</code></td>
+</tr>
+<tr>
+<td>403</td>
+<td>权限不足</td>
+<td><code>FORBIDDEN</code>, <code>INSUFFICIENT_SCOPE</code></td>
+</tr>
+<tr>
+<td>404</td>
+<td>资源不存在</td>
+<td><code>DOC_NOT_FOUND</code>, <code>ROW_NOT_FOUND</code></td>
+</tr>
+<tr>
+<td>409</td>
+<td>资源冲突</td>
+<td><code>VERSION_CONFLICT</code>, <code>DUPLICATE_ID</code></td>
+</tr>
+<tr>
+<td>429</td>
+<td>请求过于频繁</td>
+<td><code>RATE_LIMIT_EXCEEDED</code></td>
+</tr>
+<tr>
+<td>500</td>
+<td>服务器错误</td>
+<td><code>INTERNAL_ERROR</code></td>
+</tr>
+</tbody></table>
+<h2>认证相关错误</h2>
+<h3>INVALID_CLIENT</h3>
+<ul>
+<li><strong>说明</strong>：客户端凭证无效</li>
+<li><strong>原因</strong>：client_id 或 client_secret 错误</li>
+<li><strong>解决方案</strong>：检查客户端凭证是否正确</li>
+</ul>
+<h3>INVALID_TOKEN</h3>
+<ul>
+<li><strong>说明</strong>：访问令牌无效或已过期</li>
+<li><strong>原因</strong>：Token 过期、格式错误或已被撤销</li>
+<li><strong>解决方案</strong>：使用 refresh_token 刷新或重新获取 Token</li>
+</ul>
+<h3>UNAUTHORIZED</h3>
+<ul>
+<li><strong>说明</strong>：未提供认证信息</li>
+<li><strong>原因</strong>：请求头中缺少 Authorization</li>
+<li><strong>解决方案</strong>：添加 <code>Authorization: Bearer YOUR_TOKEN</code></li>
+</ul>
+<h3>FORBIDDEN</h3>
+<ul>
+<li><strong>说明</strong>：权限不足</li>
+<li><strong>原因</strong>：Token 的 Scope 不包含所需权限</li>
+<li><strong>解决方案</strong>：请求包含所需权限的 Token</li>
+</ul>
+<h3>INSUFFICIENT_SCOPE</h3>
+<ul>
+<li><strong>说明</strong>：Scope 权限不足</li>
+<li><strong>原因</strong>：操作需要的权限未在 Token 中授予</li>
+<li><strong>解决方案</strong>：重新获取包含所需 Scope 的 Token</li>
+</ul>
+<h2>文档相关错误</h2>
+<h3>DOC_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：文档不存在</li>
+<li><strong>原因</strong>：指定的 doc-id 不存在</li>
+<li><strong>解决方案</strong>：检查文档 ID 是否正确</li>
+</ul>
+<h3>DOC_TYPE_UNKNOWN</h3>
+<ul>
+<li><strong>说明</strong>：未知的文档类型</li>
+<li><strong>原因</strong>：doc-type 参数不被支持</li>
+<li><strong>解决方案</strong>：检查文档类型拼写</li>
+</ul>
+<h3>DOC_ACCESS_DENIED</h3>
+<ul>
+<li><strong>说明</strong>：文档访问被拒绝</li>
+<li><strong>原因</strong>：用户无权访问该文档</li>
+<li><strong>解决方案</strong>：联系文档所有者授予权限</li>
+</ul>
+<h3>DOC_LOCKED</h3>
+<ul>
+<li><strong>说明</strong>：文档已被锁定</li>
+<li><strong>原因</strong>：文档处于锁定状态，不允许修改</li>
+<li><strong>解决方案</strong>：等待锁定解除或联系管理员</li>
+</ul>
+<h2>视图相关错误</h2>
+<h3>VIEW_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：视图不存在</li>
+<li><strong>原因</strong>：指定的 view-id 不存在</li>
+<li><strong>解决方案</strong>：检查视图 ID 是否正确</li>
+</ul>
+<h3>VIEW_INVALID_DEFINITION</h3>
+<ul>
+<li><strong>说明</strong>：视图定义无效</li>
+<li><strong>原因</strong>：视图配置不符合规范</li>
+<li><strong>解决方案</strong>：检查视图配置，确保字段 ID、过滤条件等正确</li>
+</ul>
+<h3>VIEW_PERMISSION_DENIED</h3>
+<ul>
+<li><strong>说明</strong>：无权操作视图</li>
+<li><strong>原因</strong>：用户无权创建、修改或删除视图</li>
+<li><strong>解决方案</strong>：请求 <code>views:manage</code> 权限</li>
+</ul>
+<h2>数据相关错误</h2>
+<h3>ROW_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：数据行不存在</li>
+<li><strong>原因</strong>：指定的 row-id 不存在</li>
+<li><strong>解决方案</strong>：检查行 ID 是否正确</li>
+</ul>
+<h3>FIELD_TYPE_MISMATCH</h3>
+<ul>
+<li><strong>说明</strong>：字段类型不匹配</li>
+<li><strong>原因</strong>：提供的值类型与字段定义不符</li>
+<li><strong>解决方案</strong>：检查字段值格式</li>
+</ul>
+<h3>CONSTRAINT_VIOLATION</h3>
+<ul>
+<li><strong>说明</strong>：约束违反</li>
+<li><strong>原因</strong>：违反了字段的验证规则（必填、唯一等）</li>
+<li><strong>解决方案</strong>：检查数据是否满足字段约束</li>
+</ul>
+<h3>VERSION_CONFLICT</h3>
+<ul>
+<li><strong>说明</strong>：版本冲突</li>
+<li><strong>原因</strong>：数据已被其他用户修改</li>
+<li><strong>解决方案</strong>：刷新数据后重试</li>
+</ul>
+<h3>DUPLICATE_ID</h3>
+<ul>
+<li><strong>说明</strong>：ID 重复</li>
+<li><strong>原因</strong>：尝试创建的 ID 已存在</li>
+<li><strong>解决方案</strong>：使用不同的 ID</li>
+</ul>
+<h3>INVALID_FIELD_ID</h3>
+<ul>
+<li><strong>说明</strong>：无效的字段 ID</li>
+<li><strong>原因</strong>：元数据中不存在该字段</li>
+<li><strong>解决方案</strong>：检查字段 ID 拼写</li>
+</ul>
+<h3>REQUIRED_FIELD_MISSING</h3>
+<ul>
+<li><strong>说明</strong>：必填字段缺失</li>
+<li><strong>原因</strong>：未提供必填字段的值</li>
+<li><strong>解决方案</strong>：补充必填字段</li>
+</ul>
+<h3>VALIDATION_ERROR</h3>
+<ul>
+<li><strong>说明</strong>：数据验证失败</li>
+<li><strong>原因</strong>：数据不符合验证规则</li>
+<li><strong>解决方案</strong>：检查数据格式和范围</li>
+</ul>
+<h2>评论相关错误</h2>
+<h3>COMMENT_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：评论不存在</li>
+<li><strong>原因</strong>：指定的 comment-id 不存在</li>
+<li><strong>解决方案</strong>：检查评论 ID 是否正确</li>
+</ul>
+<h3>COMMENT_PERMISSION_DENIED</h3>
+<ul>
+<li><strong>说明</strong>：无权操作评论</li>
+<li><strong>原因</strong>：只有评论创建者或管理员可以编辑/删除</li>
+<li><strong>解决方案</strong>：确认操作权限</li>
+</ul>
+<h2>审批相关错误</h2>
+<h3>APPROVAL_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：审批实例不存在</li>
+<li><strong>原因</strong>：指定的审批 ID 不存在</li>
+<li><strong>解决方案</strong>：检查审批 ID 是否正确</li>
+</ul>
+<h3>APPROVAL_ALREADY_COMPLETED</h3>
+<ul>
+<li><strong>说明</strong>：审批已完成</li>
+<li><strong>原因</strong>：审批流程已结束</li>
+<li><strong>解决方案</strong>：无需再次审批</li>
+</ul>
+<h3>APPROVAL_PERMISSION_DENIED</h3>
+<ul>
+<li><strong>说明</strong>：无审批权限</li>
+<li><strong>原因</strong>：用户不在审批人列表中</li>
+<li><strong>解决方案</strong>：确认审批权限</li>
+</ul>
+<h2>Webhook 相关错误</h2>
+<h3>WEBHOOK_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：Webhook 不存在</li>
+<li><strong>原因</strong>：指定的 webhook-id 不存在</li>
+<li><strong>解决方案</strong>：检查 Webhook ID</li>
+</ul>
+<h3>WEBHOOK_URL_INVALID</h3>
+<ul>
+<li><strong>说明</strong>：Webhook URL 无效</li>
+<li><strong>原因</strong>：URL 格式错误或无法访问</li>
+<li><strong>解决方案</strong>：检查 URL 格式</li>
+</ul>
+<h3>WEBHOOK_DELIVERY_FAILED</h3>
+<ul>
+<li><strong>说明</strong>：Webhook 投递失败</li>
+<li><strong>原因</strong>：目标服务器返回错误或超时</li>
+<li><strong>解决方案</strong>：检查目标服务器状态</li>
+</ul>
+<h2>请求相关错误</h2>
+<h3>REQUEST_NOT_FOUND</h3>
+<ul>
+<li><strong>说明</strong>：变更请求不存在</li>
+<li><strong>原因</strong>：指定的 request-id 不存在</li>
+<li><strong>解决方案</strong>：检查请求 ID</li>
+</ul>
+<h3>REQUEST_ALREADY_MERGED</h3>
+<ul>
+<li><strong>说明</strong>：请求已合并</li>
+<li><strong>原因</strong>：变更请求已经被合并</li>
+<li><strong>解决方案</strong>：无需再次合并</li>
+</ul>
+<h3>REQUEST_CONFLICT</h3>
+<ul>
+<li><strong>说明</strong>：请求冲突</li>
+<li><strong>原因</strong>：请求中的变更与当前状态冲突</li>
+<li><strong>解决方案</strong>：解决冲突后重试</li>
+</ul>
+<h2>通用错误</h2>
+<h3>INVALID_PARAMETER</h3>
+<ul>
+<li><strong>说明</strong>：参数无效</li>
+<li><strong>原因</strong>：请求参数格式错误或缺失</li>
+<li><strong>解决方案</strong>：检查请求参数</li>
+</ul>
+<h3>RATE_LIMIT_EXCEEDED</h3>
+<ul>
+<li><strong>说明</strong>：请求频率超限</li>
+<li><strong>原因</strong>：短时间内请求过多</li>
+<li><strong>解决方案</strong>：降低请求频率，查看 <code>Retry-After</code> 响应头</li>
+</ul>
+<h3>INTERNAL_ERROR</h3>
+<ul>
+<li><strong>说明</strong>：服务器内部错误</li>
+<li><strong>原因</strong>：服务器处理请求时发生异常</li>
+<li><strong>解决方案</strong>：稍后重试，如果持续出现请联系技术支持</li>
+</ul>
+<h3>SERVICE_UNAVAILABLE</h3>
+<ul>
+<li><strong>说明</strong>：服务暂时不可用</li>
+<li><strong>原因</strong>：服务器维护或过载</li>
+<li><strong>解决方案</strong>：稍后重试</li>
+</ul>
+<h2>错误处理最佳实践</h2>
+<h3>1. 错误重试策略</h3>
+<pre><code class="language-javascript">async function retryableRequest(requestFn, maxRetries = 3) {
+  const retryableCodes = [&#39;INTERNAL_ERROR&#39;, &#39;SERVICE_UNAVAILABLE&#39;];
+  
+  for (let i = 0; i &lt; maxRetries; i++) {
+    try {
+      return await requestFn();
+    } catch (error) {
+      if (!retryableCodes.includes(error.code) || i === maxRetries - 1) {
+        throw error;
+      }
+      
+      // 指数退避
+      await sleep(Math.pow(2, i) * 1000);
+    }
+  }
+}
+</code></pre>
+<h3>2. 用户友好提示</h3>
+<pre><code class="language-javascript">function getUserFriendlyMessage(error, userLang = &#39;zh&#39;) {
+  // 优先使用 API 返回的多语言消息
+  if (error.message &amp;&amp; error.message[userLang]) {
+    return error.message[userLang];
+  }
+  
+  // 降级到通用提示
+  const fallbackMessages = {
+    &#39;INVALID_TOKEN&#39;: &#39;登录已过期，请重新登录&#39;,
+    &#39;FORBIDDEN&#39;: &#39;您没有权限执行此操作&#39;,
+    &#39;VERSION_CONFLICT&#39;: &#39;数据已被修改，请刷新后重试&#39;,
+    &#39;RATE_LIMIT_EXCEEDED&#39;: &#39;操作过于频繁，请稍后再试&#39;
+  };
+  
+  return fallbackMessages[error.code] || &#39;操作失败，请稍后重试&#39;;
+}
+</code></pre>
+<h3>3. 错误日志记录</h3>
+<pre><code class="language-javascript">function logError(error, context) {
+  logger.error(&#39;API Error&#39;, {
+    code: error.code,
+    message: error.message,
+    endpoint: context.endpoint,
+    method: context.method,
+    userId: context.userId,
+    timestamp: new Date().toISOString()
+  });
+}
+</code></pre>
+<h2>实时协同相关错误</h2>
+<h3>WS_AUTH_FAILED</h3>
+<ul>
+<li><strong>说明</strong>：WebSocket 认证失败</li>
+<li><strong>原因</strong>：连接令牌无效或过期</li>
+<li><strong>解决方案</strong>：重新获取连接信息并认证</li>
+</ul>
+<h3>WS_RATE_LIMITED</h3>
+<ul>
+<li><strong>说明</strong>：WebSocket 消息速率超限</li>
+<li><strong>原因</strong>：单位时间内消息过多</li>
+<li><strong>解决方案</strong>：降低消息频率或启用批处理</li>
+</ul>
+<h3>LOCK_CONFLICT</h3>
+<ul>
+<li><strong>说明</strong>：单元格锁冲突</li>
+<li><strong>原因</strong>：目标单元格已被其他会话锁定</li>
+<li><strong>解决方案</strong>：等待释放或申请更长的锁定时间</li>
+</ul>
+<h3>SSE_UNSUPPORTED</h3>
+<ul>
+<li><strong>说明</strong>：目标环境不支持 SSE</li>
+<li><strong>原因</strong>：代理或浏览器限制</li>
+<li><strong>解决方案</strong>：改用 WebSocket 或轮询</li>
+</ul>
+<h2>下一步</h2>
+<ul>
+<li>📖 阅读 <a href="../api/index.html">API 参考文档</a></li>
+<li>🚀 阅读 <a href="../guides/getting-started.html">快速开始</a></li>
+<li>💡 阅读 <a href="../guides/best-practices.html">最佳实践</a></li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
