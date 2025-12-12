@@ -99,10 +99,59 @@ jobs:
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
 
+  # 构建 K3s 版本的文档
+  build-k3s-docs:
+    name: Build for K3s
+    runs-on: ubuntu-latest
+    # 标签推送时总是执行，手动触发时根据选择执行
+    if: |
+      github.event_name == 'push' || 
+      (github.event_name == 'workflow_dispatch' && 
+       (inputs.deploy_target == 'k3s' || inputs.deploy_target == 'both'))
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+          else
+            VERSION=$(git describe --tags --always)
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "✅ 版本: $VERSION"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build docs for K3s (no BASE_PATH)
+        run: make docs
+
+      - name: Deploy to openapi branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: openapi
+          commit_message: 'docs: update openapi docs ${{ steps.get_version.outputs.version || github.sha }}'
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
   # 构建 Docker 镜像用于 K3s
   build-docker-image:
     name: Build Docker Image
     runs-on: ubuntu-latest
+    needs: build-k3s-docs  # 等待文档构建并推送到 openapi 分支
     # 标签推送时总是执行，手动触发时根据选择执行
     if: |
       github.event_name == 'push' || 
@@ -114,10 +163,16 @@ jobs:
       image-tags: ${{ steps.meta.outputs.tags }}
     
     steps:
-      - name: Checkout
+      - name: Checkout main branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout openapi branch for docs
+        uses: actions/checkout@v4
+        with:
+          ref: openapi
+          path: docs
 
       - name: Get version
         id: get_version
@@ -230,7 +285,7 @@ jobs:
   summary:
     name: Deployment Summary
     runs-on: ubuntu-latest
-    needs: [build-github-pages, build-docker-image]
+    needs: [build-github-pages, build-k3s-docs, build-docker-image]
     if: always()
     
     steps:
