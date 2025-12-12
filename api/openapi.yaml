@@ -81,8 +81,8 @@ info:
     数据行使用版本号 (version) 进行并发控制。更新时需要提供当前版本号。
   version: 0.0.0
 servers:
-  - url: Open
-    description: https://open.nexusbook.app
+  - url: https://open.nexusbook.app
+    description: Open API Server
     variables: {}
 tags:
   - name: OAuth
