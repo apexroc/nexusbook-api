@@ -88,17 +88,11 @@ graph TB
             Org["🏢 Organization<br/>组织/租户<br/><small>数据隔离边界</small>"]
             OrgMember["👥 Organization Members<br/>组织成员<br/><small>owner/admin/member/guest</small>"]
             
-            subgraph "共享工作区 Shared Workspace"
-                MasterWS["📚 主数据中心<br/>Master Data Workspace<br/><small>visibility: public</small>"]
-                MasterDoc1["📄 产品目录<br/><small>product</small>"]
-                MasterDoc2["📄 供应商名录<br/><small>supplier</small>"]
-                MasterDoc3["📄 标准菜谱<br/><small>recipe</small>"]
-            end
-            
-            subgraph "业务工作区 Business Workspaces"
-                WS1["🍜 朝阳餐厅<br/>Workspace<br/><small>visibility: private</small>"]
-                WS2["🛍️ 海淀超市<br/>Workspace<br/><small>visibility: private</small>"]
-                WS3["🚚 绿源供应商<br/>Workspace<br/><small>visibility: private</small>"]
+            subgraph "工作区 Workspaces"
+                WS1["📚 主数据中心<br/>Workspace A<br/><small>包含 product, supplier</small>"]
+                WS2["🍜 朝阳餐厅<br/>Workspace B<br/><small>引用 A 的 product</small>"]
+                WS3["🛍️ 海淀超市<br/>Workspace C<br/><small>引用 A 的 product, supplier</small>"]
+                WS4["🚚 绿源供应商<br/>Workspace D<br/><small>独立数据</small>"]
             end
             
             WSMember["👥 Workspace Members<br/>工作区成员<br/><small>owner/editor/viewer</small>"]
@@ -107,10 +101,10 @@ graph TB
             JoinReq["📝 Join Request<br/>加入申请<br/><small>用户主动申请</small>"]
         end
         
-        subgraph "业务文档 Business Documents"
-            Doc1["📄 订货单<br/><small>purchase</small>"]
-            Doc2["📄 库存表<br/><small>inventory</small>"]
-            Doc3["📄 销售记录<br/><small>sales</small>"]
+        subgraph "数据共享关系 Data Sharing"
+            Ref1["🔗 B 引用 A.product<br/><small>readonly</small>"]
+            Ref2["🔗 C 引用 A.product<br/><small>readonly</small>"]
+            Ref3["🔗 C 引用 A.supplier<br/><small>readonly</small>"]
         end
     end
     
@@ -118,37 +112,34 @@ graph TB
     User -->|owner| Org
     User -->|加入| OrgMember
     
-    Org -->|包含| MasterWS
-    Org -->|包含1-N| WS1
-    Org -->|包含1-N| WS2
-    Org -->|包含1-N| WS3
-    
-    MasterWS -->|管理共享数据| MasterDoc1
-    MasterWS -->|管理共享数据| MasterDoc2
-    MasterWS -->|管理共享数据| MasterDoc3
+    Org -->|包含| WS1
+    Org -->|包含| WS2
+    Org -->|包含| WS3
+    Org -->|包含| WS4
+    Org -->|创建时自动创建| WS1
     
     OrgMember -->|需显式加入| WSMember
     
     Org -->|邀请用户| Invite
     Org -->|接受申请| JoinReq
     
-    WS1 -->|管理业务数据| Doc1
-    WS2 -->|管理业务数据| Doc2
-    WS3 -->|管理业务数据| Doc3
+    WS2 -.->|数据源引用| Ref1
+    WS3 -.->|数据源引用| Ref2
+    WS3 -.->|数据源引用| Ref3
     
-    Doc1 -.->|relation字段引用| MasterDoc1
-    Doc2 -.->|relation字段引用| MasterDoc1
-    Doc3 -.->|relation字段引用| MasterDoc2
+    Ref1 --> WS1
+    Ref2 --> WS1
+    Ref3 --> WS1
     
     style Org fill:#e1f5ff
-    style MasterWS fill:#d4edda
-    style WS1 fill:#fff4e6
+    style WS1 fill:#d4edda
     style WS2 fill:#fff4e6
     style WS3 fill:#fff4e6
+    style WS4 fill:#fff4e6
     style User fill:#f0f0f0
-    style MasterDoc1 fill:#c3e6cb
-    style MasterDoc2 fill:#c3e6cb
-    style MasterDoc3 fill:#c3e6cb
+    style Ref1 fill:#ffeaa7
+    style Ref2 fill:#ffeaa7
+    style Ref3 fill:#ffeaa7
 ```
 
 ### 核心概念说明
@@ -170,61 +161,299 @@ graph TB
   - `admin`：管理员，可管理成员、工作区、组织设置
   - `member`：普通成员，可访问被授权的工作区
   - `guest`：访客，仅能访问特定资源
-- **默认工作区**：创建组织时自动创建一个默认 Workspace
+- **默认工作区**：创建组织时自动创建一个默认 Workspace，通常作为主数据中心使用
 
 #### 3. Workspace（工作区）- 业务容器
 
-Workspace 分为两种类型：**共享工作区**和**业务工作区**。
+Workspace 是 Organization 内的数据组织容器，所有 Workspace 地位平等，通过**数据源引用**机制实现跨工作区数据共享。
 
-**📚 共享工作区（主数据中心）**：
-- **特殊标识**：`visibility: public`，组织内所有成员可见
-- **主要职责**：存放组织级共享主数据，供多个业务工作区引用
-- **典型数据**：
-  - 产品目录：餐饮集团的所有菜品信息
-  - 供应商名录：全部合作供应商的联系信息
-  - 标准菜谱：集团统一的菜品制作标准
-  - 质量标准、标准操作流程等
-- **权限控制**：
-  - 数据管理员：`editor`（可编辑主数据）
-  - 业务人员：`viewer`（只读访问，不能修改）
-
-**🍜 业务工作区**：
-- **业务隔离**：Workspace 是实际业务开展的容器，承载供应链管理的各种业务
-- **现实映射**：
-  - 🍜 餐厅：每家餐厅的独立运营管理（朝阳餐厅、西城餐厅等）
-  - 🛍️ 超市：超市的采购与库存管理（海淀超市、西单超市等）
-  - 🚚 供应商：供应商的订单与发货管理（绿源供应商、丰收农场等）
-  - 🏭 仓库：仓库的进出库管理
+**基本特性**：
+- **数据隔离**：每个 Workspace 的 Document 数据默认独立隔离
+- **灵活共享**：可选择性地引用其他 Workspace 的特定 document type 数据
 - **显式加入**：组织成员需要被显式添加到 Workspace 才能访问其中的内容
 - **成员角色**：
   - `owner`：工作区负责人，可管理工作区和成员
   - `editor`：编辑者，可创建和编辑文档
   - `viewer`：查看者，只读权限
 - **可见性控制**：
-  - `public`：组织内所有成员可见
+  - `public`：组织内所有成员可见（建议主数据中心使用）
   - `private`：仅成员可见（建议业务工作区使用）
 
-#### 4. Workspace 与 Document 的关系
+**典型场景**：
+- 📚 **主数据中心**：存放组织级共享主数据（产品目录、供应商名录、标准菜谱等）
+- 🍜 **餐厅工作区**：每家餐厅的独立运营管理（朝阳餐厅、西城餐厅等）
+- 🛍️ **超市工作区**：超市的采购与库存管理（海淀超市、西单超市等）
+- 🚚 **供应商工作区**：供应商的订单与发货管理（绿源供应商、丰收农场等）
+- 🏭 **仓库工作区**：仓库的进出库管理
 
-**一对多关系**：一个 Workspace 可以包含多个 Document
+#### 4. 数据源引用机制（Data Source Reference）
 
-**共享工作区的 Document**：
-- 产品目录 Document（`product` 类型）
-- 供应商名录 Document（`supplier` 类型）
-- 标准菜谱 Document（`recipe` 类型）
+**核心设计**：
 
-**业务工作区的 Document**：
-- 订货单 Document（`purchase` 类型）
-- 库存表 Document（`inventory` 类型）
-- 销售记录 Document（`sales` 类型）
-- 发货单 Document（`shipment` 类型）
+创建 Workspace 时，可以配置**数据源引用**，指定使用其他 Workspace 的特定 document type 数据。
 
-**跨 Workspace 数据引用**：
-- 业务工作区的 Document 可以通过 `relation` 字段类型引用共享工作区的主数据
-- 例如：餐厅的订货单中的“产品”字段关联到主数据中心的“产品目录”
-- 实现数据一致性：主数据更新后，所有引用处自动生效
+```typescript
+// 创建 Workspace 时配置数据源引用
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  "name": "🍜 朝阳餐厅",
+  "slug": "chaoyang-restaurant",
+  "visibility": "private",
+  "dataSourceReferences": [
+    {
+      "sourceWorkspaceId": "workspace-a",  // 主数据中心 ID
+      "documentType": "product",           // 引用的文档类型
+      "mode": "readonly",                  // 只读模式
+      "priority": 1                        // 优先级（用于排序）
+    }
+  ]
+}
+```
 
-**权限继承**：Document 的访问权限基于 Workspace 成员权限
+**数据管理上下文隔离**：
+
+⚠️ **重要原则**：用户在管理数据时，必须进入特定 Workspace 的上下文，只能修改当前 Workspace 的数据。
+
+```bash
+# ✅ 正确：在 Workspace B 中只能修改 B 的本地数据
+PATCH /api/v1/workspaces/{workspace-b}/documents/product/data/{rowId}
+{
+  "values": [
+    {"fieldId": "name", "value": {"text": "本店特色菜"}}
+  ]
+}
+# 只能修改 workspace-b 自己的 product 数据
+
+# ❌ 错误：不能在 Workspace B 中修改引用的数据
+PATCH /api/v1/workspaces/{workspace-b}/documents/product/data/{product-from-workspace-a}
+# 后端应返回 403 Forbidden，因为这是引用数据，只读
+
+# ✅ 正确：要修改主数据，必须切换到主数据中心的上下文
+PATCH /api/v1/workspaces/{workspace-a}/documents/product/data/{rowId}
+{
+  "values": [
+    {"fieldId": "unit_price", "value": {"currency": 52.00}}
+  ]
+}
+# 必须有 workspace-a 的 editor 权限
+```
+
+**🔐 安全防护机制**：
+
+虽然 API 路径包含 `workspaceId`，但**不会**存在篡改风险，因为后端会进行严格的权限校验：
+
+```typescript
+// 后端权限校验伪代码
+async function handleWorkspaceRequest(
+  workspaceId: string,  // 来自 URL 路径
+  userId: string,       // 来自认证 token
+  action: 'read' | 'write'
+) {
+  // 步骤1：验证用户是否是该 Workspace 的成员
+  const membership = await getWorkspaceMembership(workspaceId, userId);
+  if (!membership) {
+    throw new ForbiddenError(
+      `User ${userId} is not a member of workspace ${workspaceId}`
+    );
+  }
+  
+  // 步骤2：验证用户角色是否有对应权限
+  const hasPermission = checkRolePermission(membership.role, action);
+  if (!hasPermission) {
+    throw new ForbiddenError(
+      `Role ${membership.role} does not have ${action} permission`
+    );
+  }
+  
+  // 步骤3：对于写操作，额外验证数据来源
+  if (action === 'write') {
+    const data = await getData(rowId);
+    if (data._source.workspaceId !== workspaceId) {
+      throw new ForbiddenError(
+        `Cannot modify data from workspace ${data._source.workspaceId}`
+      );
+    }
+  }
+  
+  // 通过所有检查，允许操作
+  return true;
+}
+```
+
+**安全保障**：
+
+1. ✅ **认证层**：JWT Token 验证用户身份
+2. ✅ **成员校验**：检查用户是否是该 Workspace 成员
+3. ✅ **角色权限**：检查用户角色是否有操作权限
+4. ✅ **数据来源**：检查数据是否属于当前 Workspace
+5. ✅ **审计日志**：记录所有访问尝试（包括失败的）
+
+**恶意请求示例**：
+
+```bash
+# 恶意用户尝试访问无权限的 Workspace
+PATCH /api/v1/workspaces/{competitor-workspace}/documents/product/data/{rowId}
+Authorization: Bearer <attacker-token>
+
+# 后端响应：
+HTTP/1.1 403 Forbidden
+{
+  "error": {
+    "code": "WORKSPACE_ACCESS_DENIED",
+    "message": "User is not a member of workspace competitor-workspace",
+    "workspaceId": "competitor-workspace",
+    "userId": "attacker-id",
+    "timestamp": "2024-12-12T16:00:00Z"
+  }
+}
+
+# 同时记录审计日志：
+# [SECURITY] Unauthorized workspace access attempt
+#   User: attacker-id
+#   Workspace: competitor-workspace
+#   Action: WRITE
+#   IP: 192.168.1.100
+#   Timestamp: 2024-12-12T16:00:00Z
+```
+
+**查询逻辑**：
+
+当在 Workspace B 中查询 product 类型的 Document 数据时：
+
+```bash
+GET /api/v1/workspaces/{workspace-b}/documents/product/data
+```
+
+后端会自动合并数据：
+1. **本地数据**：Workspace B 自己的 product 数据（可编辑）
+2. **引用数据**：Workspace A 的 product 数据（只读）
+
+```json
+{
+  "items": [
+    {
+      "id": "product-001",
+      "name": "宫保鸡丁",
+      "price": 48.00,
+      "_source": {
+        "workspaceId": "workspace-a",
+        "workspaceName": "主数据中心",
+        "readonly": true  // 标记为只读
+      },
+      "_permissions": {
+        "canEdit": false,   // 不可编辑
+        "canDelete": false  // 不可删除
+      }
+    },
+    {
+      "id": "product-002",
+      "name": "本店特色菜",
+      "price": 58.00,
+      "_source": {
+        "workspaceId": "workspace-b",
+        "workspaceName": "朝阳餐厅",
+        "readonly": false  // 可编辑
+      },
+      "_permissions": {
+        "canEdit": true,    // 可编辑
+        "canDelete": true   // 可删除
+      }
+    }
+  ],
+  "meta": {
+    "totalCount": 2,
+    "sources": [
+      {"workspaceId": "workspace-b", "count": 1, "editable": true},
+      {"workspaceId": "workspace-a", "count": 1, "editable": false}
+    ]
+  }
+}
+```
+
+**核心特性**：
+
+1. **选择性共享**：只引用需要的 document type，不是全部共享
+2. **严格只读**：引用的数据不能修改，避免数据污染
+3. **上下文隔离**：用户必须切换到源 Workspace 才能修改源数据
+4. **数据标记**：明确标记数据来源和权限，前端可差异化显示
+5. **权限校验**：用户必须对源 Workspace 有读权限才能看到引用数据
+6. **多源引用**：可引用多个 Workspace 的不同 document type
+
+**优势分析**：
+
+✅ **架构统一**：所有 Workspace 地位平等，没有"特殊"工作区
+✅ **灵活性高**：可以精确控制哪些数据共享，哪些隔离
+✅ **权限清晰**：本地数据可编辑，引用数据只读，上下文隔离
+✅ **扩展性好**：支持复杂的数据共享关系
+✅ **数据安全**：源数据变更不会影响引用方逻辑，且只能在源 Workspace 修改
+✅ **职责分离**：主数据管理员在主数据中心维护，业务人员在各自 Workspace 使用
+
+**🛡️ 安全最佳实践**：
+
+1. **永远不信任客户端输入**：
+   - ❌ 错误：依赖前端校验 workspaceId
+   - ✅ 正确：后端总是验证 workspaceId 与用户权限
+
+2. **使用数据库关联查询**：
+   ```sql
+   -- ✅ 好：通过 JOIN 确保用户有权限
+   SELECT d.* FROM documents d
+   JOIN workspace_members wm 
+     ON d.workspace_id = wm.workspace_id 
+     AND wm.user_id = :userId
+   WHERE d.workspace_id = :workspaceId;
+   
+   -- ❌ 差：直接查询，没有权限检查
+   SELECT * FROM documents 
+   WHERE workspace_id = :workspaceId;
+   ```
+
+3. **实现资源级权限控制**：
+   ```typescript
+   // ✅ 好：每个操作都检查权限
+   @RequireWorkspaceMembership('editor')
+   async updateDocument(workspaceId, docId, userId) {
+     // 装饰器自动检查成员资格和角色
+   }
+   
+   // ❌ 差：仅检查用户登录状态
+   @RequireAuth()
+   async updateDocument(workspaceId, docId, userId) {
+     // 缺少 Workspace 成员校验
+   }
+   ```
+
+4. **记录详细审计日志**：
+   ```typescript
+   // 记录所有失败的访问尝试
+   if (!hasPermission) {
+     await auditLog.create({
+       level: 'SECURITY',
+       action: 'WORKSPACE_ACCESS_DENIED',
+       userId,
+       workspaceId,
+       ip: request.ip,
+       userAgent: request.headers['user-agent'],
+       timestamp: new Date()
+     });
+     
+     // 如果同一用户短时间内多次失败，发送告警
+     await checkForSuspiciousActivity(userId);
+   }
+   ```
+
+5. **限制访问频率**：
+   ```typescript
+   // 防止暴力枚举 workspaceId
+   @RateLimit({
+     maxAttempts: 10,
+     windowMs: 60000,  // 1分钟内最多10次
+     keyGenerator: (req) => `${req.userId}:workspace-access`
+   })
+   async accessWorkspace(workspaceId, userId) {
+     // ...
+   }
+   ```
 
 #### 5. 成员管理机制
 
@@ -346,38 +575,34 @@ POST /api/v1/organizations
   "description": "餐饮集团供应链管理"
 }
 
-# 返回：
-# - Organization ID
-# - 自动创建默认 Workspace
+# 系统自动执行：
+# - 创建 Organization
+# - 自动创建默认 Workspace（通常作为主数据中心使用）
 # - 创建者成为 owner
 ```
 
-#### 场景 3：创建主数据中心
+#### 场景 3：配置主数据中心
 ```bash
-# 3. 创建共享的主数据工作区
-POST /api/v1/organizations/{orgId}/workspaces
+# 3. 将默认 Workspace 配置为主数据中心
+PATCH /api/v1/organizations/{orgId}/workspaces/{defaultWsId}
 {
   "name": "📚 主数据中心",
   "slug": "master-data",
   "description": "集团共享主数据管理",
-  "visibility": "public",  // 组织内所有成员可见
-  "settings": {
-    "isShared": true,      // 自定义标识：共享工作区
-    "isMasterData": true   // 自定义标识：主数据工作区
-  }
+  "visibility": "public"  // 组织内所有成员可见
 }
 
-# 4. 添加数据管理员（可编辑主数据）
-POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
+# 4. 添加数据管理员
+POST /api/v1/organizations/{orgId}/workspaces/{defaultWsId}/members
 {
   "userId": "admin-user-id",
-  "role": "editor"  // 有权编辑产品目录
+  "role": "editor"  // 有权编辑主数据
 }
 
 # 5. 在主数据中心创建产品目录
 POST /api/v1/doc/product/create
 {
-  "workspaceId": "{masterDataWsId}",
+  "workspaceId": "{defaultWsId}",
   "name": "集团产品目录",
   "metadata": {
     "fields": [
@@ -413,122 +638,150 @@ POST /api/v1/organizations/{orgId}/invitations
 
 # 8. 被邀请人接受邀请
 POST /api/v1/invitations/{token}/accept
-
-# 9. 将餐厅经理加入主数据中心（viewer 角色）
-POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
-{
-  "userId": "manager-user-id",
-  "role": "viewer"  // 只读访问，不能修改主数据
-}
 ```
 
-#### 场景 5：创建业务工作区
+#### 场景 5：创建并引用主数据的业务工作区
 ```bash
-# 10a. 创建餐厅工作区
+# 9. 创建餐厅工作区（引用主数据中心的 product 数据）
 POST /api/v1/organizations/{orgId}/workspaces
 {
   "name": "🍜 朝阳餐厅",
   "slug": "chaoyang-restaurant",
   "description": "朝阳店运营管理",
-  "visibility": "private"
+  "visibility": "private",
+  "dataSourceReferences": [
+    {
+      "sourceWorkspaceId": "{masterDataWsId}",  // 引用主数据中心
+      "documentType": "product",                // 引用产品数据
+      "mode": "readonly",
+      "priority": 1
+    }
+  ]
 }
 
-# 10b. 创建超市工作区
+# 10. 创建超市工作区（引用 product 和 supplier）
 POST /api/v1/organizations/{orgId}/workspaces
 {
   "name": "🛍️ 海淀超市",
   "slug": "haidian-supermarket",
   "description": "海淀店采购与库存管理",
-  "visibility": "private"
+  "visibility": "private",
+  "dataSourceReferences": [
+    {
+      "sourceWorkspaceId": "{masterDataWsId}",
+      "documentType": "product",
+      "mode": "readonly",
+      "priority": 1
+    },
+    {
+      "sourceWorkspaceId": "{masterDataWsId}",
+      "documentType": "supplier",
+      "mode": "readonly",
+      "priority": 2
+    }
+  ]
 }
 
-# 10c. 创建供应商工作区
+# 11. 创建供应商工作区（不引用任何数据，独立管理）
 POST /api/v1/organizations/{orgId}/workspaces
 {
   "name": "🚚 绿源供应商",
   "slug": "greensource-supplier",
   "description": "绿源供应商订单管理",
   "visibility": "private"
+  // 不配置 dataSourceReferences，数据完全独立
 }
 
-# 11. 添加餐厅经理到工作区
+# 12. 添加餐厅经理
 POST /api/v1/organizations/{orgId}/workspaces/{restaurantWsId}/members
 {
   "userId": "restaurant-manager-id",
-  "role": "owner"  // 餐厅负责人
-}
-
-# 12. 添加超市采购员到工作区
-POST /api/v1/organizations/{orgId}/workspaces/{supermarketWsId}/members
-{
-  "userId": "purchaser-user-id",
-  "role": "editor"  // 可编辑订货单
+  "role": "owner"
 }
 ```
 
-#### 场景 6：创建订货单并引用主数据
+#### 场景 6：查询合并数据
 ```bash
-# 13. 在餐厅工作区创建订货单
-POST /api/v1/doc/purchase/create
+# 13. 在餐厅工作区查询 product 数据
+GET /api/v1/workspaces/{restaurantWsId}/documents/product/data
+
+# 返回结果（自动合并本地和引用数据）
 {
-  "workspaceId": "{restaurantWsId}",
-  "name": "2024年12月订货单",
-  "metadata": {
-    "fields": [
-      {
-        "id": "product",
-        "name": "产品",
-        "type": "relation",
-        "config": {
-          // 关联到主数据中心的产品目录
-          "targetWorkspace": "{masterDataWsId}",
-          "targetDocument": "{productDocId}",
-          "displayFields": ["name", "category", "unit_price"]
-        }
-      },
-      {"id": "quantity", "name": "数量", "type": "number"},
-      {"id": "total_price", "name": "总价", "type": "currency"}
+  "items": [
+    {
+      "id": "product-001",
+      "name": "宫保鸡丁",
+      "price": 48.00,
+      "_source": {
+        "workspaceId": "{masterDataWsId}",
+        "workspaceName": "主数据中心",
+        "readonly": true  // 来自主数据中心，只读
+      }
+    },
+    {
+      "id": "product-local-001",
+      "name": "本店特色菜",
+      "price": 68.00,
+      "_source": {
+        "workspaceId": "{restaurantWsId}",
+        "workspaceName": "朝阳餐厅",
+        "readonly": false  // 本地数据，可编辑
+      }
+    }
+  ],
+  "meta": {
+    "totalCount": 2,
+    "sources": [
+      {"workspaceId": "{restaurantWsId}", "count": 1},
+      {"workspaceId": "{masterDataWsId}", "count": 1}
     ]
   }
 }
 
-# 14. 添加订货数据（引用主数据）
-POST /api/v1/doc/purchase/{purchaseDocId}/data
+# 优势：
+# - 餐厅既能使用集团统一产品，也能添加本店特色菜
+# - 数据来源明确，前端可差异化显示（如只读数据灰色显示）
+# - 主数据更新后，所有引用处自动生效
+```
+
+#### 场景 7：动态添加数据源引用
+```bash
+# 14. 后续为工作区添加新的数据源引用
+PATCH /api/v1/organizations/{orgId}/workspaces/{restaurantWsId}
 {
-  "values": [
+  "dataSourceReferences": [
     {
-      "fieldId": "product",
-      "value": {
-        "relation": {
-          // 跨 Workspace 引用主数据中心的产品
-          "workspaceId": "{masterDataWsId}",
-          "documentId": "{productDocId}",
-          "rowId": "product-001"  // 宫保鸡丁
-        }
-      }
+      "sourceWorkspaceId": "{masterDataWsId}",
+      "documentType": "product",
+      "mode": "readonly",
+      "priority": 1
     },
-    {"fieldId": "quantity", "value": {"number": 50}},
-    {"fieldId": "total_price", "value": {"currency": 2400.00}}
+    {
+      // 新增：引用供应商数据
+      "sourceWorkspaceId": "{masterDataWsId}",
+      "documentType": "supplier",
+      "mode": "readonly",
+      "priority": 2
+    }
   ]
 }
 
-# 优势：
-# - 产品信息统一维护，主数据中心更新后所有引用处自动生效
-# - 避免多处重复录入相同产品，保证数据一致性
-# - 集团级产品价格调整时，所有餐厅的订货单自动同步
+# 优势：灵活调整数据共享关系，无需重建工作区
 ```
-
-#### 场景 7：查看共享数据
 
 ### 架构优势
 
-1. **灵活的组织结构**：支持个人、团队、企业多种组织类型
-2. **细粒度权限控制**：Organization 和 Workspace 双层角色体系
-3. **业务隔离**：不同业务（餐厅、超市、供应商、仓库）独立管理
-4. **协作友好**：完善的邀请和申请机制
-5. **可扩展性**：支持无限扩展 Workspace 和 Document
-6. **主数据管理**：通过共享 Workspace 实现组织级主数据统一管理
-7. **数据一致性**：跨 Workspace 引用机制，主数据更新自动同步到所有引用处
+1. **架构统一性**：所有 Workspace 地位平等，没有“特殊”工作区概念
+2. **灵活的数据共享**：通过数据源引用机制，精确控制哪些数据共享、哪些隔离
+3. **上下文隔离**：用户必须进入特定 Workspace 管理数据，只能修改当前 Workspace 的数据
+4. **细粒度权限控制**：Organization 和 Workspace 双层角色体系，引用数据自动只读
+5. **业务隔离**：不同业务（餐厅、超市、供应商、仓库）独立管理
+6. **协作友好**：完善的邀请和申请机制
+7. **可扩展性**：支持无限扩展 Workspace，支持复杂的多源引用关系
+8. **数据一致性**：主数据更新后，所有引用处自动生效，无需手动同步
+9. **职责分离**：主数据管理员在主数据中心维护，业务人员在各自 Workspace 使用
+10. **避免特殊化逻辑**：不需要为“共享工作区”实现特殊的业务逻辑
+
 
 ## 目录结构
 
