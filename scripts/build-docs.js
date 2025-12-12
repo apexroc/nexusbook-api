@@ -7,6 +7,7 @@ const yaml = require('js-yaml');
 
 const DOCS_DIR = path.join(__dirname, '../docs');
 const DOCS_SRC_DIR = path.join(__dirname, '../docs-src');
+const ADVANCED_SRC_DIR = path.join(__dirname, '../.qoder/repowiki/zh/content');
 const API_DIR = path.join(__dirname, '../api');
 const README_PATH = path.join(__dirname, '../README.md');
 const REDOCLY_CONFIG_PATH = path.join(__dirname, '../redocly.yaml');
@@ -100,6 +101,7 @@ async function generateHomePage() {
                 <a href="${resolvePath('index.html')}">首页</a>
                 <a href="${resolvePath('api/')}">API 参考</a>
                 <a href="${resolvePath('guides/getting-started.html')}">开发指南</a>
+                <a href="${resolvePath('advanced/README.html')}">高级手册</a>
                 <a href="${resolvePath('references/error-codes.html')}">参考文档</a>
                 <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
             </nav>
@@ -139,6 +141,13 @@ async function generateHomePage() {
                     </div>
 
                     <div class="feature-card">
+                        <div class="feature-icon">📖</div>
+                        <h3>高级手册</h3>
+                        <p>深入的架构设计、最佳实践、故障排除等高级主题，帮助你更好地使用 API。</p>
+                        <a href="${resolvePath('advanced/README.html')}" class="feature-link">查看手册 →</a>
+                    </div>
+
+                    <div class="feature-card">
                         <div class="feature-icon">🔔</div>
                         <h3>Webhook 指南</h3>
                         <p>事件驱动的通知机制，支持 20+ 种事件类型，自动推送变更通知。</p>
@@ -170,6 +179,18 @@ async function generateHomePage() {
                         <li><a href="${resolvePath('guides/examples.html')}">完整示例</a> - 常见场景的代码示例</li>
                         <li><a href="${resolvePath('guides/architecture.html')}">架构设计</a> - 系统架构和设计原则</li>
                         <li><a href="${resolvePath('guides/development.html')}">开发指南</a> - 项目开发和贡献指南</li>
+                    </ul>
+                </div>
+                <div class="doc-section">
+                    <h3>📖 高级手册</h3>
+                    <ul class="doc-list">
+                        <li><a href="${resolvePath('advanced/项目概述.html')}">项目概述</a> - NexusBook 平台的整体介绍和核心概念</li>
+                        <li><a href="${resolvePath('advanced/快速开始.html')}">快速开始</a> - 5分钟快速上手指南</li>
+                        <li><a href="${resolvePath('advanced/API参考.html')}">API 参考</a> - 完整的 API 接口文档</li>
+                        <li><a href="${resolvePath('advanced/认证与授权.html')}">认证与授权</a> - OAuth2、OIDC 和权限管理详解</li>
+                        <li><a href="${resolvePath('advanced/开发与部署.html')}">开发与部署</a> - 本地开发、测试和生产部署指南</li>
+                        <li><a href="${resolvePath('advanced/扩展与集成.html')}">扩展与集成</a> - Webhook、插件系统和第三方集成</li>
+                        <li><a href="${resolvePath('advanced/故障排除与最佳实践.html')}">故障排除与最佳实践</a> - 常见问题和性能优化建议</li>
                     </ul>
                 </div>
                 <div class="doc-section">
@@ -282,6 +303,7 @@ function generatePageTemplate(title, content, activeNav = '', currentPath = '') 
                     <a href="${resolvePath('index.html')}">首页</a>
                     <a href="${resolvePath('api/')}" ${activeNav === 'api' ? 'class="active"' : ''}>API 参考</a>
                     <a href="${resolvePath('guides/getting-started.html')}" ${activeNav === 'guides' ? 'class="active"' : ''}>开发指南</a>
+                    <a href="${resolvePath('advanced/README.html')}" ${activeNav === 'advanced' ? 'class="active"' : ''}>高级手册</a>
                     <a href="${resolvePath('references/error-codes.html')}" ${activeNav === 'references' ? 'class="active"' : ''}>参考文档</a>
                     <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
                 </nav>
@@ -304,6 +326,35 @@ function generatePageTemplate(title, content, activeNav = '', currentPath = '') 
     </div>
 </body>
 </html>`;
+}
+
+// 递归处理高级手册目录
+async function processAdvancedDocs() {
+  const advancedDestDir = path.join(DOCS_DIR, 'advanced');
+
+  async function processDirectory(srcDir, destDir, relativePath = '') {
+    const entries = await fs.readdir(srcDir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const srcPath = path.join(srcDir, entry.name);
+      const destPath = path.join(destDir, entry.name);
+      const currentRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+
+      if (entry.isDirectory()) {
+        // 创建目录并递归处理
+        await fs.ensureDir(destPath);
+        await processDirectory(srcPath, destPath, currentRelativePath);
+      } else if (entry.name.endsWith('.md')) {
+        // 转换 Markdown 文件
+        const htmlFileName = entry.name.replace('.md', '.html');
+        const htmlPath = path.join(destDir, htmlFileName);
+        const title = entry.name.replace('.md', '');
+        await convertMarkdownToHtml(srcPath, htmlPath, title, 'advanced');
+      }
+    }
+  }
+
+  await processDirectory(ADVANCED_SRC_DIR, advancedDestDir);
 }
 
 // 转换 Markdown 为 HTML
@@ -356,6 +407,7 @@ async function build() {
     await fs.ensureDir(DOCS_DIR);
     await fs.ensureDir(path.join(DOCS_DIR, 'guides'));
     await fs.ensureDir(path.join(DOCS_DIR, 'references'));
+    await fs.ensureDir(path.join(DOCS_DIR, 'advanced'));
     await fs.ensureDir(path.join(DOCS_DIR, 'styles'));
 
     // 复制样式文件
@@ -419,6 +471,10 @@ async function build() {
       const htmlPath = path.join(DOCS_DIR, 'references', `${ref.file}.html`);
       await convertMarkdownToHtml(mdPath, htmlPath, ref.title, 'references');
     }
+
+    // 转换高级手册文档
+    console.log('\n处理高级手册文档...');
+    await processAdvancedDocs();
 
     console.log('\n✅ 文档站点构建完成！');
   } catch (error) {
