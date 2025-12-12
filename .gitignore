@@ -5,3 +5,8 @@ tsp-output/
 
 # 生成的文档（不提交，只提交源文件 docs-src/）
 docs/
+
+*.kubeconfig
+
+# Deployment 配置文件需要提交
+!deployment/

@@ -57,6 +57,63 @@ serve: docs
 	@echo "Visit: http://localhost:$(DOCS_PORT)"
 	@npx http-server $(DOCS_DIR) -p $(DOCS_PORT) -o
 
-# 清理文档（仅删除生成的 HTML，保留 Markdown 源文件）
+# 清理文档(仅删除生成的 HTML,保留 Markdown 源文件)
 clean-docs:
 	@rm -rf $(DOCS_DIR)
+
+# K3s 部署相关命令
+DOCKER_REGISTRY ?= ghcr.io/apexroc
+IMAGE_NAME ?= nexusbook-api-docs
+VERSION ?= latest
+NAMESPACE ?= nexusbook
+
+# 构建 Docker 镜像
+docker-build:
+	@echo "Building Docker image..."
+	docker build -t $(DOCKER_REGISTRY)/$(IMAGE_NAME):$(VERSION) .
+	@echo "✅ Docker image built: $(DOCKER_REGISTRY)/$(IMAGE_NAME):$(VERSION)"
+
+# 推送 Docker 镜像
+docker-push:
+	@echo "Pushing Docker image..."
+	docker push $(DOCKER_REGISTRY)/$(IMAGE_NAME):$(VERSION)
+	@echo "✅ Docker image pushed: $(DOCKER_REGISTRY)/$(IMAGE_NAME):$(VERSION)"
+
+# 构建并推送镜像
+docker-release: docker-build docker-push
+
+# 部署到 K3s
+k3s-deploy:
+	@echo "Deploying to K3s cluster..."
+	@kubectl create namespace $(NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
+	@export DOCKER_REGISTRY=$(DOCKER_REGISTRY) VERSION=$(VERSION) && \
+		cat deployment/k3s-deployment.yaml | envsubst | kubectl apply -f -
+	@kubectl rollout status deployment/nexusbook-api-docs -n $(NAMESPACE) --timeout=5m
+	@echo "✅ Deployment successful!"
+
+# 查看 K3s 部署状态
+k3s-status:
+	@echo "Deployment Status:"
+	@kubectl get deployment nexusbook-api-docs -n $(NAMESPACE)
+	@echo ""
+	@echo "Pods:"
+	@kubectl get pods -n $(NAMESPACE) -l app=nexusbook-api-docs
+	@echo ""
+	@echo "Service:"
+	@kubectl get service nexusbook-api-docs -n $(NAMESPACE)
+	@echo ""
+	@echo "Ingress:"
+	@kubectl get ingress nexusbook-api-docs -n $(NAMESPACE)
+
+# 查看日志
+k3s-logs:
+	@kubectl logs -n $(NAMESPACE) -l app=nexusbook-api-docs --tail=100 -f
+
+# 删除 K3s 部署
+k3s-delete:
+	@echo "Deleting K3s deployment..."
+	@kubectl delete -f deployment/k3s-deployment.yaml -n $(NAMESPACE) || true
+	@echo "✅ Deployment deleted"
+
+# 完整的发布流程: 构建镜像 -> 推送镜像 -> 部署到 K3s
+release: docker-release k3s-deploy k3s-status
