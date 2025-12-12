@@ -40,8 +40,14 @@ clean:
 DOCS_DIR := docs
 DOCS_PORT ?= $(PORT)
 
+# 构建高级手册 (Docsify)
+build-advanced-docs:
+	@echo "Building advanced documentation with Docsify..."
+	@node scripts/build-advanced-docs.js
+	@echo "✅ Advanced documentation built!"
+
 # 构建完整文档站点
-docs: build-docs
+docs: build-docs build-advanced-docs
 	@echo "Building documentation site..."
 	@mkdir -p $(DOCS_DIR)/api $(DOCS_DIR)/guides $(DOCS_DIR)/references $(DOCS_DIR)/styles
 	@# 复制 API 文档
@@ -55,6 +61,7 @@ docs: build-docs
 serve: docs
 	@echo "Starting documentation server on port $(DOCS_PORT)..."
 	@echo "Visit: http://localhost:$(DOCS_PORT)"
+	@echo "Advanced Docs: http://localhost:$(DOCS_PORT)/advanced/"
 	@npx http-server $(DOCS_DIR) -p $(DOCS_PORT) -o
 
 # 清理文档(仅删除生成的 HTML,保留 Markdown 源文件)

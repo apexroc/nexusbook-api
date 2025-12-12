@@ -3,6 +3,7 @@
     "build:docs": "make docs",
     "build:openapi": "make openapi",
     "build-docs": "node scripts/build-docs.js",
+    "build-advanced-docs": "node scripts/build-advanced-docs.js",
     "build-for-github": "./scripts/build-for-github.sh"
   },
   "devDependencies": {
