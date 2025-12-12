@@ -93,7 +93,7 @@ using OpenAPI;
  *
  * 数据行使用版本号 (version) 进行并发控制。更新时需要提供当前版本号。
  */
-@server("Open", "https://open.nexusbook.app")
+@server("https://open.nexusbook.app", "Open API Server")
 @service(#{ title: "NexusBook OpenAPI" })
 namespace NexusBook.Api {
 /**
@@ -121,7 +121,7 @@ namespace NexusBook.Api {
  *
  * 标准 OIDC 发现端点: /.well-known/openid-configuration
  */
-@server("Auth", "https://auth.nexusbook.app")
+@server("https://auth.nexusbook.app", "Auth API Server")
 @service(#{ title: "NexusBook Auth API" })
 namespace NexusBook.Auth {
 /**
