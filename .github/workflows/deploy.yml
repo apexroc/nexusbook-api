@@ -28,7 +28,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-docs
+  IMAGE_NAME: nexusbook-api-docs
 
 jobs:
   # 构建文档（同时构建 GitHub Pages 和 K3s 两个版本）
@@ -188,7 +188,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -239,7 +239,7 @@ jobs:
       - name: Deploy to K3s
         run: |
           VERSION=${{ needs.build-docker-image.outputs.version }}
-          DOCKER_IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$VERSION"
+          DOCKER_IMAGE="${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:$VERSION"
           
           export DOCKER_IMAGE
           
@@ -259,7 +259,7 @@ jobs:
           echo "## 🚀 K3s Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Version:** ${{ needs.build-docker-image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image:** ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-docker-image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image:** ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ needs.build-docker-image.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **URL:** https://open.nexusbook.app" >> $GITHUB_STEP_SUMMARY
           echo "- **Namespace:** nexusbook" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
