@@ -3,11 +3,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# 安装 make (Alpine 需要)
+RUN apk add --no-cache make
+
 # 复制依赖文件
 COPY package*.json ./
 COPY tspconfig.yaml ./
 COPY redocly.yaml ./
 COPY sidebars.yaml ./
+COPY Makefile ./
 
 # 安装依赖
 RUN npm ci
@@ -18,7 +22,7 @@ COPY docs-src/ ./docs-src/
 COPY scripts/ ./scripts/
 
 # 构建文档 (不使用 BASE_PATH，K3s 部署使用根路径)
-RUN npm run build:docs
+RUN make docs
 
 # 生产镜像 - 使用 nginx 提供静态文件服务
 FROM nginx:alpine
