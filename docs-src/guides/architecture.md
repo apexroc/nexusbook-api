@@ -75,6 +75,461 @@ graph TB
 - **查询能力** - 强大的过滤、排序、分组和聚合查询
 - **认证授权** - OAuth2/OIDC 标准认证，基于 Scope 的权限控制
 
+## 租户数据核心概念架构
+
+NexusBook 采用多租户 SaaS 架构，通过 Organization（组织）和 Workspace（工作区）实现数据隔离和权限管理，设计理念参考 Miro 的协作模式。
+
+```mermaid
+graph TB
+    subgraph "多租户架构 Multi-Tenant Architecture"
+        User["👤 User<br/>用户<br/><small>独立实体</small>"]
+        
+        subgraph "Organization 组织（租户）"
+            Org["🏢 Organization<br/>组织/租户<br/><small>数据隔离边界</small>"]
+            OrgMember["👥 Organization Members<br/>组织成员<br/><small>owner/admin/member/guest</small>"]
+            
+            subgraph "共享工作区 Shared Workspace"
+                MasterWS["📚 主数据中心<br/>Master Data Workspace<br/><small>visibility: public</small>"]
+                MasterDoc1["📄 产品目录<br/><small>product</small>"]
+                MasterDoc2["📄 供应商名录<br/><small>supplier</small>"]
+                MasterDoc3["📄 标准菜谱<br/><small>recipe</small>"]
+            end
+            
+            subgraph "业务工作区 Business Workspaces"
+                WS1["🍜 朝阳餐厅<br/>Workspace<br/><small>visibility: private</small>"]
+                WS2["🛍️ 海淀超市<br/>Workspace<br/><small>visibility: private</small>"]
+                WS3["🚚 绿源供应商<br/>Workspace<br/><small>visibility: private</small>"]
+            end
+            
+            WSMember["👥 Workspace Members<br/>工作区成员<br/><small>owner/editor/viewer</small>"]
+            
+            Invite["✉️ Invitation<br/>邀请机制<br/><small>邮箱邀请</small>"]
+            JoinReq["📝 Join Request<br/>加入申请<br/><small>用户主动申请</small>"]
+        end
+        
+        subgraph "业务文档 Business Documents"
+            Doc1["📄 订货单<br/><small>purchase</small>"]
+            Doc2["📄 库存表<br/><small>inventory</small>"]
+            Doc3["📄 销售记录<br/><small>sales</small>"]
+        end
+    end
+    
+    User -->|注册时自动创建| Org
+    User -->|owner| Org
+    User -->|加入| OrgMember
+    
+    Org -->|包含| MasterWS
+    Org -->|包含1-N| WS1
+    Org -->|包含1-N| WS2
+    Org -->|包含1-N| WS3
+    
+    MasterWS -->|管理共享数据| MasterDoc1
+    MasterWS -->|管理共享数据| MasterDoc2
+    MasterWS -->|管理共享数据| MasterDoc3
+    
+    OrgMember -->|需显式加入| WSMember
+    
+    Org -->|邀请用户| Invite
+    Org -->|接受申请| JoinReq
+    
+    WS1 -->|管理业务数据| Doc1
+    WS2 -->|管理业务数据| Doc2
+    WS3 -->|管理业务数据| Doc3
+    
+    Doc1 -.->|relation字段引用| MasterDoc1
+    Doc2 -.->|relation字段引用| MasterDoc1
+    Doc3 -.->|relation字段引用| MasterDoc2
+    
+    style Org fill:#e1f5ff
+    style MasterWS fill:#d4edda
+    style WS1 fill:#fff4e6
+    style WS2 fill:#fff4e6
+    style WS3 fill:#fff4e6
+    style User fill:#f0f0f0
+    style MasterDoc1 fill:#c3e6cb
+    style MasterDoc2 fill:#c3e6cb
+    style MasterDoc3 fill:#c3e6cb
+```
+
+### 核心概念说明
+
+#### 1. User（用户）- 独立身份实体
+- **独立性**：用户是系统中的独立实体，不依附于任何组织
+- **自动组织**：用户注册时，系统自动创建一个 Personal 类型的 Organization，用户成为该组织的 owner
+- **多组织成员**：一个用户可以同时是多个 Organization 的成员
+- **身份验证**：支持邮箱/密码、OAuth 第三方登录（Google、GitHub、微信、钉钉、飞书）
+
+#### 2. Organization（组织）- 租户边界
+- **租户隔离**：Organization 是数据隔离的基本单元，类似 Miro 的 Team
+- **组织类型**：
+  - `personal`：个人组织（用户注册时自动创建）
+  - `team`：团队组织
+  - `enterprise`：企业组织
+- **成员角色**：
+  - `owner`：组织拥有者，拥有所有权限（包括删除组织、转让所有权）
+  - `admin`：管理员，可管理成员、工作区、组织设置
+  - `member`：普通成员，可访问被授权的工作区
+  - `guest`：访客，仅能访问特定资源
+- **默认工作区**：创建组织时自动创建一个默认 Workspace
+
+#### 3. Workspace（工作区）- 业务容器
+
+Workspace 分为两种类型：**共享工作区**和**业务工作区**。
+
+**📚 共享工作区（主数据中心）**：
+- **特殊标识**：`visibility: public`，组织内所有成员可见
+- **主要职责**：存放组织级共享主数据，供多个业务工作区引用
+- **典型数据**：
+  - 产品目录：餐饮集团的所有菜品信息
+  - 供应商名录：全部合作供应商的联系信息
+  - 标准菜谱：集团统一的菜品制作标准
+  - 质量标准、标准操作流程等
+- **权限控制**：
+  - 数据管理员：`editor`（可编辑主数据）
+  - 业务人员：`viewer`（只读访问，不能修改）
+
+**🍜 业务工作区**：
+- **业务隔离**：Workspace 是实际业务开展的容器，承载供应链管理的各种业务
+- **现实映射**：
+  - 🍜 餐厅：每家餐厅的独立运营管理（朝阳餐厅、西城餐厅等）
+  - 🛍️ 超市：超市的采购与库存管理（海淀超市、西单超市等）
+  - 🚚 供应商：供应商的订单与发货管理（绿源供应商、丰收农场等）
+  - 🏭 仓库：仓库的进出库管理
+- **显式加入**：组织成员需要被显式添加到 Workspace 才能访问其中的内容
+- **成员角色**：
+  - `owner`：工作区负责人，可管理工作区和成员
+  - `editor`：编辑者，可创建和编辑文档
+  - `viewer`：查看者，只读权限
+- **可见性控制**：
+  - `public`：组织内所有成员可见
+  - `private`：仅成员可见（建议业务工作区使用）
+
+#### 4. Workspace 与 Document 的关系
+
+**一对多关系**：一个 Workspace 可以包含多个 Document
+
+**共享工作区的 Document**：
+- 产品目录 Document（`product` 类型）
+- 供应商名录 Document（`supplier` 类型）
+- 标准菜谱 Document（`recipe` 类型）
+
+**业务工作区的 Document**：
+- 订货单 Document（`purchase` 类型）
+- 库存表 Document（`inventory` 类型）
+- 销售记录 Document（`sales` 类型）
+- 发货单 Document（`shipment` 类型）
+
+**跨 Workspace 数据引用**：
+- 业务工作区的 Document 可以通过 `relation` 字段类型引用共享工作区的主数据
+- 例如：餐厅的订货单中的“产品”字段关联到主数据中心的“产品目录”
+- 实现数据一致性：主数据更新后，所有引用处自动生效
+
+**权限继承**：Document 的访问权限基于 Workspace 成员权限
+
+#### 5. 成员管理机制
+
+**邀请流程（Invitation）**：
+```mermaid
+sequenceDiagram
+    participant Admin as 👤 管理员<br/>(owner/admin)
+    participant System as 🌐 系统
+    participant User as 👤 被邀请用户
+    participant Email as 📧 邮件
+
+    Admin->>System: POST /organizations/{id}/invitations<br/>创建邀请
+    System->>Email: 发送邀请邮件（包含令牌链接）
+    Email->>User: 接收邮件
+    User->>System: POST /invitations/{token}/accept<br/>接受邀请
+    System->>System: 创建 OrganizationMember
+    System-->>User: 成功加入组织
+    
+    Note over Admin,User: 管理员可以撤销未接受的邀请<br/>DELETE /invitations/{id}
+```
+
+**加入申请流程（Join Request）**：
+```mermaid
+sequenceDiagram
+    participant User as 👤 申请用户
+    participant System as 🌐 系统
+    participant Admin as 👤 管理员<br/>(owner/admin)
+
+    User->>System: POST /organizations/{id}/join-requests<br/>提交申请
+    System->>Admin: 通知有新申请
+    Admin->>System: GET /join-requests<br/>查看申请列表
+    
+    alt 批准申请
+        Admin->>System: POST /join-requests/{id}/approve<br/>批准
+        System->>System: 创建 OrganizationMember
+        System-->>User: 通知申请通过
+    else 拒绝申请
+        Admin->>System: POST /join-requests/{id}/reject<br/>拒绝
+        System-->>User: 通知申请被拒绝（含原因）
+    end
+    
+    Note over User,Admin: 用户可以取消自己的申请<br/>DELETE /join-requests/{id}
+```
+
+#### 6. 角色权限矩阵
+
+**Organization 角色权限**：
+
+| 操作 | owner | admin | member | guest |
+|------|-------|-------|--------|-------|
+| 查看组织信息 | ✅ | ✅ | ✅ | ✅ |
+| 更新组织设置 | ✅ | ✅ | ❌ | ❌ |
+| 删除组织 | ✅ | ❌ | ❌ | ❌ |
+| 邀请成员 | ✅ | ✅ | ❌ | ❌ |
+| 管理成员角色 | ✅ | ✅ | ❌ | ❌ |
+| 移除成员 | ✅ | ✅ | ❌ | ❌ |
+| 创建工作区 | ✅ | ✅ | ❌ | ❌ |
+| 管理工作区 | ✅ | ✅ | ❌ | ❌ |
+
+**Workspace 角色权限**：
+
+| 操作 | owner | editor | viewer |
+|------|-------|--------|--------|
+| 查看工作区 | ✅ | ✅ | ✅ |
+| 查看文档 | ✅ | ✅ | ✅ |
+| 创建文档 | ✅ | ✅ | ❌ |
+| 编辑文档 | ✅ | ✅ | ❌ |
+| 删除文档 | ✅ | ✅ | ❌ |
+| 管理成员 | ✅ | ❌ | ❌ |
+| 工作区设置 | ✅ | ❌ | ❌ |
+
+#### 7. 数据隔离与安全
+
+**隔离层级**：
+```
+Organization（租户级隔离）
+  └── Workspace（业务级隔离）
+        └── Document（文档级隔离）
+              ├── Properties（文档属性）
+              ├── Metadata（字段定义）
+              ├── Data（数据行）
+              └── Views（视图配置）
+```
+
+**权限校验流程**：
+1. **用户身份验证**：验证 JWT Token
+2. **组织成员检查**：确认用户是该 Organization 的成员
+3. **工作区权限检查**：确认用户在该 Workspace 中的角色
+4. **操作权限验证**：根据角色验证是否有权限执行操作
+5. **数据访问控制**：仅返回用户有权访问的数据
+
+### 典型使用场景
+
+#### 场景 1：新用户注册
+```bash
+# 1. 用户注册
+POST /api/v1/auth/register
+{
+  "email": "user@example.com",
+  "password": "******",
+  "displayName": "张三"
+}
+
+# 系统自动执行：
+# - 创建 User 记录
+# - 创建个人 Organization（type: personal）
+# - 创建默认 Workspace
+# - 设置用户为 Organization owner
+```
+
+#### 场景 2：创建团队组织
+```bash
+# 2. 创建餐饮集团组织
+POST /api/v1/organizations
+{
+  "name": "鲜食餐饮集团",
+  "slug": "fresh-dining",
+  "type": "enterprise",
+  "description": "餐饮集团供应链管理"
+}
+
+# 返回：
+# - Organization ID
+# - 自动创建默认 Workspace
+# - 创建者成为 owner
+```
+
+#### 场景 3：创建主数据中心
+```bash
+# 3. 创建共享的主数据工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  "name": "📚 主数据中心",
+  "slug": "master-data",
+  "description": "集团共享主数据管理",
+  "visibility": "public",  // 组织内所有成员可见
+  "settings": {
+    "isShared": true,      // 自定义标识：共享工作区
+    "isMasterData": true   // 自定义标识：主数据工作区
+  }
+}
+
+# 4. 添加数据管理员（可编辑主数据）
+POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
+{
+  "userId": "admin-user-id",
+  "role": "editor"  // 有权编辑产品目录
+}
+
+# 5. 在主数据中心创建产品目录
+POST /api/v1/doc/product/create
+{
+  "workspaceId": "{masterDataWsId}",
+  "name": "集团产品目录",
+  "metadata": {
+    "fields": [
+      {"id": "name", "name": "菜品名称", "type": "text"},
+      {"id": "category", "name": "类别", "type": "single_select"},
+      {"id": "unit_price", "name": "标准价格", "type": "currency"},
+      {"id": "unit", "name": "计量单位", "type": "text"}
+    ]
+  }
+}
+
+# 6. 添加产品数据
+POST /api/v1/doc/product/{productDocId}/data
+{
+  "values": [
+    {"fieldId": "name", "value": {"text": "宫保鸡丁"}},
+    {"fieldId": "category", "value": {"selectOption": {"id": "main-course"}}},
+    {"fieldId": "unit_price", "value": {"currency": 48.00}},
+    {"fieldId": "unit", "value": {"text": "份"}}
+  ]
+}
+```
+
+#### 场景 4：邀请团队成员
+```bash
+# 7. 邀请成员加入组织
+POST /api/v1/organizations/{orgId}/invitations
+{
+  "email": "manager@example.com",
+  "role": "admin",
+  "message": "欢迎加入餐饮集团管理团队！"
+}
+
+# 8. 被邀请人接受邀请
+POST /api/v1/invitations/{token}/accept
+
+# 9. 将餐厅经理加入主数据中心（viewer 角色）
+POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
+{
+  "userId": "manager-user-id",
+  "role": "viewer"  // 只读访问，不能修改主数据
+}
+```
+
+#### 场景 5：创建业务工作区
+```bash
+# 10a. 创建餐厅工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  "name": "🍜 朝阳餐厅",
+  "slug": "chaoyang-restaurant",
+  "description": "朝阳店运营管理",
+  "visibility": "private"
+}
+
+# 10b. 创建超市工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  "name": "🛍️ 海淀超市",
+  "slug": "haidian-supermarket",
+  "description": "海淀店采购与库存管理",
+  "visibility": "private"
+}
+
+# 10c. 创建供应商工作区
+POST /api/v1/organizations/{orgId}/workspaces
+{
+  "name": "🚚 绿源供应商",
+  "slug": "greensource-supplier",
+  "description": "绿源供应商订单管理",
+  "visibility": "private"
+}
+
+# 11. 添加餐厅经理到工作区
+POST /api/v1/organizations/{orgId}/workspaces/{restaurantWsId}/members
+{
+  "userId": "restaurant-manager-id",
+  "role": "owner"  // 餐厅负责人
+}
+
+# 12. 添加超市采购员到工作区
+POST /api/v1/organizations/{orgId}/workspaces/{supermarketWsId}/members
+{
+  "userId": "purchaser-user-id",
+  "role": "editor"  // 可编辑订货单
+}
+```
+
+#### 场景 6：创建订货单并引用主数据
+```bash
+# 13. 在餐厅工作区创建订货单
+POST /api/v1/doc/purchase/create
+{
+  "workspaceId": "{restaurantWsId}",
+  "name": "2024年12月订货单",
+  "metadata": {
+    "fields": [
+      {
+        "id": "product",
+        "name": "产品",
+        "type": "relation",
+        "config": {
+          // 关联到主数据中心的产品目录
+          "targetWorkspace": "{masterDataWsId}",
+          "targetDocument": "{productDocId}",
+          "displayFields": ["name", "category", "unit_price"]
+        }
+      },
+      {"id": "quantity", "name": "数量", "type": "number"},
+      {"id": "total_price", "name": "总价", "type": "currency"}
+    ]
+  }
+}
+
+# 14. 添加订货数据（引用主数据）
+POST /api/v1/doc/purchase/{purchaseDocId}/data
+{
+  "values": [
+    {
+      "fieldId": "product",
+      "value": {
+        "relation": {
+          // 跨 Workspace 引用主数据中心的产品
+          "workspaceId": "{masterDataWsId}",
+          "documentId": "{productDocId}",
+          "rowId": "product-001"  // 宫保鸡丁
+        }
+      }
+    },
+    {"fieldId": "quantity", "value": {"number": 50}},
+    {"fieldId": "total_price", "value": {"currency": 2400.00}}
+  ]
+}
+
+# 优势：
+# - 产品信息统一维护，主数据中心更新后所有引用处自动生效
+# - 避免多处重复录入相同产品，保证数据一致性
+# - 集团级产品价格调整时，所有餐厅的订货单自动同步
+```
+
+#### 场景 7：查看共享数据
+
+### 架构优势
+
+1. **灵活的组织结构**：支持个人、团队、企业多种组织类型
+2. **细粒度权限控制**：Organization 和 Workspace 双层角色体系
+3. **业务隔离**：不同业务（餐厅、超市、供应商、仓库）独立管理
+4. **协作友好**：完善的邀请和申请机制
+5. **可扩展性**：支持无限扩展 Workspace 和 Document
+6. **主数据管理**：通过共享 Workspace 实现组织级主数据统一管理
+7. **数据一致性**：跨 Workspace 引用机制，主数据更新自动同步到所有引用处
+
 ## 目录结构
 
 ```
