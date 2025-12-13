@@ -13,6 +13,10 @@
  * - sync/ - 数据同步
  * - realtime/ - 实时协作 (Yjs)
  * - tenant-document.tsp - 组织和工作区级文档支持
+ * - catalog/ - Catalog 产品目录管理（供应链协作）
+ * - orderbook/ - OrderBook 订货本管理（供应链协作）
+ * - connection/ - Connection 跨组织数据分享（供应链协作）
+ * - connector/ - Connector 组织内部文档联动（供应链协作）
  *
  * 依赖关系：
  * - shared/index.tsp - 基础共享类型
@@ -28,3 +32,7 @@ import "./attachments/index.tsp";
 import "./sync/index.tsp";
 import "./realtime/index.tsp";
 import "./tenant-document.tsp";
+import "./catalog/index.tsp";
+import "./orderbook/index.tsp";
+import "./connection/index.tsp";
+import "./connector/index.tsp";
