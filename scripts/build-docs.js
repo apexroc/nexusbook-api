@@ -172,11 +172,13 @@ async function generateHomePage() {
                         <li><a href="${resolvePath('guides/getting-started.html')}">快速开始</a> - 5分钟了解如何使用 API</li>
                         <li><a href="${resolvePath('guides/authentication.html')}">认证授权指南</a> - OAuth2、OIDC 和 JWT 详解</li>
                         <li><a href="${resolvePath('guides/document-model.html')}">文档模型详解</a> - 统一文档抽象和字段类型</li>
+                        <li><a href="${resolvePath('guides/document-model-complete.html')}">文档模型完整版</a> - 文档模型的完整详细说明</li>
                         <li><a href="${resolvePath('guides/data-operations.html')}">数据操作指南</a> - CRUD 操作和高级查询</li>
                         <li><a href="${resolvePath('guides/webhooks.html')}">Webhook 使用指南</a> - 事件驱动通知机制</li>
+                        <li><a href="${resolvePath('guides/realtime-collaboration.html')}">实时协同开发指南</a> - 实时协作功能和使用</li>
+                        <li><a href="${resolvePath('guides/architecture.html')}">架构设计</a> - 系统架构和设计原则</li>
                         <li><a href="${resolvePath('guides/best-practices.html')}">最佳实践</a> - 性能优化和安全建议</li>
                         <li><a href="${resolvePath('guides/examples.html')}">完整示例</a> - 常见场景的代码示例</li>
-                        <li><a href="${resolvePath('guides/architecture.html')}">架构设计</a> - 系统架构和设计原则</li>
                         <li><a href="${resolvePath('guides/development.html')}">开发指南</a> - 项目开发和贡献指南</li>
                     </ul>
                 </div>
@@ -404,13 +406,14 @@ async function build() {
       { file: 'getting-started', title: '快速开始' },
       { file: 'authentication', title: '认证授权指南' },
       { file: 'document-model', title: '文档模型详解' },
+      { file: 'document-model-complete', title: '文档模型完整版' },
       { file: 'data-operations', title: '数据操作指南' },
       { file: 'webhooks', title: 'Webhook 使用指南' },
+      { file: 'realtime-collaboration', title: '实时协同开发指南' },
+      { file: 'architecture', title: '架构设计' },
       { file: 'best-practices', title: '最佳实践' },
       { file: 'examples', title: '完整示例' },
-      { file: 'architecture', title: '架构设计' },
-      { file: 'development', title: '开发指南' },
-      { file: 'realtime-collaboration', title: '实时协同开发指南' }
+      { file: 'development', title: '开发指南' }
     ];
 
     for (const guide of guides) {
@@ -433,6 +436,7 @@ async function build() {
       const htmlPath = path.join(DOCS_DIR, 'references', `${ref.file}.html`);
       await convertMarkdownToHtml(mdPath, htmlPath, ref.title, 'references');
     }
+
 
     console.log('\n✅ 文档站点构建完成！');
   } catch (error) {

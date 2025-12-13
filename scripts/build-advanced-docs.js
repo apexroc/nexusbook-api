@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const REPOWIKI_DIR = path.join(__dirname, '../.qoder/repowiki/zh/content');
-const ADVANCED_CONTENT_DIR = path.join(__dirname, '../docs/advanced-content');
+const ADVANCED_CONTENT_DIR = path.join(__dirname, '../docs/advanced');
 
 // 清理并创建目标目录
 async function prepareDirectories() {
@@ -104,12 +104,79 @@ async function addDirectoryToSidebar(dirPath, sidebar, indent, relativePath) {
   }
 }
 
+// 生成 Docsify index.html
+async function generateDocsifyIndex() {
+  const indexHtml = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>NexusBook API 高级手册</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/themes/vue.css">
+  <style>
+    :root {
+      --base-font-size: 16px;
+      --theme-color: #1976d2;
+      --sidebar-width: 280px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">加载中...</div>
+  <script>
+    window.$docsify = {
+      name: 'NexusBook API 高级手册',
+      repo: 'https://github.com/NexusBook/nexusbook-api',
+      loadSidebar: true,
+      subMaxLevel: 3,
+      maxLevel: 4,
+      auto2top: true,
+      homepage: 'README.md',
+      search: {
+        maxAge: 86400000,
+        paths: 'auto',
+        placeholder: '搜索',
+        noData: '没有结果',
+        depth: 6
+      },
+      pagination: {
+        previousText: '上一章',
+        nextText: '下一章',
+        crossChapter: true
+      },
+      coverpage: false,
+      onlyCover: false
+    }
+  </script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-typescript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+</body>
+</html>
+`;
+
+  await fs.writeFile(path.join(ADVANCED_CONTENT_DIR, 'index.html'), indexHtml, 'utf-8');
+  console.log('✓ 生成 Docsify index.html');
+}
+
 async function main() {
   console.log('开始构建高级手册...');
   
   await prepareDirectories();
   await copyMarkdownFiles(REPOWIKI_DIR, ADVANCED_CONTENT_DIR);
   await generateSidebar();
+  await generateDocsifyIndex();
   
   console.log('✅ 高级手册构建完成！');
 }

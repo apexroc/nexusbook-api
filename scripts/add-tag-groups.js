@@ -49,6 +49,15 @@ async function main() {
         ]
       },
       {
+        name: 'Supply Chain (供应链协作)',
+        tags: [
+          'Catalog',
+          'OrderBook',
+          'Connection',
+          'Connector'
+        ]
+      },
+      {
         name: 'Auth (认证)',
         tags: [
           'OAuth',
@@ -111,6 +120,15 @@ async function main() {
         ]
       },
       {
+        name: 'Supply Chain (供应链协作)',
+        tags: [
+          'Catalog',
+          'OrderBook',
+          'Connection',
+          'Connector'
+        ]
+      },
+      {
         name: 'Auth (认证)',
         tags: [
           'OAuth',
@@ -166,6 +184,10 @@ async function main() {
     'Document - Collaboration': '协作功能（评论、实时）',
     'Document - Workflow': '工作流（审批、变更请求、修订）',
     'Document - Tenancy': '多租户（组织/工作区级文档）',
+    'Catalog': '产品目录管理（供应商侧）',
+    'OrderBook': '订货本管理（采购商侧）',
+    'Connection': '跨组织数据分享与传播',
+    'Connector': '组织内部文档联动',
     'Subscription Plans': '订阅计划管理',
     'Subscription Management': '订阅管理',
     'Invoices': '账单管理',
