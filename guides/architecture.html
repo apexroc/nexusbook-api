@@ -112,6 +112,7 @@
                     <a href="/index.html">首页</a>
                     <a href="/api/" >API 参考</a>
                     <a href="/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/advanced/README.html" >高级手册</a>
                     <a href="/references/error-codes.html" >参考文档</a>
                     <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
                 </nav>
@@ -202,17 +203,11 @@
             Org["🏢 Organization<br/>组织/租户<br/><small>数据隔离边界</small>"]
             OrgMember["👥 Organization Members<br/>组织成员<br/><small>owner/admin/member/guest</small>"]
             
-            subgraph "共享工作区 Shared Workspace"
-                MasterWS["📚 主数据中心<br/>Master Data Workspace<br/><small>visibility: public</small>"]
-                MasterDoc1["📄 产品目录<br/><small>product</small>"]
-                MasterDoc2["📄 供应商名录<br/><small>supplier</small>"]
-                MasterDoc3["📄 标准菜谱<br/><small>recipe</small>"]
-            end
-            
-            subgraph "业务工作区 Business Workspaces"
-                WS1["🍜 朝阳餐厅<br/>Workspace<br/><small>visibility: private</small>"]
-                WS2["🛍️ 海淀超市<br/>Workspace<br/><small>visibility: private</small>"]
-                WS3["🚚 绿源供应商<br/>Workspace<br/><small>visibility: private</small>"]
+            subgraph "工作区 Workspaces"
+                WS1["📚 主数据中心<br/>Workspace A<br/><small>包含 product, supplier</small>"]
+                WS2["🍜 朝阳餐厅<br/>Workspace B<br/><small>引用 A 的 product</small>"]
+                WS3["🛍️ 海淀超市<br/>Workspace C<br/><small>引用 A 的 product, supplier</small>"]
+                WS4["🚚 绿源供应商<br/>Workspace D<br/><small>独立数据</small>"]
             end
             
             WSMember["👥 Workspace Members<br/>工作区成员<br/><small>owner/editor/viewer</small>"]
@@ -221,10 +216,10 @@
             JoinReq["📝 Join Request<br/>加入申请<br/><small>用户主动申请</small>"]
         end
         
-        subgraph "业务文档 Business Documents"
-            Doc1["📄 订货单<br/><small>purchase</small>"]
-            Doc2["📄 库存表<br/><small>inventory</small>"]
-            Doc3["📄 销售记录<br/><small>sales</small>"]
+        subgraph "数据共享关系 Data Sharing"
+            Ref1["🔗 B 引用 A.product<br/><small>readonly</small>"]
+            Ref2["🔗 C 引用 A.product<br/><small>readonly</small>"]
+            Ref3["🔗 C 引用 A.supplier<br/><small>readonly</small>"]
         end
     end
     
@@ -232,37 +227,34 @@
     User -->|owner| Org
     User -->|加入| OrgMember
     
-    Org -->|包含| MasterWS
-    Org -->|包含1-N| WS1
-    Org -->|包含1-N| WS2
-    Org -->|包含1-N| WS3
-    
-    MasterWS -->|管理共享数据| MasterDoc1
-    MasterWS -->|管理共享数据| MasterDoc2
-    MasterWS -->|管理共享数据| MasterDoc3
+    Org -->|包含| WS1
+    Org -->|包含| WS2
+    Org -->|包含| WS3
+    Org -->|包含| WS4
+    Org -->|创建时自动创建| WS1
     
     OrgMember -->|需显式加入| WSMember
     
     Org -->|邀请用户| Invite
     Org -->|接受申请| JoinReq
     
-    WS1 -->|管理业务数据| Doc1
-    WS2 -->|管理业务数据| Doc2
-    WS3 -->|管理业务数据| Doc3
+    WS2 -.->|数据源引用| Ref1
+    WS3 -.->|数据源引用| Ref2
+    WS3 -.->|数据源引用| Ref3
     
-    Doc1 -.->|relation字段引用| MasterDoc1
-    Doc2 -.->|relation字段引用| MasterDoc1
-    Doc3 -.->|relation字段引用| MasterDoc2
+    Ref1 --> WS1
+    Ref2 --> WS1
+    Ref3 --> WS1
     
     style Org fill:#e1f5ff
-    style MasterWS fill:#d4edda
-    style WS1 fill:#fff4e6
+    style WS1 fill:#d4edda
     style WS2 fill:#fff4e6
     style WS3 fill:#fff4e6
+    style WS4 fill:#fff4e6
     style User fill:#f0f0f0
-    style MasterDoc1 fill:#c3e6cb
-    style MasterDoc2 fill:#c3e6cb
-    style MasterDoc3 fill:#c3e6cb</div>
+    style Ref1 fill:#ffeaa7
+    style Ref2 fill:#ffeaa7
+    style Ref3 fill:#ffeaa7</div>
 <h3>核心概念说明</h3>
 <h4>1. User（用户）- 独立身份实体</h4>
 <ul>
@@ -287,37 +279,14 @@
 <li><code>guest</code>：访客，仅能访问特定资源</li>
 </ul>
 </li>
-<li><strong>默认工作区</strong>：创建组织时自动创建一个默认 Workspace</li>
+<li><strong>默认工作区</strong>：创建组织时自动创建一个默认 Workspace，通常作为主数据中心使用</li>
 </ul>
 <h4>3. Workspace（工作区）- 业务容器</h4>
-<p>Workspace 分为两种类型：<strong>共享工作区</strong>和<strong>业务工作区</strong>。</p>
-<p><strong>📚 共享工作区（主数据中心）</strong>：</p>
+<p>Workspace 是 Organization 内的数据组织容器，所有 Workspace 地位平等，通过<strong>数据源引用</strong>机制实现跨工作区数据共享。</p>
+<p><strong>基本特性</strong>：</p>
 <ul>
-<li><strong>特殊标识</strong>：<code>visibility: public</code>，组织内所有成员可见</li>
-<li><strong>主要职责</strong>：存放组织级共享主数据，供多个业务工作区引用</li>
-<li><strong>典型数据</strong>：<ul>
-<li>产品目录：餐饮集团的所有菜品信息</li>
-<li>供应商名录：全部合作供应商的联系信息</li>
-<li>标准菜谱：集团统一的菜品制作标准</li>
-<li>质量标准、标准操作流程等</li>
-</ul>
-</li>
-<li><strong>权限控制</strong>：<ul>
-<li>数据管理员：<code>editor</code>（可编辑主数据）</li>
-<li>业务人员：<code>viewer</code>（只读访问，不能修改）</li>
-</ul>
-</li>
-</ul>
-<p><strong>🍜 业务工作区</strong>：</p>
-<ul>
-<li><strong>业务隔离</strong>：Workspace 是实际业务开展的容器，承载供应链管理的各种业务</li>
-<li><strong>现实映射</strong>：<ul>
-<li>🍜 餐厅：每家餐厅的独立运营管理（朝阳餐厅、西城餐厅等）</li>
-<li>🛍️ 超市：超市的采购与库存管理（海淀超市、西单超市等）</li>
-<li>🚚 供应商：供应商的订单与发货管理（绿源供应商、丰收农场等）</li>
-<li>🏭 仓库：仓库的进出库管理</li>
-</ul>
-</li>
+<li><strong>数据隔离</strong>：每个 Workspace 的 Document 数据默认独立隔离</li>
+<li><strong>灵活共享</strong>：可选择性地引用其他 Workspace 的特定 document type 数据</li>
 <li><strong>显式加入</strong>：组织成员需要被显式添加到 Workspace 才能访问其中的内容</li>
 <li><strong>成员角色</strong>：<ul>
 <li><code>owner</code>：工作区负责人，可管理工作区和成员</li>
@@ -326,33 +295,32 @@
 </ul>
 </li>
 <li><strong>可见性控制</strong>：<ul>
-<li><code>public</code>：组织内所有成员可见</li>
+<li><code>public</code>：组织内所有成员可见（建议主数据中心使用）</li>
 <li><code>private</code>：仅成员可见（建议业务工作区使用）</li>
 </ul>
 </li>
 </ul>
-<h4>4. Workspace 与 Document 的关系</h4>
-<p><strong>一对多关系</strong>：一个 Workspace 可以包含多个 Document</p>
-<p><strong>共享工作区的 Document</strong>：</p>
+<p><strong>典型场景</strong>：</p>
 <ul>
-<li>产品目录 Document（<code>product</code> 类型）</li>
-<li>供应商名录 Document（<code>supplier</code> 类型）</li>
-<li>标准菜谱 Document（<code>recipe</code> 类型）</li>
+<li>📚 <strong>主数据中心</strong>：存放组织级共享主数据（产品目录、供应商名录、标准菜谱等）</li>
+<li>🍜 <strong>餐厅工作区</strong>：每家餐厅的独立运营管理（朝阳餐厅、西城餐厅等）</li>
+<li>🛍️ <strong>超市工作区</strong>：超市的采购与库存管理（海淀超市、西单超市等）</li>
+<li>🚚 <strong>供应商工作区</strong>：供应商的订单与发货管理（绿源供应商、丰收农场等）</li>
+<li>🏭 <strong>仓库工作区</strong>：仓库的进出库管理</li>
 </ul>
-<p><strong>业务工作区的 Document</strong>：</p>
+<h5>4. 数据源引用机制（Data Source Reference）</h5>
+<p>Workspace 支持引用其他 Workspace 的特定 document type 数据，采用<strong>替换模式</strong>：</p>
+<p><strong>替换模式</strong>：</p>
 <ul>
-<li>订货单 Document（<code>purchase</code> 类型）</li>
-<li>库存表 Document（<code>inventory</code> 类型）</li>
-<li>销售记录 Document（<code>sales</code> 类型）</li>
-<li>发货单 Document（<code>shipment</code> 类型）</li>
+<li>Workspace B 引用 Workspace A 的 product 数据后，查询 product 只显示 A 的数据（只读）</li>
+<li>Workspace B 自己的 product 数据被隐藏（但未删除）</li>
+<li>解除引用后，本地数据恢复显示</li>
 </ul>
-<p><strong>跨 Workspace 数据引用</strong>：</p>
+<p><strong>查询逻辑</strong>：</p>
 <ul>
-<li>业务工作区的 Document 可以通过 <code>relation</code> 字段类型引用共享工作区的主数据</li>
-<li>例如：餐厅的订货单中的“产品”字段关联到主数据中心的“产品目录”</li>
-<li>实现数据一致性：主数据更新后，所有引用处自动生效</li>
+<li>有活跃引用：查询源 Workspace 的数据，标记为只读</li>
+<li>无引用或引用已停用：查询本地数据，可编辑</li>
 </ul>
-<p><strong>权限继承</strong>：Document 的访问权限基于 Workspace 成员权限</p>
 <h4>5. 成员管理机制</h4>
 <p><strong>邀请流程（Invitation）</strong>：</p>
 <div class="mermaid">sequenceDiagram
@@ -529,206 +497,138 @@
 <li><strong>操作权限验证</strong>：根据角色验证是否有权限执行操作</li>
 <li><strong>数据访问控制</strong>：仅返回用户有权访问的数据</li>
 </ol>
-<h3>典型使用场景</h3>
-<h4>场景 1：新用户注册</h4>
-<pre><code class="language-bash"># 1. 用户注册
-POST /api/v1/auth/register
-{
-  &quot;email&quot;: &quot;user@example.com&quot;,
-  &quot;password&quot;: &quot;******&quot;,
-  &quot;displayName&quot;: &quot;张三&quot;
-}
-
-# 系统自动执行：
-# - 创建 User 记录
-# - 创建个人 Organization（type: personal）
-# - 创建默认 Workspace
-# - 设置用户为 Organization owner
-</code></pre>
-<h4>场景 2：创建团队组织</h4>
-<pre><code class="language-bash"># 2. 创建餐饮集团组织
-POST /api/v1/organizations
-{
-  &quot;name&quot;: &quot;鲜食餐饮集团&quot;,
-  &quot;slug&quot;: &quot;fresh-dining&quot;,
-  &quot;type&quot;: &quot;enterprise&quot;,
-  &quot;description&quot;: &quot;餐饮集团供应链管理&quot;
-}
-
-# 返回：
-# - Organization ID
-# - 自动创建默认 Workspace
-# - 创建者成为 owner
-</code></pre>
-<h4>场景 3：创建主数据中心</h4>
-<pre><code class="language-bash"># 3. 创建共享的主数据工作区
-POST /api/v1/organizations/{orgId}/workspaces
-{
-  &quot;name&quot;: &quot;📚 主数据中心&quot;,
-  &quot;slug&quot;: &quot;master-data&quot;,
-  &quot;description&quot;: &quot;集团共享主数据管理&quot;,
-  &quot;visibility&quot;: &quot;public&quot;,  // 组织内所有成员可见
-  &quot;settings&quot;: {
-    &quot;isShared&quot;: true,      // 自定义标识：共享工作区
-    &quot;isMasterData&quot;: true   // 自定义标识：主数据工作区
-  }
-}
-
-# 4. 添加数据管理员（可编辑主数据）
-POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
-{
-  &quot;userId&quot;: &quot;admin-user-id&quot;,
-  &quot;role&quot;: &quot;editor&quot;  // 有权编辑产品目录
-}
-
-# 5. 在主数据中心创建产品目录
-POST /api/v1/doc/product/create
-{
-  &quot;workspaceId&quot;: &quot;{masterDataWsId}&quot;,
-  &quot;name&quot;: &quot;集团产品目录&quot;,
-  &quot;metadata&quot;: {
-    &quot;fields&quot;: [
-      {&quot;id&quot;: &quot;name&quot;, &quot;name&quot;: &quot;菜品名称&quot;, &quot;type&quot;: &quot;text&quot;},
-      {&quot;id&quot;: &quot;category&quot;, &quot;name&quot;: &quot;类别&quot;, &quot;type&quot;: &quot;single_select&quot;},
-      {&quot;id&quot;: &quot;unit_price&quot;, &quot;name&quot;: &quot;标准价格&quot;, &quot;type&quot;: &quot;currency&quot;},
-      {&quot;id&quot;: &quot;unit&quot;, &quot;name&quot;: &quot;计量单位&quot;, &quot;type&quot;: &quot;text&quot;}
-    ]
-  }
-}
-
-# 6. 添加产品数据
-POST /api/v1/doc/product/{productDocId}/data
-{
-  &quot;values&quot;: [
-    {&quot;fieldId&quot;: &quot;name&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;宫保鸡丁&quot;}},
-    {&quot;fieldId&quot;: &quot;category&quot;, &quot;value&quot;: {&quot;selectOption&quot;: {&quot;id&quot;: &quot;main-course&quot;}}},
-    {&quot;fieldId&quot;: &quot;unit_price&quot;, &quot;value&quot;: {&quot;currency&quot;: 48.00}},
-    {&quot;fieldId&quot;: &quot;unit&quot;, &quot;value&quot;: {&quot;text&quot;: &quot;份&quot;}}
-  ]
-}
-</code></pre>
-<h4>场景 4：邀请团队成员</h4>
-<pre><code class="language-bash"># 7. 邀请成员加入组织
-POST /api/v1/organizations/{orgId}/invitations
-{
-  &quot;email&quot;: &quot;manager@example.com&quot;,
-  &quot;role&quot;: &quot;admin&quot;,
-  &quot;message&quot;: &quot;欢迎加入餐饮集团管理团队！&quot;
-}
-
-# 8. 被邀请人接受邀请
-POST /api/v1/invitations/{token}/accept
-
-# 9. 将餐厅经理加入主数据中心（viewer 角色）
-POST /api/v1/organizations/{orgId}/workspaces/{masterDataWsId}/members
-{
-  &quot;userId&quot;: &quot;manager-user-id&quot;,
-  &quot;role&quot;: &quot;viewer&quot;  // 只读访问，不能修改主数据
-}
-</code></pre>
-<h4>场景 5：创建业务工作区</h4>
-<pre><code class="language-bash"># 10a. 创建餐厅工作区
-POST /api/v1/organizations/{orgId}/workspaces
-{
-  &quot;name&quot;: &quot;🍜 朝阳餐厅&quot;,
-  &quot;slug&quot;: &quot;chaoyang-restaurant&quot;,
-  &quot;description&quot;: &quot;朝阳店运营管理&quot;,
-  &quot;visibility&quot;: &quot;private&quot;
-}
-
-# 10b. 创建超市工作区
-POST /api/v1/organizations/{orgId}/workspaces
-{
-  &quot;name&quot;: &quot;🛍️ 海淀超市&quot;,
-  &quot;slug&quot;: &quot;haidian-supermarket&quot;,
-  &quot;description&quot;: &quot;海淀店采购与库存管理&quot;,
-  &quot;visibility&quot;: &quot;private&quot;
-}
-
-# 10c. 创建供应商工作区
-POST /api/v1/organizations/{orgId}/workspaces
-{
-  &quot;name&quot;: &quot;🚚 绿源供应商&quot;,
-  &quot;slug&quot;: &quot;greensource-supplier&quot;,
-  &quot;description&quot;: &quot;绿源供应商订单管理&quot;,
-  &quot;visibility&quot;: &quot;private&quot;
-}
-
-# 11. 添加餐厅经理到工作区
-POST /api/v1/organizations/{orgId}/workspaces/{restaurantWsId}/members
-{
-  &quot;userId&quot;: &quot;restaurant-manager-id&quot;,
-  &quot;role&quot;: &quot;owner&quot;  // 餐厅负责人
-}
-
-# 12. 添加超市采购员到工作区
-POST /api/v1/organizations/{orgId}/workspaces/{supermarketWsId}/members
-{
-  &quot;userId&quot;: &quot;purchaser-user-id&quot;,
-  &quot;role&quot;: &quot;editor&quot;  // 可编辑订货单
-}
-</code></pre>
-<h4>场景 6：创建订货单并引用主数据</h4>
-<pre><code class="language-bash"># 13. 在餐厅工作区创建订货单
-POST /api/v1/doc/purchase/create
-{
-  &quot;workspaceId&quot;: &quot;{restaurantWsId}&quot;,
-  &quot;name&quot;: &quot;2024年12月订货单&quot;,
-  &quot;metadata&quot;: {
-    &quot;fields&quot;: [
-      {
-        &quot;id&quot;: &quot;product&quot;,
-        &quot;name&quot;: &quot;产品&quot;,
-        &quot;type&quot;: &quot;relation&quot;,
-        &quot;config&quot;: {
-          // 关联到主数据中心的产品目录
-          &quot;targetWorkspace&quot;: &quot;{masterDataWsId}&quot;,
-          &quot;targetDocument&quot;: &quot;{productDocId}&quot;,
-          &quot;displayFields&quot;: [&quot;name&quot;, &quot;category&quot;, &quot;unit_price&quot;]
-        }
-      },
-      {&quot;id&quot;: &quot;quantity&quot;, &quot;name&quot;: &quot;数量&quot;, &quot;type&quot;: &quot;number&quot;},
-      {&quot;id&quot;: &quot;total_price&quot;, &quot;name&quot;: &quot;总价&quot;, &quot;type&quot;: &quot;currency&quot;}
-    ]
-  }
-}
-
-# 14. 添加订货数据（引用主数据）
-POST /api/v1/doc/purchase/{purchaseDocId}/data
-{
-  &quot;values&quot;: [
-    {
-      &quot;fieldId&quot;: &quot;product&quot;,
-      &quot;value&quot;: {
-        &quot;relation&quot;: {
-          // 跨 Workspace 引用主数据中心的产品
-          &quot;workspaceId&quot;: &quot;{masterDataWsId}&quot;,
-          &quot;documentId&quot;: &quot;{productDocId}&quot;,
-          &quot;rowId&quot;: &quot;product-001&quot;  // 宫保鸡丁
-        }
-      }
-    },
-    {&quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: {&quot;number&quot;: 50}},
-    {&quot;fieldId&quot;: &quot;total_price&quot;, &quot;value&quot;: {&quot;currency&quot;: 2400.00}}
-  ]
-}
-
-# 优势：
-# - 产品信息统一维护，主数据中心更新后所有引用处自动生效
-# - 避免多处重复录入相同产品，保证数据一致性
-# - 集团级产品价格调整时，所有餐厅的订货单自动同步
-</code></pre>
-<h4>场景 7：查看共享数据</h4>
-<h3>架构优势</h3>
-<ol>
-<li><strong>灵活的组织结构</strong>：支持个人、团队、企业多种组织类型</li>
-<li><strong>细粒度权限控制</strong>：Organization 和 Workspace 双层角色体系</li>
-<li><strong>业务隔离</strong>：不同业务（餐厅、超市、供应商、仓库）独立管理</li>
-<li><strong>协作友好</strong>：完善的邀请和申请机制</li>
-<li><strong>可扩展性</strong>：支持无限扩展 Workspace 和 Document</li>
-<li><strong>主数据管理</strong>：通过共享 Workspace 实现组织级主数据统一管理</li>
-<li><strong>数据一致性</strong>：跨 Workspace 引用机制，主数据更新自动同步到所有引用处</li>
-</ol>
+<h3>部分API</h3>
+<h4>认证与用户</h4>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>方法</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/api/v1/auth/register</code></td>
+<td>POST</td>
+<td>用户注册，系统自动创建个人 Organization 和默认 Workspace</td>
+</tr>
+</tbody></table>
+<h4>组织管理</h4>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>方法</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/api/v1/organizations</code></td>
+<td>POST</td>
+<td>创建组织，系统自动创建默认 Workspace</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/invitations</code></td>
+<td>POST</td>
+<td>邀请成员加入组织</td>
+</tr>
+<tr>
+<td><code>/api/v1/invitations/{token}/accept</code></td>
+<td>POST</td>
+<td>接受组织邀请</td>
+</tr>
+</tbody></table>
+<h4>工作区管理</h4>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>方法</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces</code></td>
+<td>POST</td>
+<td>创建工作区</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}</code></td>
+<td>PATCH</td>
+<td>配置工作区名称、可见性等</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}/members</code></td>
+<td>POST</td>
+<td>添加工作区成员</td>
+</tr>
+</tbody></table>
+<h4>数据源引用管理</h4>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>方法</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}/data-source-references</code></td>
+<td>GET</td>
+<td>列出当前工作区的所有引用配置</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}/data-source-references</code></td>
+<td>POST</td>
+<td>添加数据源引用（替换模式）</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}/data-source-references/{refId}</code></td>
+<td>GET</td>
+<td>获取单个引用详情</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}/data-source-references/{refId}</code></td>
+<td>PATCH</td>
+<td>暂停/启用引用</td>
+</tr>
+<tr>
+<td><code>/api/v1/organizations/{orgId}/workspaces/{wsId}/data-source-references/{refId}</code></td>
+<td>DELETE</td>
+<td>解除引用，恢复本地数据显示</td>
+</tr>
+</tbody></table>
+<p><strong>数据引用说明</strong>：</p>
+<ul>
+<li>当 workspace 引用其他 workspace 的 product 数据时，查询只返回源 workspace 的数据，本地数据被隐藏</li>
+<li>解除引用后，查询恢复返回本地数据</li>
+<li>数据源替换无损，本地数据不会丢失</li>
+</ul>
+<p><strong>权限控制说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>结果</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>用户是 workspace-b owner，但不是 workspace-a 成员</td>
+<td>403 Forbidden</td>
+<td>添加引用时必须对源 workspace 有读权限</td>
+</tr>
+<tr>
+<td>用户是 workspace-b editor，不是 owner</td>
+<td>403 Forbidden</td>
+<td>只有 workspace owner 可管理引用</td>
+</tr>
+<tr>
+<td>用户是 Organization admin</td>
+<td>200 OK</td>
+<td>Organization admin 可强制配置引用</td>
+</tr>
+</tbody></table>
 <h2>目录结构</h2>
 <pre><code>api/
 ├── main.tsp                    # 顶层入口

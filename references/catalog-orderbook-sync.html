@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog-OrderBook 数据协同参考 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/index.html">首页</a>
+                    <a href="/api/" >API 参考</a>
+                    <a href="/guides/getting-started.html" >开发指南</a>
+                    <a href="/advanced/README.html" >高级手册</a>
+                    <a href="/references/error-codes.html" class="active">参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>Catalog-OrderBook 数据协同参考</h1>
+<h2>概述</h2>
+<p>NexusBook 的 Catalog-OrderBook 系统是一个完整的供应链数据协同解决方案，支持跨组织的商品信息共享、订货管理和多级分销。本文档详细介绍其架构设计、工作机制和典型应用场景。</p>
+<p><strong>目标读者</strong>：产品经理、业务分析师、解决方案架构师、技术团队</p>
+<h2>核心概念</h2>
+<h3>1. 三大核心资源</h3>
+<div class="mermaid">graph LR
+    subgraph 供应商组织
+        C[Catalog<br/>商品目录]
+    end
+    
+    subgraph 采购商组织
+        O[OrderBook<br/>订货本]
+    end
+    
+    C -->|Connection| CN[Connection<br/>数据分享通道]
+    CN -->|Binding| O
+    
+    style C fill:#e1f5e1
+    style O fill:#e1e5f5
+    style CN fill:#fff4e1</div>
+<ul>
+<li><strong>Catalog（商品目录）</strong>：供应商维护的商品清单，支持自定义字段以适应不同行业（电子产品、服装、食品等）</li>
+<li><strong>OrderBook（订货本）</strong>：采购商基于供应商 Catalog 生成的订货清单，可自定义字段映射和过滤规则</li>
+<li><strong>Connection（连接）</strong>：跨组织的数据分享通道，由供应商创建并配置分享范围和权限</li>
+</ul>
+<h3>2. 组织级别资源设计</h3>
+<p><strong>关键原则</strong>：Catalog 和 OrderBook 都是组织级别资源（<code>workspaceId = null</code>），支持组织内多个 Workspace 共享访问。</p>
+<div class="mermaid">graph TB
+    subgraph 供应商组织A
+        OrgA[Organization A]
+        OrgA --> WS1[Workspace 1]
+        OrgA --> WS2[Workspace 2]
+        OrgA --> CAT[Catalog<br/>workspaceId=null]
+        
+        WS1 -.共享访问.-> CAT
+        WS2 -.共享访问.-> CAT
+    end
+    
+    subgraph 采购商组织B
+        OrgB[Organization B]
+        OrgB --> WS3[Workspace 3]
+        OrgB --> WS4[Workspace 4]
+        OrgB --> OB[OrderBook<br/>workspaceId=null]
+        
+        WS3 -.共享访问.-> OB
+        WS4 -.共享访问.-> OB
+    end
+    
+    CAT -->|Connection| OB
+    
+    style CAT fill:#e1f5e1
+    style OB fill:#e1e5f5</div>
+<p><strong>设计优势</strong>：</p>
+<ul>
+<li>避免在不同 Workspace 中重复维护相同数据</li>
+<li>支持跨工作区的数据协同和权限控制</li>
+<li>便于组织级别的数据统计和管理</li>
+</ul>
+<hr>
+<h2>第一部分：供应商-采购商联动机制</h2>
+<h3>场景 1：建立数据连接</h3>
+<h4>步骤 1：供应商创建 Catalog 并配置自定义字段</h4>
+<p>供应商根据行业特点定义商品字段。</p>
+<p><strong>示例：电子产品供应商</strong></p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-supplier/catalogs
+{
+  &quot;name&quot;: &quot;电子产品目录 2024&quot;,
+  &quot;catalogType&quot;: &quot;supplier&quot;,
+  &quot;sharingEnabled&quot;: true,
+  &quot;fields&quot;: [
+    {
+      &quot;name&quot;: &quot;品牌&quot;,
+      &quot;type&quot;: &quot;single_select&quot;,
+      &quot;required&quot;: true,
+      &quot;selectOptions&quot;: [
+        {&quot;label&quot;: &quot;Apple&quot;, &quot;color&quot;: &quot;#000000&quot;},
+        {&quot;label&quot;: &quot;Samsung&quot;, &quot;color&quot;: &quot;#1428A0&quot;},
+        {&quot;label&quot;: &quot;Huawei&quot;, &quot;color&quot;: &quot;#FF0000&quot;}
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;型号&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;规格参数&quot;,
+      &quot;type&quot;: &quot;long_text&quot;
+    },
+    {
+      &quot;name&quot;: &quot;库存数量&quot;,
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;批发价（美元）&quot;,
+      &quot;type&quot;: &quot;currency&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;建议零售价（美元）&quot;,
+      &quot;type&quot;: &quot;currency&quot;
+    }
+  ]
+}
+</code></pre>
+<p><strong>示例：服装供应商</strong></p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-fashion/catalogs
+{
+  &quot;name&quot;: &quot;春季服装目录&quot;,
+  &quot;catalogType&quot;: &quot;supplier&quot;,
+  &quot;fields&quot;: [
+    {
+      &quot;name&quot;: &quot;款式名称&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;尺码&quot;,
+      &quot;type&quot;: &quot;multi_select&quot;,
+      &quot;selectOptions&quot;: [
+        {&quot;label&quot;: &quot;XS&quot;}, {&quot;label&quot;: &quot;S&quot;}, {&quot;label&quot;: &quot;M&quot;}, 
+        {&quot;label&quot;: &quot;L&quot;}, {&quot;label&quot;: &quot;XL&quot;}, {&quot;label&quot;: &quot;XXL&quot;}
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;颜色&quot;,
+      &quot;type&quot;: &quot;multi_select&quot;,
+      &quot;selectOptions&quot;: [
+        {&quot;label&quot;: &quot;黑色&quot;, &quot;color&quot;: &quot;#000000&quot;},
+        {&quot;label&quot;: &quot;白色&quot;, &quot;color&quot;: &quot;#FFFFFF&quot;},
+        {&quot;label&quot;: &quot;红色&quot;, &quot;color&quot;: &quot;#FF0000&quot;}
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;材质&quot;,
+      &quot;type&quot;: &quot;text&quot;
+    },
+    {
+      &quot;name&quot;: &quot;批发价（人民币）&quot;,
+      &quot;type&quot;: &quot;currency&quot;
+    }
+  ]
+}
+</code></pre>
+<h4>步骤 2：供应商创建 Connection 并配置分享规则</h4>
+<pre><code class="language-bash">POST /api/v1/organizations/org-supplier/connections
+{
+  &quot;name&quot;: &quot;面向大型零售商的连接&quot;,
+  &quot;sourceCatalogId&quot;: &quot;catalog-001&quot;,
+  &quot;shareMode&quot;: &quot;multiple&quot;,
+  
+  # 访问控制：仅允许特定组织访问
+  &quot;accessControl&quot;: {
+    &quot;mode&quot;: &quot;whitelist&quot;,
+    &quot;allowedOrganizations&quot;: [&quot;org-retailer-a&quot;, &quot;org-retailer-b&quot;]
+  },
+  
+  # 分享范围：仅分享库存大于 10 的商品
+  &quot;shareScope&quot;: {
+    &quot;mode&quot;: &quot;filter&quot;,
+    &quot;filterGroup&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;stock_quantity&quot;,
+          &quot;operator&quot;: &quot;gt&quot;,
+          &quot;value&quot;: 10
+        },
+        {
+          &quot;fieldId&quot;: &quot;status&quot;,
+          &quot;operator&quot;: &quot;eq&quot;,
+          &quot;value&quot;: &quot;active&quot;
+        }
+      ]
+    }
+  },
+  
+  # 建议的字段映射和冲突解决策略
+  &quot;defaultReceiverConfig&quot;: {
+    &quot;suggestedFieldMapping&quot;: {
+      &quot;rules&quot;: [
+        {
+          &quot;sourceFieldId&quot;: &quot;wholesale_price_usd&quot;,
+          &quot;targetFieldId&quot;: &quot;cost_price&quot;,
+          &quot;transformType&quot;: &quot;unit_convert&quot;,
+          &quot;unitConversion&quot;: {
+            &quot;sourceUnit&quot;: &quot;USD&quot;,
+            &quot;targetUnit&quot;: &quot;CNY&quot;,
+            &quot;conversionType&quot;: &quot;currency&quot;,
+            &quot;exchangeRateSource&quot;: &quot;daily&quot;
+          }
+        }
+      ],
+      &quot;unmappedFields&quot;: &quot;create&quot;
+    },
+    &quot;suggestedAcceptMode&quot;: &quot;selective&quot;
+  },
+  
+  # 订阅变更事件
+  &quot;propagationEvents&quot;: {
+    &quot;eventTypes&quot;: [
+      &quot;row_created&quot;,
+      &quot;row_updated&quot;,
+      &quot;row_deleted&quot;,
+      &quot;field_value_changed&quot;
+    ],
+    &quot;batchMerge&quot;: true,
+    &quot;batchWindowSeconds&quot;: 300
+  }
+}
+</code></pre>
+<h4>步骤 3：供应商生成并分享连接链接</h4>
+<pre><code class="language-bash"># 生成分享链接
+POST /api/v1/organizations/org-supplier/connections/conn-001/share-link
+{
+  &quot;expiresAt&quot;: &quot;2024-12-31T23:59:59Z&quot;,
+  &quot;maxUses&quot;: 100
+}
+
+# 响应
+{
+  &quot;shareUrl&quot;: &quot;https://open.nexusbook.app/connect/share/abc123def456&quot;,
+  &quot;qrCode&quot;: &quot;data:image/png;base64,...&quot;,
+  &quot;expiresAt&quot;: &quot;2024-12-31T23:59:59Z&quot;
+}
+</code></pre>
+<h4>步骤 4：采购商接受连接并创建 Binding</h4>
+<p><strong>4.1 采购商访问分享链接</strong></p>
+<pre><code class="language-bash">GET /connect/share/abc123def456
+
+# 响应：Connection 详情
+{
+  &quot;connectionId&quot;: &quot;conn-001&quot;,
+  &quot;name&quot;: &quot;面向大型零售商的连接&quot;,
+  &quot;sourceOrganization&quot;: {
+    &quot;id&quot;: &quot;org-supplier&quot;,
+    &quot;name&quot;: &quot;科技供应链有限公司&quot;
+  },
+  &quot;sourceCatalog&quot;: {
+    &quot;id&quot;: &quot;catalog-001&quot;,
+    &quot;name&quot;: &quot;电子产品目录 2024&quot;,
+    &quot;productCount&quot;: 350
+  },
+  &quot;shareMode&quot;: &quot;multiple&quot;
+}
+</code></pre>
+<p><strong>4.2 采购商创建 OrderBook（基于 Connection 自动生成字段）</strong></p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-retailer/orderbooks
+{
+  &quot;name&quot;: &quot;电子产品订货本&quot;,
+  &quot;description&quot;: &quot;来自科技供应链的商品&quot;,
+  
+  # 基于已连接的 Connection 创建
+  &quot;sourceConnectionIds&quot;: [&quot;conn-001&quot;],
+  
+  # 自定义额外字段
+  &quot;fields&quot;: [
+    {
+      &quot;name&quot;: &quot;我方SKU&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;description&quot;: &quot;内部商品编码&quot;
+    },
+    {
+      &quot;name&quot;: &quot;销售价格（人民币）&quot;,
+      &quot;type&quot;: &quot;currency&quot;
+    },
+    {
+      &quot;name&quot;: &quot;最小起订量&quot;,
+      &quot;type&quot;: &quot;number&quot;
+    }
+  ]
+}
+
+# 响应：自动生成的 OrderBook（已包含源字段映射）
+{
+  &quot;orderBookId&quot;: &quot;orderbook-001&quot;,
+  &quot;fields&quot;: [
+    # 来自 Catalog 的映射字段
+    {
+      &quot;id&quot;: &quot;brand&quot;,
+      &quot;name&quot;: &quot;品牌&quot;,
+      &quot;type&quot;: &quot;single_select&quot;,
+      &quot;sourceCatalogId&quot;: &quot;catalog-001&quot;,
+      &quot;sourceFieldId&quot;: &quot;brand&quot;
+    },
+    {
+      &quot;id&quot;: &quot;model&quot;,
+      &quot;name&quot;: &quot;型号&quot;,
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;sourceCatalogId&quot;: &quot;catalog-001&quot;,
+      &quot;sourceFieldId&quot;: &quot;model&quot;
+    },
+    {
+      &quot;id&quot;: &quot;cost_price&quot;,
+      &quot;name&quot;: &quot;采购成本（人民币）&quot;,
+      &quot;type&quot;: &quot;currency&quot;,
+      &quot;sourceCatalogId&quot;: &quot;catalog-001&quot;,
+      &quot;sourceFieldId&quot;: &quot;wholesale_price_usd&quot;
+    },
+    # 自定义字段
+    {
+      &quot;id&quot;: &quot;internal_sku&quot;,
+      &quot;name&quot;: &quot;我方SKU&quot;,
+      &quot;type&quot;: &quot;text&quot;
+    },
+    {
+      &quot;id&quot;: &quot;retail_price&quot;,
+      &quot;name&quot;: &quot;销售价格（人民币）&quot;,
+      &quot;type&quot;: &quot;currency&quot;
+    }
+  ]
+}
+</code></pre>
+<p><strong>4.3 预览字段映射</strong></p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/field-mapping/preview
+{
+  &quot;connectionId&quot;: &quot;conn-001&quot;
+}
+
+# 响应：建议的映射规则
+{
+  &quot;suggestedMappings&quot;: [
+    {
+      &quot;sourceFieldId&quot;: &quot;brand&quot;,
+      &quot;targetFieldId&quot;: &quot;brand&quot;,
+      &quot;transformType&quot;: &quot;direct&quot;,
+      &quot;propagationMode&quot;: &quot;oneway&quot;
+    },
+    {
+      &quot;sourceFieldId&quot;: &quot;wholesale_price_usd&quot;,
+      &quot;targetFieldId&quot;: &quot;cost_price&quot;,
+      &quot;transformType&quot;: &quot;unit_convert&quot;,
+      &quot;unitConversion&quot;: {
+        &quot;sourceUnit&quot;: &quot;USD&quot;,
+        &quot;targetUnit&quot;: &quot;CNY&quot;,
+        &quot;conversionType&quot;: &quot;currency&quot;,
+        &quot;exchangeRateSource&quot;: &quot;daily&quot;,
+        &quot;fixedRate&quot;: 7.2
+      },
+      &quot;propagationMode&quot;: &quot;oneway&quot;
+    },
+    {
+      &quot;sourceFieldId&quot;: &quot;stock_quantity&quot;,
+      &quot;targetFieldId&quot;: &quot;available_stock&quot;,
+      &quot;transformType&quot;: &quot;direct&quot;,
+      &quot;propagationMode&quot;: &quot;oneway&quot;
+    }
+  ],
+  &quot;unmappedSourceFields&quot;: [&quot;suggested_retail_price&quot;],
+  &quot;unmappedTargetFields&quot;: [&quot;internal_sku&quot;, &quot;retail_price&quot;]
+}
+</code></pre>
+<p><strong>4.4 创建 Binding 并配置过滤规则</strong></p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/bindings
+{
+  &quot;connectionId&quot;: &quot;conn-001&quot;,
+  &quot;targetOrderBookId&quot;: &quot;orderbook-001&quot;,
+  
+  # 接收方过滤：只接收特定品牌和价格范围的商品
+  &quot;receiverFilter&quot;: {
+    &quot;filterGroup&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;brand&quot;,
+          &quot;operator&quot;: &quot;in&quot;,
+          &quot;values&quot;: [&quot;Apple&quot;, &quot;Samsung&quot;]
+        },
+        {
+          &quot;fieldId&quot;: &quot;wholesale_price_usd&quot;,
+          &quot;operator&quot;: &quot;lte&quot;,
+          &quot;value&quot;: 1000
+        }
+      ],
+      &quot;groups&quot;: [
+        {
+          &quot;operator&quot;: &quot;OR&quot;,
+          &quot;conditions&quot;: [
+            {
+              &quot;fieldId&quot;: &quot;stock_quantity&quot;,
+              &quot;operator&quot;: &quot;gte&quot;,
+              &quot;value&quot;: 50
+            },
+            {
+              &quot;fieldId&quot;: &quot;is_pre_order&quot;,
+              &quot;operator&quot;: &quot;eq&quot;,
+              &quot;value&quot;: true
+            }
+          ]
+        }
+      ]
+    },
+    &quot;acceptMode&quot;: &quot;selective&quot;,
+    &quot;manualAcceptRules&quot;: {
+      # 自动接受：价格低于500美元且库存充足
+      &quot;autoAcceptIf&quot;: {
+        &quot;operator&quot;: &quot;AND&quot;,
+        &quot;conditions&quot;: [
+          {
+            &quot;fieldId&quot;: &quot;wholesale_price_usd&quot;,
+            &quot;operator&quot;: &quot;lt&quot;,
+            &quot;value&quot;: 500
+          },
+          {
+            &quot;fieldId&quot;: &quot;stock_quantity&quot;,
+            &quot;operator&quot;: &quot;gt&quot;,
+            &quot;value&quot;: 100
+          }
+        ]
+      },
+      # 需要审批：高价商品
+      &quot;requireApprovalIf&quot;: {
+        &quot;operator&quot;: &quot;AND&quot;,
+        &quot;conditions&quot;: [
+          {
+            &quot;fieldId&quot;: &quot;wholesale_price_usd&quot;,
+            &quot;operator&quot;: &quot;gte&quot;,
+            &quot;value&quot;: 500
+          }
+        ]
+      },
+      # 自动拒绝：库存不足
+      &quot;autoRejectIf&quot;: {
+        &quot;operator&quot;: &quot;AND&quot;,
+        &quot;conditions&quot;: [
+          {
+            &quot;fieldId&quot;: &quot;stock_quantity&quot;,
+            &quot;operator&quot;: &quot;lt&quot;,
+            &quot;value&quot;: 10
+          }
+        ]
+      },
+      &quot;defaultAction&quot;: &quot;manual&quot;
+    },
+    &quot;deduplicationStrategy&quot;: &quot;by_field&quot;,
+    &quot;deduplicationFieldIds&quot;: [&quot;model&quot;]
+  },
+  
+  # 字段映射配置
+  &quot;fieldMapping&quot;: {
+    &quot;rules&quot;: [
+      {
+        &quot;sourceFieldId&quot;: &quot;brand&quot;,
+        &quot;targetFieldId&quot;: &quot;brand&quot;,
+        &quot;transformType&quot;: &quot;direct&quot;,
+        &quot;propagationMode&quot;: &quot;oneway&quot;,
+        &quot;enabled&quot;: true
+      },
+      {
+        &quot;sourceFieldId&quot;: &quot;model&quot;,
+        &quot;targetFieldId&quot;: &quot;model&quot;,
+        &quot;transformType&quot;: &quot;direct&quot;,
+        &quot;propagationMode&quot;: &quot;oneway&quot;
+      },
+      {
+        &quot;sourceFieldId&quot;: &quot;wholesale_price_usd&quot;,
+        &quot;targetFieldId&quot;: &quot;cost_price&quot;,
+        &quot;transformType&quot;: &quot;unit_convert&quot;,
+        &quot;unitConversion&quot;: {
+          &quot;sourceUnit&quot;: &quot;USD&quot;,
+          &quot;targetUnit&quot;: &quot;CNY&quot;,
+          &quot;conversionType&quot;: &quot;currency&quot;,
+          &quot;exchangeRateSource&quot;: &quot;daily&quot;
+        },
+        &quot;propagationMode&quot;: &quot;oneway&quot;
+      },
+      {
+        &quot;sourceFieldId&quot;: &quot;specs&quot;,
+        &quot;targetFieldId&quot;: &quot;product_description&quot;,
+        &quot;transformType&quot;: &quot;format&quot;,
+        &quot;formatConfig&quot;: {
+          &quot;template&quot;: &quot;规格：${value}&quot;
+        },
+        &quot;propagationMode&quot;: &quot;oneway&quot;
+      }
+    ],
+    &quot;unmappedFields&quot;: &quot;ignore&quot;
+  },
+  
+  # 冲突解决策略
+  &quot;conflictResolution&quot;: {
+    &quot;defaultStrategy&quot;: &quot;keep_upstream&quot;,
+    &quot;fieldStrategies&quot;: {
+      &quot;cost_price&quot;: {
+        &quot;strategy&quot;: &quot;latest_wins&quot;
+      }
+    }
+  }
+}
+</code></pre>
+<h3>完整连接建立流程图</h3>
+<div class="mermaid">sequenceDiagram
+    participant S as 供应商
+    participant C as Catalog
+    participant CN as Connection
+    participant B as 采购商
+    participant OB as OrderBook
+    participant BD as Binding
+    
+    S->>C: 1. 创建 Catalog<br/>定义自定义字段
+    S->>CN: 2. 创建 Connection<br/>配置分享范围
+    S->>CN: 3. 生成分享链接
+    S->>B: 4. 发送链接给采购商
+    
+    B->>CN: 5. 访问分享链接<br/>查看 Connection 详情
+    B->>OB: 6. 创建 OrderBook<br/>基于 Connection 生成字段
+    B->>OB: 7. 预览字段映射
+    B->>BD: 8. 创建 Binding<br/>配置过滤和映射规则
+    
+    CN->>BD: 9. Binding 状态: pending
+    Note over CN,BD: 等待供应商审批（可选）
+    
+    CN->>BD: 10. 激活 Binding
+    BD->>OB: 11. 开始同步数据
+    
+    Note over C,OB: 数据连接已建立</div>
+<hr>
+<h2>第二部分：商品信息变动联动机制</h2>
+<h3>数据传播完整流程</h3>
+<p>当供应商的 Catalog 发生变更时，系统会自动将变更传播到所有连接的 OrderBook。</p>
+<div class="mermaid">graph TD
+    A[供应商修改Catalog数据] --> B[生成Revision]
+    B --> C[触发Document Hook]
+    C --> D[查询Active Connection]
+    D --> E[应用Connection.shareScope过滤]
+    E --> F{是否在分享范围内?}
+    
+    F -->|否| Z[结束]
+    F -->|是| G[查询该Connection下所有Active Binding]
+    
+    G --> H[遍历每个Binding]
+    H --> I[应用Binding.receiverFilter]
+    I --> J{是否满足接收条件?}
+    
+    J -->|否| H
+    J -->|是| K[执行Binding.fieldMapping]
+    K --> L[类型转换/单位转换/格式化]
+    L --> M[生成变更数据]
+    M --> N{acceptMode?}
+    
+    N -->|auto| O[自动创建/更新OrderBook数据]
+    N -->|selective| P{匹配autoAcceptIf?}
+    N -->|manual| Q[创建待审批Request]
+    
+    P -->|是| O
+    P -->|否| R{匹配requireApprovalIf?}
+    
+    R -->|是| Q
+    R -->|否| S{匹配autoRejectIf?}
+    
+    S -->|是| T[自动拒绝]
+    S -->|否| Q
+    
+    O --> U[在OrderBook创建Request]
+    Q --> U
+    U --> V[通知采购商]
+    V --> H
+    
+    H -->|所有Binding处理完| W[结束]
+    
+    style A fill:#ffe1e1
+    style O fill:#e1f5e1
+    style Q fill:#fff4e1
+    style T fill:#f5e1e1</div>
+<h3>场景 2：价格变动</h3>
+<p><strong>供应商降价</strong></p>
+<pre><code class="language-bash"># 供应商更新 Catalog 商品价格
+PATCH /api/v1/organizations/org-supplier/catalogs/catalog-001/rows/row-123?requestId=req-price-001
+{
+  &quot;values&quot;: [
+    {
+      &quot;fieldId&quot;: &quot;wholesale_price_usd&quot;,
+      &quot;value&quot;: {
+        &quot;number&quot;: 699.99  # 从 799.99 降到 699.99
+      }
+    }
+  ]
+}
+
+# 系统自动生成 Revision
+# 触发 Document Hook
+# 查询所有 Active Connection
+# 对每个 Connection 下的 Binding 执行传播
+</code></pre>
+<p><strong>采购商侧的自动处理</strong></p>
+<pre><code class="language-bash"># Binding 配置的字段映射会自动转换价格
+# wholesale_price_usd (699.99 USD) 
+#   -&gt; unit_convert (汇率 7.2)
+#   -&gt; cost_price (5039.93 CNY)
+
+# 根据 acceptMode 决定如何处理
+# 如果 acceptMode = &quot;auto&quot;，直接更新 OrderBook
+# 如果 acceptMode = &quot;selective&quot;，检查 autoAcceptIf 规则
+
+# 假设满足自动接受条件
+POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/rows/batch-update?requestId=req-sync-001
+{
+  &quot;rows&quot;: [
+    {
+      &quot;target&quot;: {
+        &quot;row&quot;: &quot;row-456&quot;
+      },
+      &quot;values&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;cost_price&quot;,
+          &quot;value&quot;: {
+            &quot;number&quot;: 5039.93
+          }
+        }
+      ],
+      &quot;metadata&quot;: {
+        &quot;syncSource&quot;: {
+          &quot;connectionId&quot;: &quot;conn-001&quot;,
+          &quot;sourceCatalogId&quot;: &quot;catalog-001&quot;,
+          &quot;sourceRowId&quot;: &quot;row-123&quot;,
+          &quot;sourceRevisionId&quot;: &quot;rev-price-001&quot;,
+          &quot;syncedAt&quot;: &quot;2024-12-14T10:00:00Z&quot;
+        }
+      }
+    }
+  ]
+}
+</code></pre>
+<h3>场景 3：库存变动</h3>
+<p><strong>供应商补货</strong></p>
+<pre><code class="language-bash"># 供应商更新库存
+PATCH /api/v1/organizations/org-supplier/catalogs/catalog-001/rows/row-123?requestId=req-stock-001
+{
+  &quot;values&quot;: [
+    {
+      &quot;fieldId&quot;: &quot;stock_quantity&quot;,
+      &quot;value&quot;: {
+        &quot;number&quot;: 150  # 从 20 更新到 150
+      }
+    }
+  ]
+}
+</code></pre>
+<p><strong>采购商侧的处理</strong></p>
+<p>如果该商品之前因库存不足被 <code>autoRejectIf</code> 规则拒绝，现在库存充足后会重新触发同步：</p>
+<pre><code class="language-bash"># 系统检测到库存从 20 增加到 150
+# 满足 Binding.receiverFilter 条件（stock_quantity &gt;= 50）
+# 创建新的 Request 通知采购商
+
+POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/requests
+{
+  &quot;requestId&quot;: &quot;req-new-product-001&quot;,
+  &quot;requestType&quot;: &quot;data_sync&quot;,
+  &quot;source&quot;: {
+    &quot;connectionId&quot;: &quot;conn-001&quot;,
+    &quot;catalogId&quot;: &quot;catalog-001&quot;,
+    &quot;rowId&quot;: &quot;row-123&quot;
+  },
+  &quot;changes&quot;: [
+    {
+      &quot;operation&quot;: &quot;create_row&quot;,
+      &quot;data&quot;: {
+        &quot;values&quot;: [
+          {
+            &quot;fieldId&quot;: &quot;brand&quot;,
+            &quot;value&quot;: {&quot;text&quot;: &quot;Apple&quot;}
+          },
+          {
+            &quot;fieldId&quot;: &quot;model&quot;,
+            &quot;value&quot;: {&quot;text&quot;: &quot;iPhone 15 Pro&quot;}
+          },
+          {
+            &quot;fieldId&quot;: &quot;cost_price&quot;,
+            &quot;value&quot;: {&quot;number&quot;: 5039.93}
+          },
+          {
+            &quot;fieldId&quot;: &quot;available_stock&quot;,
+            &quot;value&quot;: {&quot;number&quot;: 150}
+          }
+        ]
+      }
+    }
+  ],
+  &quot;status&quot;: &quot;pending&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;检测到新的可订购商品&quot;,
+    &quot;en&quot;: &quot;New orderable product detected&quot;
+  }
+}
+
+# 发送通知给采购商
+POST /webhooks/order-manager
+{
+  &quot;event&quot;: &quot;orderbook_sync_request_created&quot;,
+  &quot;payload&quot;: {
+    &quot;requestId&quot;: &quot;req-new-product-001&quot;,
+    &quot;orderBookId&quot;: &quot;orderbook-001&quot;,
+    &quot;productInfo&quot;: {
+      &quot;brand&quot;: &quot;Apple&quot;,
+      &quot;model&quot;: &quot;iPhone 15 Pro&quot;,
+      &quot;newStock&quot;: 150
+    }
+  }
+}
+</code></pre>
+<h3>场景 4：商品下架</h3>
+<p><strong>供应商停止销售某商品</strong></p>
+<pre><code class="language-bash"># 供应商删除商品或标记为不可用
+DELETE /api/v1/organizations/org-supplier/catalogs/catalog-001/rows/row-123?requestId=req-remove-001
+
+# 或者更新状态
+PATCH /api/v1/organizations/org-supplier/catalogs/catalog-001/rows/row-123?requestId=req-status-001
+{
+  &quot;values&quot;: [
+    {
+      &quot;fieldId&quot;: &quot;status&quot;,
+      &quot;value&quot;: {
+        &quot;selectOption&quot;: &quot;discontinued&quot;
+      }
+    }
+  ]
+}
+</code></pre>
+<p><strong>采购商侧的处理</strong></p>
+<pre><code class="language-bash"># 根据 Connection.shareScope 的配置
+# 如果商品不再满足分享条件（status != &quot;active&quot;）
+# 会触发删除或更新操作
+
+# 生成 Request 通知采购商
+POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/requests
+{
+  &quot;requestId&quot;: &quot;req-remove-product-001&quot;,
+  &quot;requestType&quot;: &quot;data_sync&quot;,
+  &quot;changes&quot;: [
+    {
+      &quot;operation&quot;: &quot;delete_row&quot;,
+      &quot;rowId&quot;: &quot;row-456&quot;,
+      &quot;reason&quot;: {
+        &quot;zh&quot;: &quot;供应商已停止供应此商品&quot;,
+        &quot;en&quot;: &quot;Supplier has discontinued this product&quot;
+      }
+    }
+  ],
+  &quot;status&quot;: &quot;pending&quot;
+}
+</code></pre>
+<h3>批量变更处理</h3>
+<p>供应商批量更新商品信息时，系统会在批处理窗口内合并变更：</p>
+<pre><code class="language-bash"># 供应商批量更新 100 个商品的价格
+POST /api/v1/organizations/org-supplier/catalogs/catalog-001/rows/batch-update?requestId=req-batch-001
+{
+  &quot;rows&quot;: [...100 rows...]
+}
+
+# 系统配置：propagationEvents.batchMerge = true
+#          propagationEvents.batchWindowSeconds = 300
+
+# 5分钟内的所有变更会合并成一个 Revision
+# 然后批量传播到所有 OrderBook
+# 减少网络请求和数据库操作
+</code></pre>
+<hr>
+<h2>第三部分：中间商（二级分销）机制</h2>
+<p>中间商既是采购商（从上游进货），也是供应商（向下游销售）。</p>
+<h3>架构模式</h3>
+<div class="mermaid">graph TB
+    subgraph 一级供应商
+        C1[Catalog 1<br/>批发商品目录]
+    end
+    
+    subgraph 中间商组织
+        OB1[OrderBook 1<br/>采购订货本]
+        CON[Connector<br/>转换器]
+        C2[Catalog 2<br/>零售商品目录]
+    end
+    
+    subgraph 下游零售商
+        OB2[OrderBook 2<br/>零售订货本]
+    end
+    
+    C1 -->|Connection A| OB1
+    OB1 -->|Connector转换| C2
+    C2 -->|Connection B| OB2
+    
+    style OB1 fill:#e1e5f5
+    style C2 fill:#e1f5e1
+    style CON fill:#ffe1f5</div>
+<h3>场景 5：中间商工作流程</h3>
+<h4>5.1 作为采购商：接收上游商品</h4>
+<pre><code class="language-bash"># 中间商从一级供应商接收商品
+# Connection A: 一级供应商 Catalog 1 -&gt; 中间商 OrderBook 1
+
+POST /api/v1/organizations/org-middle/orderbooks/orderbook-001/bindings
+{
+  &quot;connectionId&quot;: &quot;conn-upstream-001&quot;,
+  &quot;receiverFilter&quot;: {
+    &quot;filterGroup&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;wholesale_price_usd&quot;,
+          &quot;operator&quot;: &quot;lte&quot;,
+          &quot;value&quot;: 500  # 只采购单价低于500美元的商品
+        },
+        {
+          &quot;fieldId&quot;: &quot;min_order_quantity&quot;,
+          &quot;operator&quot;: &quot;lte&quot;,
+          &quot;value&quot;: 10  # 起订量不超过10件
+        }
+      ]
+    },
+    &quot;acceptMode&quot;: &quot;auto&quot;
+  },
+  &quot;fieldMapping&quot;: {
+    &quot;rules&quot;: [
+      {
+        &quot;sourceFieldId&quot;: &quot;wholesale_price_usd&quot;,
+        &quot;targetFieldId&quot;: &quot;purchase_cost_usd&quot;,
+        &quot;transformType&quot;: &quot;direct&quot;
+      }
+    ]
+  }
+}
+</code></pre>
+<h4>5.2 转换为下游 Catalog</h4>
+<p>使用 Connector 将 OrderBook 转换为新的 Catalog：</p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-middle/connectors
+{
+  &quot;name&quot;: &quot;订货本转零售目录&quot;,
+  &quot;connectorType&quot;: &quot;orderbook_to_catalog&quot;,
+  &quot;sourceDocId&quot;: &quot;orderbook-001&quot;,
+  &quot;sourceDocType&quot;: &quot;orderbook&quot;,
+  &quot;targetDocId&quot;: &quot;catalog-002&quot;,
+  &quot;targetDocType&quot;: &quot;catalog&quot;,
+  
+  &quot;orderbookToCatalogConfig&quot;: {
+    # 字段映射：添加利润率
+    &quot;fieldMapping&quot;: {
+      &quot;rules&quot;: [
+        {
+          &quot;sourceFieldId&quot;: &quot;purchase_cost_usd&quot;,
+          &quot;targetFieldId&quot;: &quot;wholesale_price_usd&quot;,
+          &quot;transformType&quot;: &quot;formula&quot;,
+          &quot;formula&quot;: &quot;purchase_cost_usd * 1.2&quot;,  # 加价20%
+          &quot;propagationMode&quot;: &quot;sync&quot;
+        },
+        {
+          &quot;sourceFieldId&quot;: &quot;brand&quot;,
+          &quot;targetFieldId&quot;: &quot;brand&quot;,
+          &quot;transformType&quot;: &quot;direct&quot;
+        },
+        {
+          &quot;sourceFieldId&quot;: &quot;model&quot;,
+          &quot;targetFieldId&quot;: &quot;model&quot;,
+          &quot;transformType&quot;: &quot;direct&quot;
+        }
+      ]
+    },
+    
+    # 过滤规则：只转换有利润空间的商品
+    &quot;sourceFilter&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;purchase_cost_usd&quot;,
+          &quot;operator&quot;: &quot;lt&quot;,
+          &quot;value&quot;: 400  # 成本低于400美元的商品才转换
+        }
+      ]
+    },
+    
+    # 同步模式：实时同步
+    &quot;syncMode&quot;: &quot;realtime&quot;,
+    &quot;conflictResolution&quot;: &quot;source_wins&quot;
+  }
+}
+</code></pre>
+<h4>5.3 作为供应商：向下游分享</h4>
+<pre><code class="language-bash"># 创建面向零售商的 Connection
+POST /api/v1/organizations/org-middle/connections
+{
+  &quot;name&quot;: &quot;零售商连接&quot;,
+  &quot;sourceCatalogId&quot;: &quot;catalog-002&quot;,
+  &quot;shareMode&quot;: &quot;multiple&quot;,
+  
+  &quot;shareScope&quot;: {
+    &quot;mode&quot;: &quot;filter&quot;,
+    &quot;filterGroup&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;wholesale_price_usd&quot;,
+          &quot;operator&quot;: &quot;lte&quot;,
+          &quot;value&quot;: 600
+        }
+      ]
+    }
+  },
+  
+  &quot;defaultReceiverConfig&quot;: {
+    &quot;suggestedFieldMapping&quot;: {
+      &quot;rules&quot;: [
+        {
+          &quot;sourceFieldId&quot;: &quot;wholesale_price_usd&quot;,
+          &quot;targetFieldId&quot;: &quot;cost_price&quot;,
+          &quot;transformType&quot;: &quot;direct&quot;
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+<h3>价格传导机制</h3>
+<div class="mermaid">sequenceDiagram
+    participant C1 as 一级供应商<br/>Catalog
+    participant OB1 as 中间商<br/>OrderBook
+    participant CON as Connector
+    participant C2 as 中间商<br/>Catalog
+    participant OB2 as 零售商<br/>OrderBook
+    
+    C1->>OB1: 1. 价格下调<br/>$800 -> $700
+    Note over OB1: 接收成本降低
+    
+    OB1->>CON: 2. 触发 Connector
+    CON->>CON: 3. 执行公式<br/>$700 * 1.2 = $840
+    CON->>C2: 4. 更新批发价<br/>$840
+    
+    C2->>OB2: 5. 传播到零售商<br/>成本 $840
+    
+    Note over C1,OB2: 价格变动自动传导完成</div>
+<h3>库存管理</h3>
+<p>中间商可以设置库存缓冲策略：</p>
+<pre><code class="language-bash"># Connector 配置：库存转换规则
+{
+  &quot;orderbookToCatalogConfig&quot;: {
+    &quot;fieldMapping&quot;: {
+      &quot;rules&quot;: [
+        {
+          &quot;sourceFieldId&quot;: &quot;available_stock&quot;,
+          &quot;targetFieldId&quot;: &quot;stock_quantity&quot;,
+          &quot;transformType&quot;: &quot;formula&quot;,
+          # 只转换80%的库存，保留20%作为安全库存
+          &quot;formula&quot;: &quot;FLOOR(available_stock * 0.8)&quot;
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+<hr>
+<h2>第四部分：组织内文档连接</h2>
+<p>在同一组织内，可以将 OrderBook 转换为 Catalog，用于内部分销或跨部门共享。</p>
+<h3>场景 6：OrderBook 转 Catalog</h3>
+<p><strong>用例</strong>：采购部门的 OrderBook 转换为销售部门的 Catalog</p>
+<div class="mermaid">graph LR
+    subgraph 组织A
+        subgraph 采购部门Workspace
+            OB[OrderBook<br/>采购订货本]
+        end
+        
+        subgraph 销售部门Workspace
+            C[Catalog<br/>销售目录]
+        end
+        
+        CON[Connector<br/>组织内转换器]
+        
+        OB -->|Connector| CON
+        CON --> C
+    end
+    
+    style OB fill:#e1e5f5
+    style C fill:#e1f5e1
+    style CON fill:#ffe1f5</div>
+<p><strong>配置示例</strong>：</p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-company/connectors
+{
+  &quot;name&quot;: &quot;采购到销售转换&quot;,
+  &quot;connectorType&quot;: &quot;orderbook_to_catalog&quot;,
+  &quot;sourceDocId&quot;: &quot;orderbook-purchase-001&quot;,
+  &quot;targetDocId&quot;: &quot;catalog-sales-001&quot;,
+  
+  &quot;orderbookToCatalogConfig&quot;: {
+    &quot;fieldMapping&quot;: {
+      &quot;rules&quot;: [
+        # 成本价转为内部批发价（加价30%）
+        {
+          &quot;sourceFieldId&quot;: &quot;purchase_cost&quot;,
+          &quot;targetFieldId&quot;: &quot;internal_wholesale_price&quot;,
+          &quot;transformType&quot;: &quot;formula&quot;,
+          &quot;formula&quot;: &quot;purchase_cost * 1.3&quot;
+        },
+        
+        # 建议零售价（加价50%）
+        {
+          &quot;sourceFieldId&quot;: &quot;purchase_cost&quot;,
+          &quot;targetFieldId&quot;: &quot;suggested_retail_price&quot;,
+          &quot;transformType&quot;: &quot;formula&quot;,
+          &quot;formula&quot;: &quot;purchase_cost * 1.5&quot;
+        },
+        
+        # 直接映射
+        {
+          &quot;sourceFieldId&quot;: &quot;product_name&quot;,
+          &quot;targetFieldId&quot;: &quot;product_name&quot;,
+          &quot;transformType&quot;: &quot;direct&quot;
+        },
+        
+        # 库存转换（预留10%）
+        {
+          &quot;sourceFieldId&quot;: &quot;total_stock&quot;,
+          &quot;targetFieldId&quot;: &quot;available_stock&quot;,
+          &quot;transformType&quot;: &quot;formula&quot;,
+          &quot;formula&quot;: &quot;FLOOR(total_stock * 0.9)&quot;
+        }
+      ],
+      &quot;unmappedFields&quot;: &quot;ignore&quot;
+    },
+    
+    # 只转换已验收的商品
+    &quot;sourceFilter&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;inspection_status&quot;,
+          &quot;operator&quot;: &quot;eq&quot;,
+          &quot;value&quot;: &quot;approved&quot;
+        },
+        {
+          &quot;fieldId&quot;: &quot;stock_location&quot;,
+          &quot;operator&quot;: &quot;eq&quot;,
+          &quot;value&quot;: &quot;main_warehouse&quot;
+        }
+      ]
+    },
+    
+    &quot;syncMode&quot;: &quot;scheduled&quot;,
+    &quot;scheduleConfig&quot;: {
+      &quot;cron&quot;: &quot;0 0 * * *&quot;,  # 每天凌晨同步
+      &quot;timezone&quot;: &quot;Asia/Shanghai&quot;
+    }
+  }
+}
+</code></pre>
+<h3>场景 7：Catalog 克隆</h3>
+<p>在组织内复制 Catalog 用于不同业务场景：</p>
+<pre><code class="language-bash">POST /api/v1/organizations/org-company/connectors
+{
+  &quot;name&quot;: &quot;主目录克隆到促销目录&quot;,
+  &quot;connectorType&quot;: &quot;catalog_clone&quot;,
+  &quot;sourceDocId&quot;: &quot;catalog-main-001&quot;,
+  &quot;targetDocId&quot;: &quot;catalog-promo-001&quot;,
+  
+  &quot;catalogCloneConfig&quot;: {
+    &quot;fieldMapping&quot;: {
+      &quot;rules&quot;: [
+        # 价格打8折
+        {
+          &quot;sourceFieldId&quot;: &quot;regular_price&quot;,
+          &quot;targetFieldId&quot;: &quot;promo_price&quot;,
+          &quot;transformType&quot;: &quot;formula&quot;,
+          &quot;formula&quot;: &quot;regular_price * 0.8&quot;
+        }
+      ]
+    },
+    
+    # 只克隆促销商品
+    &quot;sourceFilter&quot;: {
+      &quot;operator&quot;: &quot;AND&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;fieldId&quot;: &quot;promo_eligible&quot;,
+          &quot;operator&quot;: &quot;eq&quot;,
+          &quot;value&quot;: true
+        }
+      ]
+    },
+    
+    &quot;syncMode&quot;: &quot;realtime&quot;,
+    &quot;bidirectional&quot;: false
+  }
+}
+</code></pre>
+<hr>
+<h2>第五部分：完整架构总览</h2>
+<h3>系统架构层次</h3>
+<div class="mermaid">graph TB
+    subgraph 应用层
+        UI[前端应用]
+        API[REST API]
+    end
+    
+    subgraph 业务逻辑层
+        CS[Catalog Service]
+        OBS[OrderBook Service]
+        CNS[Connection Service]
+        BDS[Binding Service]
+        CONS[Connector Service]
+    end
+    
+    subgraph 数据协同层
+        FSE[字段映射引擎]
+        FE[过滤引擎]
+        TE[转换引擎]
+        SE[同步引擎]
+    end
+    
+    subgraph 工作流层
+        REQ[Request管理]
+        REV[Revision管理]
+        APP[Approval流程]
+        WH[Webhook通知]
+    end
+    
+    subgraph 存储层
+        DOC[(Document Store)]
+        META[(Metadata Store)]
+        REL[(Relation Store)]
+    end
+    
+    UI --> API
+    API --> CS
+    API --> OBS
+    API --> CNS
+    
+    CS --> FSE
+    OBS --> FSE
+    CNS --> FE
+    BDS --> TE
+    CONS --> SE
+    
+    FSE --> REQ
+    FE --> REQ
+    TE --> REQ
+    SE --> REQ
+    
+    REQ --> REV
+    REQ --> APP
+    REV --> WH
+    APP --> WH
+    
+    CS --> DOC
+    OBS --> DOC
+    CNS --> META
+    BDS --> REL
+    
+    style UI fill:#e1f5e1
+    style API fill:#e1e5f5
+    style FSE fill:#fff4e1
+    style REQ fill:#ffe1f5</div>
+<h3>核心组件职责</h3>
+<h4>1. Catalog Service</h4>
+<ul>
+<li>管理供应商商品目录</li>
+<li>支持自定义字段定义</li>
+<li>处理商品增删改查</li>
+<li>生成数据变更 Revision</li>
+</ul>
+<h4>2. OrderBook Service</h4>
+<ul>
+<li>管理采购商订货本</li>
+<li>基于 Connection 自动生成字段</li>
+<li>接收上游数据同步</li>
+<li>支持字段映射预览</li>
+</ul>
+<h4>3. Connection Service（Outbound）</h4>
+<ul>
+<li>创建跨组织数据分享通道</li>
+<li>配置分享范围和访问控制</li>
+<li>管理默认接收方配置</li>
+<li>监听源 Catalog 变更事件</li>
+</ul>
+<h4>4. Binding Service（Inbound）</h4>
+<ul>
+<li>建立 OrderBook 到 Connection 的绑定</li>
+<li>配置接收方过滤规则</li>
+<li>配置字段映射转换</li>
+<li>执行数据同步逻辑</li>
+</ul>
+<h4>5. Connector Service</h4>
+<ul>
+<li>组织内文档转换</li>
+<li>OrderBook -&gt; Catalog 转换</li>
+<li>Catalog -&gt; Catalog 克隆</li>
+<li>支持实时/定时同步</li>
+</ul>
+<h4>6. 字段映射引擎</h4>
+<ul>
+<li>直接映射（direct）</li>
+<li>类型转换（type_convert）</li>
+<li>单位转换（unit_convert）</li>
+<li>选项映射（option_mapping）</li>
+<li>公式计算（formula）</li>
+<li>字符串格式化（format）</li>
+<li>字段合并/拆分（merge/split）</li>
+</ul>
+<h4>7. 过滤引擎</h4>
+<ul>
+<li>嵌套逻辑条件组（AND/OR）</li>
+<li>多种比较运算符</li>
+<li>自动接受/拒绝规则</li>
+<li>去重策略</li>
+</ul>
+<h4>8. 同步引擎</h4>
+<ul>
+<li>事件监听和触发</li>
+<li>批量变更合并</li>
+<li>冲突解决</li>
+<li>增量同步</li>
+</ul>
+<hr>
+<h2>第六部分：典型业务场景</h2>
+<h3>场景 8：跨境电商</h3>
+<p><strong>业务需求</strong>：</p>
+<ul>
+<li>中国供应商向美国零售商销售商品</li>
+<li>需要货币转换（人民币 -&gt; 美元）</li>
+<li>需要单位转换（公斤 -&gt; 磅）</li>
+<li>需要选项翻译（中文 -&gt; 英文）</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<pre><code class="language-bash"># Connection 配置
+{
+  &quot;defaultReceiverConfig&quot;: {
+    &quot;suggestedFieldMapping&quot;: {
+      &quot;rules&quot;: [
+        # 货币转换
+        {
+          &quot;sourceFieldId&quot;: &quot;price_cny&quot;,
+          &quot;targetFieldId&quot;: &quot;price_usd&quot;,
+          &quot;transformType&quot;: &quot;unit_convert&quot;,
+          &quot;unitConversion&quot;: {
+            &quot;sourceUnit&quot;: &quot;CNY&quot;,
+            &quot;targetUnit&quot;: &quot;USD&quot;,
+            &quot;conversionType&quot;: &quot;currency&quot;,
+            &quot;exchangeRateSource&quot;: &quot;realtime&quot;
+          }
+        },
+        
+        # 重量单位转换
+        {
+          &quot;sourceFieldId&quot;: &quot;weight_kg&quot;,
+          &quot;targetFieldId&quot;: &quot;weight_lb&quot;,
+          &quot;transformType&quot;: &quot;unit_convert&quot;,
+          &quot;unitConversion&quot;: {
+            &quot;sourceUnit&quot;: &quot;kg&quot;,
+            &quot;targetUnit&quot;: &quot;lb&quot;,
+            &quot;conversionType&quot;: &quot;weight&quot;,
+            &quot;customRate&quot;: 2.20462
+          }
+        },
+        
+        # 选项翻译
+        {
+          &quot;sourceFieldId&quot;: &quot;color_cn&quot;,
+          &quot;targetFieldId&quot;: &quot;color_en&quot;,
+          &quot;transformType&quot;: &quot;option_mapping&quot;,
+          &quot;optionMapping&quot;: {
+            &quot;mappings&quot;: {
+              &quot;红色&quot;: &quot;Red&quot;,
+              &quot;蓝色&quot;: &quot;Blue&quot;,
+              &quot;绿色&quot;: &quot;Green&quot;,
+              &quot;黑色&quot;: &quot;Black&quot;,
+              &quot;白色&quot;: &quot;White&quot;
+            },
+            &quot;unmappedStrategy&quot;: &quot;keep_original&quot;
+          }
+        }
+      ]
+    }
+  }
+}
+</code></pre>
+<h3>场景 9：季节性促销</h3>
+<p><strong>业务需求</strong>：</p>
+<ul>
+<li>供应商在促销季节降价</li>
+<li>采购商只接受降价通知，涨价需要审批</li>
+<li>自动更新促销商品</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<pre><code class="language-bash"># Binding 配置
+{
+  &quot;receiverFilter&quot;: {
+    &quot;acceptMode&quot;: &quot;selective&quot;,
+    &quot;manualAcceptRules&quot;: {
+      # 自动接受：价格下降
+      &quot;autoAcceptIf&quot;: {
+        &quot;operator&quot;: &quot;AND&quot;,
+        &quot;conditions&quot;: [
+          {
+            &quot;fieldId&quot;: &quot;_change_type&quot;,
+            &quot;operator&quot;: &quot;eq&quot;,
+            &quot;value&quot;: &quot;price_decrease&quot;
+          }
+        ]
+      },
+      
+      # 需要审批：价格上涨
+      &quot;requireApprovalIf&quot;: {
+        &quot;operator&quot;: &quot;AND&quot;,
+        &quot;conditions&quot;: [
+          {
+            &quot;fieldId&quot;: &quot;_change_type&quot;,
+            &quot;operator&quot;: &quot;eq&quot;,
+            &quot;value&quot;: &quot;price_increase&quot;
+          }
+        ]
+      },
+      
+      &quot;defaultAction&quot;: &quot;accept&quot;
+    }
+  },
+  
+  &quot;conflictResolution&quot;: {
+    &quot;fieldStrategies&quot;: {
+      &quot;price&quot;: {
+        &quot;strategy&quot;: &quot;keep_upstream&quot;  # 价格变动始终以上游为准
+      },
+      &quot;internal_notes&quot;: {
+        &quot;strategy&quot;: &quot;keep_local&quot;  # 内部备注保持本地值
+      }
+    }
+  }
+}
+</code></pre>
+<h3>场景 10：多供应商整合</h3>
+<p><strong>业务需求</strong>：</p>
+<ul>
+<li>采购商从多个供应商采购同类商品</li>
+<li>需要统一字段格式</li>
+<li>需要去重和合并</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<pre><code class="language-bash"># OrderBook 配置多个 Binding
+POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/bindings
+{
+  &quot;connectionId&quot;: &quot;conn-supplier-a-001&quot;,
+  &quot;fieldMapping&quot;: {
+    &quot;rules&quot;: [
+      # 供应商A的字段映射
+      {
+        &quot;sourceFieldId&quot;: &quot;item_code&quot;,
+        &quot;targetFieldId&quot;: &quot;unified_sku&quot;,
+        &quot;transformType&quot;: &quot;format&quot;,
+        &quot;formatConfig&quot;: {
+          &quot;template&quot;: &quot;SUP-A-${value}&quot;
+        }
+      }
+    ]
+  },
+  &quot;receiverFilter&quot;: {
+    &quot;deduplicationStrategy&quot;: &quot;by_fields&quot;,
+    &quot;deduplicationFieldIds&quot;: [&quot;brand&quot;, &quot;model&quot;]
+  }
+}
+
+POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/bindings
+{
+  &quot;connectionId&quot;: &quot;conn-supplier-b-001&quot;,
+  &quot;fieldMapping&quot;: {
+    &quot;rules&quot;: [
+      # 供应商B的字段映射
+      {
+        &quot;sourceFieldId&quot;: &quot;product_id&quot;,
+        &quot;targetFieldId&quot;: &quot;unified_sku&quot;,
+        &quot;transformType&quot;: &quot;format&quot;,
+        &quot;formatConfig&quot;: {
+          &quot;template&quot;: &quot;SUP-B-${value}&quot;
+        }
+      }
+    ]
+  },
+  &quot;receiverFilter&quot;: {
+    &quot;deduplicationStrategy&quot;: &quot;by_fields&quot;,
+    &quot;deduplicationFieldIds&quot;: [&quot;brand&quot;, &quot;model&quot;]
+  }
+}
+</code></pre>
+<hr>
+<h2>第七部分：最佳实践</h2>
+<h3>1. Connection 设计原则</h3>
+<p><strong>✅ 推荐做法</strong>：</p>
+<ul>
+<li>使用有意义的 Connection 名称（如&quot;面向大型零售商&quot;而非&quot;连接1&quot;）</li>
+<li>明确配置 <code>shareScope</code>，避免分享敏感或不必要的数据</li>
+<li>设置合理的 <code>accessControl</code>，使用白名单模式</li>
+<li>配置 <code>defaultReceiverConfig</code>，为下游提供建议的映射规则</li>
+<li>启用 <code>batchMerge</code>，减少频繁的小批量同步</li>
+</ul>
+<p><strong>❌ 避免做法</strong>：</p>
+<ul>
+<li>不要设置过于宽松的访问控制（如 <code>mode: &quot;approval&quot;</code> 但无审批人）</li>
+<li>不要在 <code>shareScope</code> 中使用复杂的嵌套条件（影响性能）</li>
+<li>不要频繁修改 Connection 配置（会影响已有 Binding）</li>
+</ul>
+<h3>2. Binding 设计原则</h3>
+<p><strong>✅ 推荐做法</strong>：</p>
+<ul>
+<li>明确配置 <code>receiverFilter</code>，只接收需要的商品</li>
+<li>使用 <code>selective</code> 模式，结合自动规则减少人工干预</li>
+<li>配置去重策略，避免重复数据</li>
+<li>为关键字段配置冲突解决策略</li>
+<li>使用字段映射预览 API 验证配置</li>
+</ul>
+<p><strong>❌ 避免做法</strong>：</p>
+<ul>
+<li>不要使用 <code>acceptMode: &quot;auto&quot;</code> 且无任何过滤条件（会接收所有数据）</li>
+<li>不要忽略 <code>unmappedFields</code> 的处理策略</li>
+<li>不要在生产环境直接修改 Binding，应先在测试环境验证</li>
+</ul>
+<h3>3. 字段映射最佳实践</h3>
+<p><strong>✅ 推荐做法</strong>：</p>
+<ul>
+<li>优先使用 <code>direct</code> 映射，减少转换开销</li>
+<li>货币转换使用 <code>realtime</code> 或 <code>daily</code> 汇率源</li>
+<li>公式转换保持简单，避免复杂计算</li>
+<li>选项映射提供 <code>unmappedStrategy</code></li>
+<li>为每个映射规则添加 <code>description</code></li>
+</ul>
+<p><strong>❌ 避免做法</strong>：</p>
+<ul>
+<li>不要在字段映射中执行业务逻辑（如订单计算）</li>
+<li>不要使用过于复杂的公式（影响性能和可维护性）</li>
+<li>不要忽略数据类型兼容性检查</li>
+</ul>
+<h3>4. 性能优化建议</h3>
+<p><strong>批量处理</strong>：</p>
+<pre><code class="language-bash"># 配置批处理窗口
+{
+  &quot;propagationEvents&quot;: {
+    &quot;batchMerge&quot;: true,
+    &quot;batchWindowSeconds&quot;: 300  # 5分钟窗口
+  }
+}
+</code></pre>
+<p><strong>增量同步</strong>：</p>
+<pre><code class="language-bash"># 使用 lastSyncRevisionId 实现增量同步
+GET /api/v1/organizations/org-supplier/catalogs/catalog-001/revisions?since=rev-123
+</code></pre>
+<p><strong>异步处理</strong>：</p>
+<ul>
+<li>数据传播使用异步任务队列</li>
+<li>Webhook 通知使用后台任务</li>
+<li>大批量数据同步使用分页处理</li>
+</ul>
+<h3>5. 安全性建议</h3>
+<p><strong>访问控制</strong>：</p>
+<ul>
+<li>使用白名单模式限制访问组织</li>
+<li>定期审查 Connection 的访问权限</li>
+<li>为敏感字段配置只读权限</li>
+</ul>
+<p><strong>数据验证</strong>：</p>
+<ul>
+<li>在字段映射中添加验证规则</li>
+<li>使用 <code>receiverFilter</code> 过滤非法数据</li>
+<li>配置数据完整性检查</li>
+</ul>
+<p><strong>审计追踪</strong>：</p>
+<ul>
+<li>所有数据同步生成 Revision</li>
+<li>关键操作生成审计日志</li>
+<li>配置 Webhook 实时监控</li>
+</ul>
+<hr>
+<h2>第八部分：故障排查</h2>
+<h3>常见问题</h3>
+<h4>1. 数据未同步</h4>
+<p><strong>可能原因</strong>：</p>
+<ul>
+<li>Connection 状态为 <code>paused</code> 或 <code>disabled</code></li>
+<li>Binding 状态为 <code>pending</code> 或 <code>rejected</code></li>
+<li>数据不满足 <code>shareScope</code> 过滤条件</li>
+<li>数据被 <code>receiverFilter</code> 拒绝</li>
+</ul>
+<p><strong>排查步骤</strong>：</p>
+<pre><code class="language-bash"># 1. 检查 Connection 状态
+GET /api/v1/organizations/org-supplier/connections/conn-001
+
+# 2. 检查 Binding 状态
+GET /api/v1/organizations/org-retailer/orderbooks/orderbook-001/bindings
+
+# 3. 查看同步日志
+GET /api/v1/organizations/org-retailer/orderbooks/orderbook-001/sync-logs?bindingId=binding-001
+
+# 4. 检查待处理的 Request
+GET /api/v1/organizations/org-retailer/orderbooks/orderbook-001/requests?status=pending
+</code></pre>
+<h4>2. 字段映射错误</h4>
+<p><strong>可能原因</strong>：</p>
+<ul>
+<li>源字段和目标字段类型不兼容</li>
+<li>转换配置错误</li>
+<li>公式语法错误</li>
+</ul>
+<p><strong>排查步骤</strong>：</p>
+<pre><code class="language-bash"># 使用预览 API 验证映射
+POST /api/v1/organizations/org-retailer/orderbooks/orderbook-001/field-mapping/preview
+{
+  &quot;connectionId&quot;: &quot;conn-001&quot;
+}
+
+# 检查字段定义
+GET /api/v1/organizations/org-supplier/catalogs/catalog-001/fields
+GET /api/v1/organizations/org-retailer/orderbooks/orderbook-001/fields
+</code></pre>
+<h4>3. 冲突频繁发生</h4>
+<p><strong>可能原因</strong>：</p>
+<ul>
+<li>多个 Binding 同时更新同一数据</li>
+<li>冲突解决策略配置不当</li>
+<li>缺少去重策略</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<pre><code class="language-bash"># 配置明确的冲突解决策略
+{
+  &quot;conflictResolution&quot;: {
+    &quot;defaultStrategy&quot;: &quot;latest_wins&quot;,
+    &quot;fieldStrategies&quot;: {
+      &quot;price&quot;: {
+        &quot;strategy&quot;: &quot;keep_upstream&quot;
+      }
+    }
+  }
+}
+
+# 启用去重
+{
+  &quot;receiverFilter&quot;: {
+    &quot;deduplicationStrategy&quot;: &quot;by_fields&quot;,
+    &quot;deduplicationFieldIds&quot;: [&quot;brand&quot;, &quot;model&quot;]
+  }
+}
+</code></pre>
+<hr>
+<h2>总结</h2>
+<p>NexusBook 的 Catalog-OrderBook 系统通过以下设计实现了灵活、强大的供应链数据协同：</p>
+<h3>核心优势</h3>
+<ol>
+<li><strong>组织级别资源</strong>：支持跨 Workspace 共享，避免数据重复</li>
+<li><strong>自定义字段</strong>：适应不同行业的业务需求</li>
+<li><strong>灵活的映射转换</strong>：支持类型、单位、选项、公式等多种转换</li>
+<li><strong>智能过滤</strong>：嵌套条件组和自动规则减少人工干预</li>
+<li><strong>实时同步</strong>：基于事件驱动的增量同步机制</li>
+<li><strong>完整的审计</strong>：所有变更通过 Request-Revision 工作流追踪</li>
+<li><strong>多级分销</strong>：支持中间商和组织内转换</li>
+</ol>
+<h3>适用场景</h3>
+<ul>
+<li>✅ B2B 电商平台</li>
+<li>✅ 供应链管理系统</li>
+<li>✅ 分销管理系统</li>
+<li>✅ 跨境贸易平台</li>
+<li>✅ 多品牌零售管理</li>
+<li>✅ 企业采购平台</li>
+</ul>
+<h3>进一步参考</h3>
+<ul>
+<li><a href="./api-reference.md">API 参考手册</a> - 完整的 API 端点文档</li>
+<li><a href="./field-types.md">字段类型参考</a> - 25+ 种字段类型详解</li>
+<li><a href="./error-codes.md">错误码参考</a> - 错误处理指南</li>
+<li><a href="../guides/webhooks.md">Webhook 使用指南</a> - 事件通知机制</li>
+<li><a href="../guides/best-practices.md">最佳实践</a> - 性能优化和安全建议</li>
+</ul>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
