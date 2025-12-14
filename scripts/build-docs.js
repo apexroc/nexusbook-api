@@ -159,6 +159,13 @@ async function generateHomePage() {
                         <p>错误码、字段类型、国际化等参考资料，便于快速查阅。</p>
                         <a href="${resolvePath('references/error-codes.html')}" class="feature-link">查看参考 →</a>
                     </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔗</div>
+                        <h3>Catalog-OrderBook 数据协同</h3>
+                        <p>完整的供应链数据协同解决方案，支持跨组织商品共享、订货管理和多级分销。</p>
+                        <a href="${resolvePath('references/catalog-orderbook-sync.html')}" class="feature-link">查看文档 →</a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -191,6 +198,7 @@ async function generateHomePage() {
                     <h3>📖 参考文档</h3>
                     <ul class="doc-list">
                         <li><a href="${resolvePath('references/api-reference.html')}">API 参考手册</a> - 所有端点的详细文档</li>
+                        <li><a href="${resolvePath('references/catalog-orderbook-sync.html')}">Catalog-OrderBook 数据协同</a> - 供应链协作完整参考</li>
                         <li><a href="${resolvePath('references/error-codes.html')}">错误码参考</a> - 完整的错误码列表</li>
                         <li><a href="${resolvePath('references/field-types.html')}">字段类型参考</a> - 25+ 种字段类型说明</li>
                         <li><a href="${resolvePath('references/i18n.html')}">国际化说明</a> - 多语言支持文档</li>
@@ -424,11 +432,12 @@ async function build() {
 
     // 转换参考文档
     const references = [
+      { file: 'api-reference', title: 'API 参考手册' },
+      { file: 'catalog-orderbook-sync', title: 'Catalog-OrderBook 数据协同参考' },
       { file: 'error-codes', title: '错误码参考' },
       { file: 'field-types', title: '字段类型参考' },
       { file: 'i18n', title: '国际化说明' },
-      { file: 'changelog', title: '变更日志' },
-      { file: 'api-reference', title: 'API 参考手册' }
+      { file: 'changelog', title: '变更日志' }
     ];
 
     for (const ref of references) {
