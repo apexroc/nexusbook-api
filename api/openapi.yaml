@@ -1,63 +1,208 @@
 openapi: 3.0.0
 info:
   title: NexusBook OpenAPI
+  version: 0.1.9
   description: |-
     NexusBook OpenAPI
 
-    一个功能强大的开源文档管理和数据协作平台 API。
+    🚀 **NexusBook** 是一个功能强大的开源文档管理和数据协作平台，为企业提供灵活的结构化数据管理、实时协作和供应链数据协同能力。
 
-    ## 主要功能模块
+    ---
 
-    ### 1. 文档管理 (`/doc`)
-    - **元数据** - 字段定义、类型和验证配置
-    - **视图** - 多种视图类型支持（表格/相册/看板/文档）
-    - **数据** - 结构化数据行管理和查询
-    - **修订** - 版本控制和历史记录
-    - **评论** - 多层级评论系统（文档级/字段级/行级）
-    - **审批** - 工作流审批流程
-    - **请求** - 变更请求和合并机制
-    - **设置** - 文档级和类型级配置
+    ## ✨ 核心特性
 
-    ### 2. 认证与授权 (`/auth`)
-    - OAuth2 客户端应用管理
-    - OIDC 身份提供商集成
-    - JWT 令牌管理
-    - 用户信息和权限
+    ### 📋 灵活的文档模型
+    - **25+ 种字段类型**：文本、数字、日期、附件、关联等
+    - **多视图支持**：表格、相册、看板、日历、文档视图
+    - **自定义字段**：支持不同行业的个性化扩展
+    - **版本控制**：完整的修订历史和回溯能力
 
-    ### 3. 扩展功能 (`/webhooks`)
-    - **Webhooks** - 事件驱动的通知机制
-    - 支持 Request、Approval、Comment、Metadata、View 等事件
-    - 自动重试和签名验证
-    - 投递历史和统计
+    ### 🤝 实时协作
+    - **多层级评论**：文档级、字段级、行级评论系统
+    - **审批工作流**：可配置的变更审批流程
+    - **请求与合并**：类 Git 的数据变更管理
+    - **并发控制**：基于版本号的乐观锁机制
 
-    ## API 调用示例
+    ### 🔗 供应链数据协同
+    - **Catalog（商品目录）**：供应商管理商品数据，支持行业自定义字段
+    - **OrderBook（订货本）**：采购商基于 Connection 创建订货视图
+    - **Connection（连接）**：供应商与采购商的数据共享通道
+    - **字段映射**：支持类型转换、单位转换、选项映射等 8 种转换类型
+    - **智能过滤**：嵌套条件组和自动接受/拒绝规则
+    - **中间商支持**：二级分销和多级数据传导
 
-    ```bash
-    # 获取聚合文档包
-    curl -H 'Authorization: Bearer TOKEN' \
-      'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data'
+    ### 🔌 扩展能力
+    - **Webhooks**：事件驱动的通知机制
+    - **自动化集成**：支持 Zapier、Make 等自动化平台
+    - **API Keys**：安全的服务间调用
+    - **OAuth2/OIDC**：企业级身份认证集成
 
-    # 创建数据行
-    curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/123/data' \
-      -H 'Authorization: Bearer TOKEN' \
-      -H 'Content-Type: application/json' \
-      -d '{"id":"row-1","values":[{"fieldId":"name","value":{"text":"新产品"}}]}'
-    ```
+    ---
 
-    ## 认证
+    ## 🏗️ API 架构
+
+    ### 主要命名空间
+
+    #### 1️⃣ 文档管理 (`/api/v1/doc`)
+    - **Metadata（元数据）**：字段定义、类型配置、验证规则
+    - **Views（视图）**：表格/相册/看板/日历/文档视图管理
+    - **Data（数据）**：结构化数据行的 CRUD 操作
+    - **Revisions（修订）**：版本历史和回溯
+    - **Comments（评论）**：多层级评论系统
+    - **Approvals（审批）**：工作流审批管理
+    - **Requests（请求）**：变更请求和合并
+    - **Settings（设置）**：文档级和类型级配置
+
+    #### 2️⃣ 供应链协同 (`/api/v1/organizations/{orgId}`)
+    - **Catalog**：商品目录管理，支持自定义字段
+    - **OrderBook**：订货本管理，基于 Connection 自动生成
+    - **Connection**：供应商-采购商数据连接（Outbound）
+    - **Binding**：订货本数据绑定配置（Inbound），支持字段映射和接收过滤
+    - **Connector**：组织内文档转换器（OrderBook → Catalog）
+
+    #### 3️⃣ 租户管理 (`/api/v1/users`, `/api/v1/organizations`, `/api/v1/workspaces`)
+    - **Users**：用户信息和偏好设置
+    - **Organizations**：组织管理和成员邀请
+    - **Workspaces**：工作区管理和权限控制
+
+    #### 4️⃣ 扩展功能
+    - **Webhooks** (`/api/v1/webhooks`)：事件订阅和投递管理
+    - **I18n** (`/api/v1/i18n`)：国际化翻译服务
+    - **Billing** (`/api/v1/billing`)：订阅和计费管理
+    - **Audit** (`/api/v1/audit`)：审计日志查询
+
+    ---
+
+    ## 🚀 快速开始
+
+    ### 认证
 
     所有 API 请求需要在请求头中包含有效的 Bearer Token：
-    ```
+
+    ```http
     Authorization: Bearer <access_token>
     ```
 
-    获取 Token 的方式：
-    1. 使用客户端凭证流程: POST /auth/token
-    2. 使用授权码流程: GET /auth/authorize + POST /auth/token
+    **获取 Token 的方式**：
+    1. **客户端凭证流程**（服务间调用）：`POST /auth/token`
+    2. **授权码流程**（用户授权）：`GET /auth/authorize` → `POST /auth/token`
+    3. **API Keys**：适用于 Webhook 验证和自动化集成
 
-    ## 错误处理
+    ### 基础调用示例
 
-    所有错误响应遵循统一的格式：
+    ```bash
+    # 1. 获取聚合文档包（包含元数据、视图和数据）
+    curl -H 'Authorization: Bearer TOKEN' \
+      'https://open.nexusbook.app/api/v1/doc/product/doc-123?include=metadata,views,data'
+
+    # 2. 创建数据行
+    curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/doc-123/data' \
+      -H 'Authorization: Bearer TOKEN' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "id": "row-1",
+        "values": [
+          {"fieldId": "name", "value": {"text": "iPhone 15 Pro"}},
+          {"fieldId": "price", "value": {"number": 7999}},
+          {"fieldId": "stock", "value": {"number": 100}}
+        ]
+      }'
+
+    # 3. 查询数据（高级查询）
+    curl -X POST 'https://open.nexusbook.app/api/v1/doc/product/doc-123/data/query' \
+      -H 'Authorization: Bearer TOKEN' \
+      -H 'Content-Type: application/json' \
+      -d '{
+        "filter": {
+          "and": [
+            {"field": "price", "op": "gte", "value": 5000},
+            {"field": "stock", "op": "gt", "value": 0}
+          ]
+        },
+        "sort": [{"field": "price", "order": "desc"}],
+        "page": 1,
+        "pageSize": 20
+      }'
+    ```
+
+    ### 供应链协同示例
+
+    ```bash
+    # 1. 供应商创建 Catalog
+    curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/catalogs' \
+      -H 'Authorization: Bearer TOKEN' \
+      -d '{
+        "name": "电子产品目录",
+        "catalogType": "product",
+        "fields": [
+          {"name": "品牌", "type": "text", "required": true},
+          {"name": "型号", "type": "text", "required": true},
+          {"name": "价格", "type": "currency", "required": true}
+        ]
+      }'
+
+    # 2. 供应商创建 Connection 并分享
+    curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/catalogs/cat-456/connections' \
+      -H 'Authorization: Bearer TOKEN' \
+      -d '{
+        "name": "华东地区分销商",
+        "shareScope": {"type": "all"},
+        "accessControl": "public"
+      }'
+
+    # 3. 采购商接受连接并创建 OrderBook
+    curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-789/orderbooks' \
+      -H 'Authorization: Bearer TOKEN' \
+      -d '{
+        "name": "供应商A订货本",
+        "sourceConnectionIds": ["conn-111"]
+      }'
+
+    # 4. 采购商配置 Binding（字段映射和过滤）
+    curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-789/orderbooks/ob-222/bindings' \
+      -H 'Authorization: Bearer TOKEN' \
+      -d '{
+        "connectionId": "conn-111",
+        "fieldMapping": [
+          {"sourceFieldId": "price", "targetFieldId": "cost", "transformType": "unit_convert",
+           "unitConversion": {"fromUnit": "USD", "toUnit": "CNY", "rate": 7.2}}
+        ],
+        "receiverFilter": {
+          "acceptMode": "selective",
+          "filterGroup": {
+            "operator": "AND",
+            "conditions": [{"field": "price", "op": "lte", "value": 10000}]
+          }
+        }
+      }'
+    ```
+
+    ---
+
+    ## 📖 核心概念
+
+    ### 文档包（Document Package）
+
+    NexusBook 的文档包含三个核心部分：
+    - **Metadata**：定义文档结构（字段、类型、验证规则）
+    - **Views**：定义数据展示方式（表格、看板、相册等）
+    - **Data**：实际的结构化数据行
+
+    ### 并发控制
+
+    所有数据行更新操作使用**版本号（version）**进行乐观锁控制：
+    ```json
+    {
+      "id": "row-1",
+      "version": 3,  // 必须提供当前版本号
+      "values": [...]
+    }
+    ```
+    如果版本号不匹配，API 将返回 `409 Conflict` 错误。
+
+    ### 错误处理
+
+    所有错误响应遵循统一格式：
     ```json
     {
       "success": false,
@@ -65,21 +210,86 @@ info:
       "message": {
         "zh": "错误信息（中文）",
         "en": "Error message (English)"
+      },
+      "details": {  // 可选，提供额外的错误上下文
+        "field": "price",
+        "reason": "validation_failed"
       }
     }
     ```
 
-    ## 分页和查询
+    **常见错误码**：
+    - `UNAUTHORIZED`：未授权或 Token 无效
+    - `FORBIDDEN`：权限不足
+    - `NOT_FOUND`：资源不存在
+    - `VALIDATION_ERROR`：请求参数验证失败
+    - `CONFLICT`：并发冲突（版本号不匹配）
+    - `RATE_LIMIT_EXCEEDED`：请求频率超限
 
-    支持多种查询方式：
-    - 简单分页：`page`, `pageSize`
-    - 高级查询：嵌套过滤、排序、分组和聚合
-    - 游标分页：用于深分页场景
+    ### 分页和查询
 
-    ## 并发控制
+    #### 简单分页
+    ```http
+    GET /api/v1/doc/product/doc-123/data?page=1&pageSize=20
+    ```
 
-    数据行使用版本号 (version) 进行并发控制。更新时需要提供当前版本号。
-  version: 0.0.0
+    #### 高级查询（POST 方式）
+    支持复杂过滤、排序、分组和聚合：
+    ```json
+    {
+      "filter": {
+        "and": [
+          {"field": "status", "op": "eq", "value": "active"},
+          {"or": [
+            {"field": "category", "op": "eq", "value": "electronics"},
+            {"field": "category", "op": "eq", "value": "computers"}
+          ]}
+        ]
+      },
+      "sort": [{"field": "createdAt", "order": "desc"}],
+      "page": 1,
+      "pageSize": 20
+    }
+    ```
+
+    #### 游标分页（深分页场景）
+    ```http
+    GET /api/v1/doc/product/doc-123/data?cursor=eyJ...&limit=100
+    ```
+
+    ---
+
+    ## 🔗 相关资源
+
+    - 📚 **完整文档**：https://docs.nexusbook.app
+    - 🚀 **快速开始指南**：https://docs.nexusbook.app/guides/getting-started
+    - 📘 **Catalog-OrderBook 数据协同参考**：https://docs.nexusbook.app/references/catalog-orderbook-sync
+    - 🔐 **认证授权指南**：https://docs.nexusbook.app/guides/authentication
+    - 📋 **字段类型参考**：https://docs.nexusbook.app/references/field-types
+    - ❌ **错误码参考**：https://docs.nexusbook.app/references/error-codes
+    - 🌐 **GitHub 仓库**：https://github.com/nexusbook/nexusbook-api
+    - 💬 **社区支持**：https://community.nexusbook.app
+
+    ---
+
+    ## 📊 API 版本与环境
+
+    - **当前版本**：v1
+    - **生产环境**：https://open.nexusbook.app
+    - **测试环境**：https://open-sit.nexusbook.com
+    - **认证服务**：https://auth.nexusbook.app
+
+    ---
+
+    **需要帮助？** 请访问我们的[文档中心](https://docs.nexusbook.app)或加入[开发者社区](https://community.nexusbook.app)。
+  termsOfService: https://nexusbook.app/terms
+  contact:
+    name: NexusBook API Support
+    url: https://docs.nexusbook.app/support
+    email: api@nexusbook.app
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
 servers:
   - url: https://open-sit.nexusbook.com
     description: 测试环境 (SIT)
@@ -89,13 +299,10 @@ servers:
     variables: {}
 tags:
   - name: OAuth
-    description: OAuth2/OIDC 认证
     x-displayName: OAuth
   - name: Authentication
-    description: 用户注册与登录
     x-displayName: Authentication
   - name: API Keys
-    description: API 密钥管理
     x-displayName: API Keys
   - name: OAuth Clients
     x-displayName: OAuth Clients
@@ -108,93 +315,58 @@ tags:
   - name: OAuth Extensions
     x-displayName: OAuth Extensions
   - name: Users
-    description: 用户管理
     x-displayName: Users
   - name: Organizations
-    description: 组织管理
     x-displayName: Organizations
   - name: Workspaces
-    description: 工作区管理
     x-displayName: Workspaces
   - name: Invitations
-    description: 邀请管理
     x-displayName: Invitations
   - name: Join Requests
-    description: 加入申请
     x-displayName: Join Requests
   - name: Catalog
-    description: 产品目录管理（供应商侧）
     x-displayName: Catalog
   - name: OrderBook
-    description: 订货本管理（采购商侧）
     x-displayName: OrderBook
   - name: Connection
-    description: 跨组织数据分享与传播
     x-displayName: Connection
   - name: Connector
-    description: 组织内部文档联动
     x-displayName: Connector
   - name: Document - Core
-    description: 核心功能（聚合查询、元数据、设置）
     x-displayName: Document - Core
   - name: Document - Data
-    description: 数据行管理
     x-displayName: Document - Data
   - name: Document - Workflow
-    description: 工作流（审批、变更请求、修订）
     x-displayName: Document - Workflow
   - name: Document - Properties
-    description: 文档属性
     x-displayName: Document - Properties
   - name: Document - Views
-    description: 视图管理
     x-displayName: Document - Views
   - name: Document - Collaboration
-    description: 协作功能（评论、实时）
     x-displayName: Document - Collaboration
   - name: Document - Relations
-    description: 文档关联
     x-displayName: Document - Relations
-  - name: Attachments
-    x-displayName: Attachments
   - name: Document - Sync
-    description: 数据同步
     x-displayName: Document - Sync
-  - name: Realtime
-    x-displayName: Realtime
-  - name: Organization Documents
-    x-displayName: Organization Documents
-  - name: Workspace Documents
-    x-displayName: Workspace Documents
   - name: Webhooks
-    description: Webhook 管理
     x-displayName: Webhooks
   - name: Internationalization
-    description: 国际化翻译
     x-displayName: Internationalization
   - name: User Preferences
-    description: 用户偏好设置
     x-displayName: User Preferences
   - name: Subscription Plans
-    description: 订阅计划管理
     x-displayName: Subscription Plans
   - name: Subscription Management
-    description: 订阅管理
     x-displayName: Subscription Management
   - name: Invoices
-    description: 账单管理
     x-displayName: Invoices
   - name: Payment Methods
-    description: 支付方式管理
     x-displayName: Payment Methods
   - name: Usage & Quota
-    description: 使用量与配额管理
     x-displayName: Usage & Quota
   - name: Audit Logs
-    description: 审计日志
     x-displayName: Audit Logs
   - name: Compliance
-    description: 合规性报告
     x-displayName: Compliance
   - name: Document - Attachments
     description: 附件管理
@@ -202,6 +374,9 @@ tags:
   - name: Document - Tenancy
     description: 多租户（组织/工作区级文档）
     x-displayName: Document - Tenancy
+externalDocs:
+  description: 完整的 API 文档和开发指南
+  url: https://docs.nexusbook.app
 paths:
   /.well-known/openid-configuration:
     get:
@@ -976,16 +1151,24 @@ paths:
     get:
       operationId: ApiKeyApi_getApiKeyUsageLogs
       summary: 获取使用记录
-      description: |-
+      description: >-
         获取 API Key 使用记录
+
         Get API Key usage logs
 
+
         获取 API 密钥的使用记录。
+
         Get usage logs of API key.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}/logs?page=1&pageSize=50&startTime=2024-12-01T00:00:00Z&endTime=2024-12-05T23:59:59Z' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/api-keys/{apiKeyId}/logs?page=1&pageSize=50&startTime=2024-12-01T00:00:00Z&endTime=2024-12-05T23:59:59Z'
+        \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -1648,16 +1831,24 @@ paths:
     get:
       operationId: OAuthLoginApi_getOAuthLoginUrl
       summary: 获取 OAuth 登录 URL
-      description: |-
+      description: >-
         获取 OAuth 登录 URL
+
         Get OAuth login URL
 
+
         生成第三方 OAuth 登录的授权 URL。
+
         Generate authorization URL for third-party OAuth login.
 
+
         示例（Google 登录）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/auth/oauth/google/authorize?redirectUri=https://myapp.com/callback'
+
         ```
       parameters:
         - name: provider
@@ -3044,16 +3235,23 @@ paths:
     get:
       operationId: TranslationApi_getGlossary
       summary: 获取翻译术语表
-      description: |-
+      description: >-
         获取翻译术语表
+
         Get translation glossary
 
+
         获取组织的翻译术语表。
+
         Get organization's translation glossary.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/glossary?sourceLanguage=zh&targetLanguage=en' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/glossary?sourceLanguage=zh&targetLanguage=en' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -3903,15 +4101,22 @@ paths:
     post:
       operationId: InvitationApi_acceptInvitation
       summary: 接受邀请
-      description: |-
+      description: >-
         接受邀请
+
         Accept invitation
 
+
         通过邀请令牌接受邀请加入组织。验证邮箱匹配后创建成员记录。
-        Accept an invitation to join the organization using invitation token. Creates member record after email verification.
+
+        Accept an invitation to join the organization using invitation token. Creates member record after email
+        verification.
+
 
         示例（cURL）：
+
         ```bash
+
         curl -X POST 'https://open.nexusbook.app/api/v1/invitations/TOKEN_STRING/accept' \
           -H 'Authorization: Bearer TOKEN'
         ```
@@ -4649,15 +4854,22 @@ paths:
     post:
       operationId: OrganizationApi_create
       summary: 创建组织
-      description: |-
+      description: >-
         创建组织
+
         Create organization
 
+
         创建一个新组织，创建者自动成为 owner，并自动创建一个默认工作区。
-        Create a new organization. The creator automatically becomes the owner, and a default workspace is created automatically.
+
+        Create a new organization. The creator automatically becomes the owner, and a default workspace is created
+        automatically.
+
 
         示例（cURL）：
+
         ```bash
+
         curl -X POST 'https://open.nexusbook.app/api/v1/organizations' \
           -H 'Authorization: Bearer TOKEN' \
           -H 'Content-Type: application/json' \
@@ -5792,16 +6004,23 @@ paths:
     get:
       operationId: CatalogApi_listCatalogs
       summary: 列出 Catalog
-      description: |-
+      description: >-
         列出组织的 Catalog
+
         List organization catalogs
 
+
         获取组织下的所有 Catalog 列表。
+
         Get list of all catalogs under organization.
 
+
         示例（cURL）:
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/catalogs?catalogType=supplier&page=1&pageSize=20' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/catalogs?catalogType=supplier&page=1&pageSize=20' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -8016,16 +8235,23 @@ paths:
     get:
       operationId: ConnectorApi_listConnectors
       summary: 列出 Connector
-      description: |-
+      description: >-
         列出组织的 Connector
+
         List organization connectors
 
+
         获取组织下的所有 Connector 列表。
+
         Get list of all connectors under organization.
 
+
         示例（cURL）:
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/connectors?connectorType=catalog_clone&status=active' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/connectors?connectorType=catalog_clone&status=active' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -8583,16 +8809,23 @@ paths:
     get:
       operationId: ConnectorApi_getLinkedRow
       summary: 获取联动行详情
-      description: |-
+      description: >-
         获取 LinkedRow 详情
+
         Get linked row details
 
+
         获取指定联动行的详细信息。
+
         Get detailed information of specified linked row.
 
+
         示例（cURL）:
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/connectors/connector-456/linked-rows/link-789' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/connectors/connector-456/linked-rows/link-789' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -8660,16 +8893,23 @@ paths:
     delete:
       operationId: ConnectorApi_deleteLinkedRow
       summary: 删除联动行
-      description: |-
+      description: >-
         删除 LinkedRow
+
         Delete linked row
 
+
         删除指定的联动行记录,解除源行和目标行的联动关系。
+
         Delete specified linked row record, remove linkage between source and target rows.
 
+
         示例（cURL）:
+
         ```bash
-        curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/connectors/connector-456/linked-rows/link-789' \
+
+        curl -X DELETE
+        'https://open.nexusbook.app/api/v1/organizations/org-123/connectors/connector-456/linked-rows/link-789' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -8967,16 +9207,23 @@ paths:
     get:
       operationId: OrganizationDocumentApi_getOrganizationDocumentAggregate
       summary: 获取组织文档聚合数据
-      description: |-
+      description: >-
         获取组织级文档聚合数据
+
         Get organization document aggregate
 
+
         一次性获取组织级文档的多种数据。需要是组织成员。
+
         Get multiple types of data for organization-level document in one request. Requires organization membership.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/doc/policy/doc-456?include=metadata,views,data' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/doc/policy/doc-456?include=metadata,views,data' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -9106,16 +9353,23 @@ paths:
     get:
       operationId: OrganizationDocumentApi_listOrganizationDocuments
       summary: 列出组织文档
-      description: |-
+      description: >-
         列出组织文档
+
         List organization documents
 
+
         获取组织下的所有文档列表。需要是组织成员。
+
         Get the list of all documents under the organization. Requires organization membership.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/documents?docType=policy&page=1&pageSize=20' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/documents?docType=policy&page=1&pageSize=20' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -9407,16 +9661,24 @@ paths:
     get:
       operationId: OrganizationI18nApi_getOrganizationCustomTranslations
       summary: 获取组织自定义翻译
-      description: |-
+      description: >-
         获取组织自定义翻译
+
         Get organization custom translations
 
+
         获取组织自定义的翻译资源。
+
         Get organization's custom translation resources.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations?language=zh&namespace=custom' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations?language=zh&namespace=custom'
+        \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -9622,16 +9884,24 @@ paths:
     delete:
       operationId: OrganizationI18nApi_deleteOrganizationCustomTranslations
       summary: 删除组织自定义翻译
-      description: |-
+      description: >-
         删除组织自定义翻译
+
         Delete organization custom translations
 
+
         删除组织的自定义翻译。需要 owner 或 admin 权限。
+
         Delete organization's custom translations. Requires owner or admin permission.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations?language=zh&keys=field.custom_status,label.department' \
+
+        curl -X DELETE
+        'https://open.nexusbook.app/api/v1/organizations/org-123/i18n/custom-translations?language=zh&keys=field.custom_status,label.department'
+        \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -10289,15 +10559,22 @@ paths:
     post:
       operationId: JoinRequestApi_createJoinRequest
       summary: 申请加入组织
-      description: |-
+      description: >-
         申请加入组织
+
         Apply to join organization
 
+
         提交加入组织的申请。前置条件：用户未加入该组织，组织允许申请加入。
-        Submit an application to join the organization. Prerequisites: user is not a member, organization allows join requests.
+
+        Submit an application to join the organization. Prerequisites: user is not a member, organization allows join
+        requests.
+
 
         示例（cURL）：
+
         ```bash
+
         curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/join-requests' \
           -H 'Authorization: Bearer TOKEN' \
           -H 'Content-Type: application/json' \
@@ -11653,15 +11930,22 @@ paths:
     post:
       operationId: OrderBookApi_createBinding
       summary: 创建 Binding
-      description: |-
+      description: >-
         创建 Connection Binding
+
         Create connection binding
 
+
         将 OrderBook 与 Connection 建立 Binding 关系,配置字段映射和过滤条件。
-        Establish a Binding relationship between OrderBook and Connection, configuring field mapping and filter conditions.
+
+        Establish a Binding relationship between OrderBook and Connection, configuring field mapping and filter
+        conditions.
+
 
         示例（cURL）:
+
         ```bash
+
         curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/bindings' \
           -H 'Authorization: Bearer TOKEN' \
           -H 'Content-Type: application/json' \
@@ -11851,13 +12135,18 @@ paths:
     patch:
       operationId: OrderBookApi_updateBinding
       summary: 更新 Binding
-      description: |-
+      description: >-
         更新 Binding
+
         Update binding
 
+
         示例（cURL）:
+
         ```bash
-        curl -X PATCH 'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/bindings/binding-999' \
+
+        curl -X PATCH
+        'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/bindings/binding-999' \
           -H 'Authorization: Bearer TOKEN' \
           -H 'Content-Type: application/json' \
           -d '{
@@ -11926,13 +12215,18 @@ paths:
     delete:
       operationId: OrderBookApi_deleteBinding
       summary: 删除 Binding
-      description: |-
+      description: >-
         删除 Binding
+
         Delete binding
 
+
         示例（cURL）:
+
         ```bash
-        curl -X DELETE 'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/bindings/binding-999' \
+
+        curl -X DELETE
+        'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/bindings/binding-999' \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -11989,16 +12283,23 @@ paths:
     post:
       operationId: OrderBookApi_previewFieldMapping
       summary: 预览字段映射
-      description: |-
+      description: >-
         预览字段映射
+
         Preview field mapping
 
+
         根据源 Catalog 和目标 OrderBook 的字段,生成建议的字段映射规则。
+
         Generate suggested field mapping rules based on source Catalog and target OrderBook fields.
 
+
         示例（cURL）:
+
         ```bash
-        curl -X POST 'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/field-mapping/preview' \
+
+        curl -X POST
+        'https://open.nexusbook.app/api/v1/organizations/org-123/orderbooks/orderbook-456/field-mapping/preview' \
           -H 'Authorization: Bearer TOKEN' \
           -H 'Content-Type: application/json' \
           -d '{
@@ -13108,15 +13409,22 @@ paths:
     get:
       operationId: WorkspaceApi_list
       summary: 列出组织的工作区
-      description: |-
+      description: >-
         列出组织的工作区
+
         List organization's workspaces
 
+
         获取组织下所有工作区列表，仅返回用户有权限访问的工作区。
-        Get the list of all workspaces under the organization. Only returns workspaces the user has permission to access.
+
+        Get the list of all workspaces under the organization. Only returns workspaces the user has permission to
+        access.
+
 
         示例（cURL）：
+
         ```bash
+
         curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces?page=1&pageSize=20' \
           -H 'Authorization: Bearer TOKEN'
         ```
@@ -13530,16 +13838,24 @@ paths:
     get:
       operationId: WorkspaceDocumentApi_getWorkspaceDocumentAggregate
       summary: 获取工作区文档聚合数据
-      description: |-
+      description: >-
         获取工作区级文档聚合数据
+
         Get workspace document aggregate
 
+
         一次性获取工作区级文档的多种数据。需要是工作区成员。
+
         Get multiple types of data for workspace-level document in one request. Requires workspace membership.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/doc/purchaseOrder/doc-789?include=metadata,views,data' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/doc/purchaseOrder/doc-789?include=metadata,views,data'
+        \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -13677,16 +13993,24 @@ paths:
     get:
       operationId: WorkspaceDocumentApi_listWorkspaceDocuments
       summary: 列出工作区文档
-      description: |-
+      description: >-
         列出工作区文档
+
         List workspace documents
 
+
         获取工作区下的所有文档列表。需要是工作区成员。
+
         Get the list of all documents under the workspace. Requires workspace membership.
 
+
         示例（cURL）：
+
         ```bash
-        curl -X GET 'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/documents?docType=purchaseOrder&page=1&pageSize=20' \
+
+        curl -X GET
+        'https://open.nexusbook.app/api/v1/organizations/org-123/workspaces/ws-456/documents?docType=purchaseOrder&page=1&pageSize=20'
+        \
           -H 'Authorization: Bearer TOKEN'
         ```
       parameters:
@@ -16334,19 +16658,28 @@ paths:
     get:
       operationId: DocumentAggregateApi_getDocBundle
       summary: 获取聚合文档包
-      description: |-
+      description: >-
         获取聚合文档包（支持 include 选择与分页）
+
 
         Fetch aggregated doc bundle (supports include selection and pagination)
 
+
         一次性获取文档的所需数据：通过 `include` 指定返回部分（如 `metadata,views,data,comments,revisions,settings`），
+
         支持视图分页（`page/pageSize`）与限制数量（`commentsLimit/revisionsLimit`）。
 
-        Fetch aggregated doc bundle with selective sections via `include` (e.g. `metadata,views,data,comments,revisions,settings`),
+
+        Fetch aggregated doc bundle with selective sections via `include` (e.g.
+        `metadata,views,data,comments,revisions,settings`),
+
         supports view paging (`page/pageSize`) and limits (`commentsLimit/revisionsLimit`).
 
+
         示例（cURL）:
+
         ```bash
+
         curl -H 'Authorization: Bearer TOKEN' \
           'https://open.nexusbook.app/api/v1/doc/product/123?include=metadata,views,data&page=1&pageSize=20'
         ```
@@ -18722,39 +19055,65 @@ paths:
     patch:
       operationId: DocumentPropertiesApi_updateProperties
       summary: 部分更新文档属性
-      description: |-
+      description: >-
         部分更新文档属性（进入变更请求）
+
 
         Partially update document properties (goes into change request)
 
+
         仅更新指定的属性字段，保留其他字段。变更会添加到指定的变更请求中。
+
         Update only specified property fields, preserve others. Changes will be added to the specified change request.
 
+
         简化提交方式：
+
         - 只需指定字段ID和原始值
+
         - 服务端根据 metadata 自动解析值类型
+
         - 无需客户端了解字段类型细节
 
+
         Simplified submission:
+
         - Only specify field id and raw value
+
         - Server auto-parses value type based on metadata
+
         - No need for client to know field type details
 
+
         查询参数:
+
         - `requestId` - 指定要追加到的请求ID（可选）
+
         - `merge=true` - 合并模式（默认）：新值与现有值合并
+
         - `merge=false` - 覆盖模式：新值覆盖现有值
+
         - `version` - 当前版本号（用于并发检查）
 
+
         Query parameters:
+
         - `requestId` - Specify which request to append to (optional)
+
         - `merge=true` - Merge mode (default): merge new values with existing
+
         - `merge=false` - Overwrite mode: new values override existing
+
         - `version` - Current version number (for concurrency check)
 
+
         示例（cURL）- 仅更新订单金额和数量：
+
         ```bash
-        curl -X PATCH 'https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1&merge=true&version=1' \\
+
+        curl -X PATCH
+        'https://open.nexusbook.app/api/v1/doc/purchaseOrder/order-123/properties?requestId=req-1&merge=true&version=1'
+        \\
           -H 'Authorization: Bearer TOKEN' \\
           -H 'Content-Type: application/json' \\
           -d '{
@@ -18765,18 +19124,30 @@ paths:
           }'
         ```
 
+
         服务端处理逻辑：
+
         1. 根据 docId 获取 metadata
+
         2. 对每个 fieldId，查找字段定义获取类型
+
         3. 将原始值转换为类型化值
+
         4. 验证值的有效性
+
         5. 添加到指定的 Request
 
+
         Server processing:
+
         1. Get metadata by docId
+
         2. For each fieldId, lookup field definition to get type
+
         3. Convert raw value to typed value
+
         4. Validate value
+
         5. Add to specified Request
       parameters:
         - name: docType
@@ -36308,12 +36679,16 @@ components:
           description: |-
             更新时间
             Updated at
-      description: |-
+      description: >-
         组织模型
+
         Organization model
 
+
         组织是用户协作的基本单元，每个用户注册后自动创建一个个人组织。
-        Organization is the basic unit of user collaboration. Each user automatically creates a personal organization upon registration.
+
+        Organization is the basic unit of user collaboration. Each user automatically creates a personal organization
+        upon registration.
     Tenant.OrganizationDetail:
       type: object
       properties:
@@ -36857,12 +37232,16 @@ components:
           description: |-
             归档时间
             Archived at
-      description: |-
+      description: >-
         工作区模型
+
         Workspace model
 
+
         工作区是实际业务开展的容器，大部分文档操作在工作区内进行。
-        Workspace is the container for actual business operations. Most document operations are performed within workspaces.
+
+        Workspace is the container for actual business operations. Most document operations are performed within
+        workspaces.
     Tenant.WorkspaceDetail:
       type: object
       properties:
