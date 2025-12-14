@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文档模型完整版 - NexusBook API 文档</title>
+    <link rel="stylesheet" href="/nexusbook-api/styles/main.css?v=${Date.now()}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/common.min.js"></script>
+    <script>
+      if (window.hljs) { hljs.highlightAll(); }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</head>
+<body class="has-sidebar">
+    <nav class="sidebar">
+<div class="sidebar-header">
+<a href="/nexusbook-api/index.html" class="sidebar-logo">NexusBook API</a>
+</div>
+<div class="sidebar-content">
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">开始使用</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/index.html">概览</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/getting-started.html">快速开始</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/authentication.html">认证授权</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">核心概念</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/document-model.html">文档模型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/data-operations.html">数据操作</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/webhooks.html">Webhook 事件</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/realtime-collaboration.html">实时协同</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group expanded">
+<div class="sidebar-group-title">API 参考</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/api/index.html">API 端点</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/field-types.html">字段类型</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/error-codes.html">错误码</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">开发指南</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/development.html">开发环境</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/architecture.html">架构设计</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/best-practices.html">最佳实践</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/guides/examples.html">完整示例</a>
+</li>
+</ul>
+</div>
+<div class="sidebar-group ">
+<div class="sidebar-group-title">其他资源</div>
+<ul class="sidebar-items">
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/i18n.html">国际化</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/references/changelog.html">更新日志</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/CONTRIBUTING.html">贡献指南</a>
+</li>
+<li class="sidebar-item ">
+<a href="/nexusbook-api/TROUBLESHOOTING.html">问题排查</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+
+    
+    <div class="main-wrapper">
+        <header class="header">
+            <div class="container">
+                <h1 class="logo"><a href="/nexusbook-api/index.html">NexusBook API</a></h1>
+                <nav class="nav">
+                    <a href="/nexusbook-api/index.html">首页</a>
+                    <a href="/nexusbook-api/api/" >API 参考</a>
+                    <a href="/nexusbook-api/guides/getting-started.html" class="active">开发指南</a>
+                    <a href="/nexusbook-api/advanced/README.html" >高级手册</a>
+                    <a href="/nexusbook-api/references/error-codes.html" >参考文档</a>
+                    <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="main content-page">
+            <div class="container">
+                <article class="content">
+                    <h1>NexusBook 文档模型完整指南</h1>
+<h2>目录</h2>
+<ul>
+<li><a href="#1-%E5%BC%95%E8%A8%80%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%96%87%E6%A1%A3%E6%A8%A1%E5%9E%8B">1. 引言：为什么需要文档模型</a></li>
+<li><a href="#2-%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6">2. 设计哲学</a></li>
+<li><a href="#3-%E6%A0%B8%E5%BF%83%E6%9E%B6%E6%9E%84">3. 核心架构</a></li>
+<li><a href="#4-%E4%B8%83%E5%B1%82%E6%A8%A1%E5%9E%8B%E8%AF%A6%E8%A7%A3">4. 七层模型详解</a></li>
+<li><a href="#5-%E5%8F%98%E6%9B%B4%E5%B7%A5%E4%BD%9C%E6%B5%81">5. 变更工作流</a></li>
+<li><a href="#6-%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86">6. 实现原理</a></li>
+<li><a href="#7-%E5%AE%8C%E6%95%B4%E4%B8%9A%E5%8A%A1%E6%B5%81%E7%A8%8B">7. 完整业务流程</a></li>
+<li><a href="#8-%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5">8. 最佳实践</a></li>
+</ul>
+<hr>
+<h2>1. 引言：为什么需要文档模型</h2>
+<h3>1.1 业务背景</h3>
+<p>在现代企业中，<strong>结构化数据文档</strong>无处不在：</p>
+<ul>
+<li>📦 <strong>订货单</strong> - 采购团队需要协同管理供应商订单</li>
+<li>📄 <strong>发票</strong> - 财务需要追踪每一笔开票记录</li>
+<li>📊 <strong>库存表</strong> - 仓库要实时更新商品库存状态</li>
+<li>📋 <strong>项目计划</strong> - 项目组需要多人协作任务分配</li>
+</ul>
+<p>这些文档都有共同的特点：</p>
+<ol>
+<li><strong>结构化</strong> - 有明确的字段定义（产品名称、数量、金额等）</li>
+<li><strong>协作性</strong> - 多人同时编辑、评论、讨论</li>
+<li><strong>可追溯</strong> - 需要知道谁在什么时候改了什么</li>
+<li><strong>需审批</strong> - 重要变更需要经过审批流程</li>
+<li><strong>多视角</strong> - 同一份数据需要不同的展示方式</li>
+</ol>
+<h3>1.2 传统方案的问题</h3>
+<p>传统的解决方案存在诸多问题：</p>
+<p><strong>方案1：使用Excel/Google Sheets</strong></p>
+<ul>
+<li>❌ 版本控制困难，容易丢失历史记录</li>
+<li>❌ 多人协作容易冲突</li>
+<li>❌ 缺乏审批流程</li>
+<li>❌ 权限控制粗糙</li>
+</ul>
+<p><strong>方案2：为每种文档类型开发独立系统</strong></p>
+<ul>
+<li>❌ 开发成本高，周期长</li>
+<li>❌ 代码重复，维护困难</li>
+<li>❌ 各系统孤立，数据难以互通</li>
+<li>❌ 每次新增文档类型都需要重新开发</li>
+</ul>
+<p><strong>方案3：使用传统数据库</strong></p>
+<ul>
+<li>❌ Schema 固定，扩展性差</li>
+<li>❌ 缺乏协作和审批能力</li>
+<li>❌ 版本控制需要额外实现</li>
+<li>❌ 多视图展示需要大量开发</li>
+</ul>
+<h3>1.3 NexusBook 文档模型的解决方案</h3>
+<p>NexusBook 提供了一个<strong>统一的文档抽象模型</strong>，就像&quot;搭积木&quot;一样：</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                    任何业务文档                               │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │ Properties   │  │   Metadata   │  │    Views     │       │
+│  │ 文档属性      │  │   字段定义    │  │   视图配置    │       │
+│  │ (订单时间)    │  │  (产品名称)   │  │  (表格/看板)  │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+│                                                               │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │                 Data (数据行)                           │ │
+│  │  存储实际的业务数据，遵循 Metadata 定义的结构            │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐       │
+│  │  Comments    │  │  Requests    │  │  Revisions   │       │
+│  │  协作评论     │  │  变更请求     │  │  版本历史     │       │
+│  └──────────────┘  └──────────────┘  └──────────────┘       │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<p><strong>核心优势</strong>：</p>
+<ul>
+<li>✅ <strong>一次开发，无限复用</strong> - 同一套模型支持所有类型的文档</li>
+<li>✅ <strong>开箱即用的协作能力</strong> - 评论、@提及、讨论线程</li>
+<li>✅ <strong>完整的版本控制</strong> - 类似 Git 的变更追踪</li>
+<li>✅ <strong>灵活的审批流程</strong> - 支持串签、并签、条件审批</li>
+<li>✅ <strong>强大的查询能力</strong> - 过滤、排序、分组、聚合</li>
+<li>✅ <strong>多视图展示</strong> - 表格、看板、日历、图表等8种视图</li>
+</ul>
+<hr>
+<h2>2. 设计哲学</h2>
+<h3>2.1 核心设计原则</h3>
+<h4>原则1：清晰分层</h4>
+<pre><code>Properties (文档属性)  - 文档级元信息，如订单时间、总金额
+Metadata (字段定义)    - 定义数据结构，如产品名称是文本类型
+Data (数据行)         - 实际业务数据，如具体的产品清单
+Views (视图)          - 数据展示方式，如表格视图、看板视图
+Comments (评论)       - 协作讨论，可精确到单元格
+Requests (变更请求)   - 变更的草稿，类似 Git PR
+Revisions (修订历史)  - 已合并的变更历史，不可修改
+Settings (设置)       - 权限、通知等配置
+</code></pre>
+<p><strong>为什么这样分层？</strong></p>
+<ul>
+<li>Properties 和 Data 分离，避免混淆&quot;订单总额&quot;和&quot;每个产品的单价&quot;</li>
+<li>Metadata 独立，可以动态调整字段定义而不影响已有数据</li>
+<li>Views 不持有数据，只是数据的不同&quot;窗口&quot;</li>
+<li>工作流层（Requests/Revisions）独立，保证数据安全和可追溯</li>
+</ul>
+<h4>原则2：元数据驱动</h4>
+<p><strong>所有字段都由 Metadata 定义</strong>：</p>
+<pre><code class="language-typescript">// 1. 先定义字段结构
+{
+  &quot;fields&quot;: [
+    { &quot;id&quot;: &quot;productName&quot;, &quot;type&quot;: &quot;text&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;quantity&quot;, &quot;type&quot;: &quot;number&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;price&quot;, &quot;type&quot;: &quot;currency&quot; }
+  ]
+}
+
+// 2. 数据行必须遵循这个结构
+{
+  &quot;values&quot;: [
+    { &quot;fieldId&quot;: &quot;productName&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;iPhone 15&quot; } },
+    { &quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: { &quot;number&quot;: 10 } },
+    { &quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: { &quot;number&quot;: 799.99 } }
+  ]
+}
+</code></pre>
+<p><strong>好处</strong>：</p>
+<ul>
+<li>🔒 <strong>类型安全</strong> - 服务端自动验证数据类型</li>
+<li>🎯 <strong>一致性保证</strong> - 不会出现字段ID不存在的情况</li>
+<li>🔄 <strong>动态扩展</strong> - 新增字段不需要修改数据库表结构</li>
+<li>📊 <strong>自动UI生成</strong> - 前端可以根据 Metadata 自动渲染表单</li>
+</ul>
+<h4>原则3：不可变历史</h4>
+<pre><code>用户编辑 → Request (可修改) → 审批通过 → Revision (不可修改)
+                              ↓
+                         永久记录在历史中
+</code></pre>
+<p><strong>为什么不可变？</strong></p>
+<ul>
+<li>审计要求：财务、法律审计需要完整的变更证据链</li>
+<li>信任基础：用户知道历史不会被篡改</li>
+<li>回滚能力：可以基于历史创建新的变更，而不是修改历史</li>
+</ul>
+<h4>原则4：审批先行</h4>
+<p><strong>所有写操作都需要 requestId</strong>：</p>
+<pre><code class="language-bash"># ❌ 不支持直接写入
+POST /doc/order/123/rows
+{ &quot;values&quot;: [...] }
+
+# ✅ 必须指定 requestId
+POST /doc/order/123/rows?requestId=req-1
+{ &quot;values&quot;: [...] }
+</code></pre>
+<p><strong>工作流</strong>：</p>
+<ol>
+<li>用户创建 Request（草稿）</li>
+<li>多人在同一个 Request 中协同编辑</li>
+<li>审批者审核 Request</li>
+<li>审批通过后，Request 合并生成 Revision</li>
+<li>Revision 记录所有变更和贡献者</li>
+</ol>
+<h4>原则5：关系是一等公民</h4>
+<p><strong>跨文档关联（Relations）和附件（Attachments）是核心能力</strong>：</p>
+<pre><code class="language-typescript">// 发票引用订货单
+{
+  &quot;type&quot;: &quot;references&quot;,
+  &quot;source&quot;: { &quot;docType&quot;: &quot;invoice&quot;, &quot;docId&quot;: &quot;inv-123&quot;, &quot;rowId&quot;: &quot;row-1&quot; },
+  &quot;target&quot;: { &quot;docType&quot;: &quot;purchaseOrder&quot;, &quot;docId&quot;: &quot;po-456&quot;, &quot;rowId&quot;: &quot;row-99&quot; }
+}
+</code></pre>
+<p><strong>关系不嵌入任何一方</strong>：</p>
+<ul>
+<li>独立存储为&quot;边&quot;（Edge）</li>
+<li>支持双向查询（出边/入边）</li>
+<li>删除保护（避免悬空引用）</li>
+<li>权限控制（跨文档边需要两端权限）</li>
+</ul>
+<h3>2.2 与其他系统的对比</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Excel</th>
+<th>Airtable</th>
+<th>Notion</th>
+<th><strong>NexusBook</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>结构化数据</td>
+<td>✅</td>
+<td>✅</td>
+<td>⚠️ 半结构化</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>多人协作</td>
+<td>⚠️ 冲突多</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>版本控制</td>
+<td>❌</td>
+<td>⚠️ 简单</td>
+<td>⚠️ 简单</td>
+<td>✅ 完整</td>
+</tr>
+<tr>
+<td>审批流程</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>跨文档关联</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>API优先设计</td>
+<td>❌</td>
+<td>✅</td>
+<td>⚠️ 有限</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>自托管</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>变更可追溯</td>
+<td>❌</td>
+<td>⚠️ 有限</td>
+<td>⚠️ 有限</td>
+<td>✅ Git级别</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>3. 核心架构</h2>
+<h3>3.1 整体架构图</h3>
+<div class="mermaid">graph TB
+    subgraph "文档抽象层 Document Abstraction"
+        Doc["📄 Document<br/>{docType}/{docId}"]
+    end
+    
+    subgraph "核心数据层 Core Data Layer"
+        Props["🏷️ Properties<br/>文档级属性"]
+        Meta["📋 Metadata<br/>字段定义"]
+        Data["📊 Data<br/>数据行"]
+        Views["👁️ Views<br/>视图配置"]
+        Settings["⚙️ Settings<br/>文档设置"]
+    end
+    
+    subgraph "协作层 Collaboration Layer"
+        Comments["💬 Comments<br/>精确位置评论"]
+        Realtime["⚡ Realtime<br/>实时协作(Yjs)"]
+    end
+    
+    subgraph "工作流层 Workflow Layer"
+        Requests["📝 Requests<br/>变更请求"]
+        Approvals["✅ Approvals<br/>审批流程"]
+        Revisions["📜 Revisions<br/>修订历史"]
+    end
+    
+    subgraph "扩展层 Extension Layer"
+        Relations["🔗 Relations<br/>跨文档关联"]
+        Attachments["📎 Attachments<br/>附件管理"]
+        Sync["🔄 Sync<br/>数据同步"]
+    end
+    
+    subgraph "查询引擎 Query Engine"
+        Filter["🔍 Filter<br/>过滤"]
+        Sort["📶 Sort<br/>排序"]
+        Group["📊 Group<br/>分组"]
+        Aggregate["🎯 Aggregate<br/>聚合"]
+    end
+    
+    Doc --> Props
+    Doc --> Meta
+    Doc --> Data
+    Doc --> Views
+    Doc --> Settings
+    Doc --> Comments
+    Doc --> Realtime
+    
+    Data --> Requests
+    Props --> Requests
+    Requests --> Approvals
+    Requests --> Revisions
+    
+    Data --> Filter
+    Data --> Sort
+    Data --> Group
+    Doc --> Aggregate
+    
+    Doc --> Relations
+    Doc --> Attachments
+    Doc --> Sync
+    
+    Meta -.定义.-> Data
+    Meta -.定义.-> Props
+    Views -.投影.-> Data</div>
+<h3>3.2 数据流向</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│                       用户操作                               │
+└────────────┬────────────────────────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. 创建 Request (草稿)                                      │
+│     - requestId: req-1                                       │
+│     - status: open                                           │
+└────────────┬────────────────────────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. 多次编辑 (所有操作携带 requestId)                         │
+│     - POST /rows?requestId=req-1                             │
+│     - PUT /rows/123?requestId=req-1                          │
+│     - PATCH /properties?requestId=req-1                      │
+│                                                               │
+│  Request 中累积 Changes:                                      │
+│     - Change 1: 创建行 row-1                                  │
+│     - Change 2: 更新行 row-1                                  │
+│     - Change 3: 更新属性 totalAmount                          │
+└────────────┬────────────────────────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. 提交审批 (可选)                                           │
+│     - 指定审批者                                              │
+│     - 审批者可查看 diff                                        │
+│     - 审批者做出决策 (通过/拒绝/请求修改)                       │
+└────────────┬────────────────────────────────────────────────┘
+             │ 审批通过
+             ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. 合并 Request                                             │
+│     POST /requests/req-1/merge                               │
+│                                                               │
+│  发生的事情:                                                  │
+│  a. 所有 Changes 转换为 ChangeOperations                      │
+│  b. 创建 Revision (rev-001)                                  │
+│  c. Revision 包含:                                           │
+│     - 所有 ChangeOperations                                  │
+│     - 所有贡献者 (contributors)                               │
+│     - 合并者 (mergedBy)                                       │
+│     - 统计信息 (rowsCreated, rowsUpdated...)                 │
+│  d. 更新 Request.generatedRevisionId = rev-001               │
+│  e. 更新 Request.status = merged                             │
+│  f. 实际数据库写入生效                                        │
+└────────────┬────────────────────────────────────────────────┘
+             │
+             ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. Revision 永久保存                                        │
+│     - 不可修改                                                │
+│     - 可查询                                                  │
+│     - 可对比 (diff)                                           │
+│     - 可基于它创建新的回滚变更                                 │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3>3.3 对象关系图</h3>
+<div class="mermaid">erDiagram
+    Document ||--o{ Properties : "has"
+    Document ||--|| Metadata : "has"
+    Document ||--o{ Row : "contains"
+    Document ||--o{ View : "has"
+    Document ||--|| Settings : "has"
+    Document ||--o{ Comment : "has"
+    Document ||--o{ Request : "has"
+    Document ||--o{ Revision : "has"
+    
+    Metadata ||--o{ Field : "defines"
+    Field ||--o{ SelectOption : "has"
+    
+    Row ||--o{ ValueEntry : "contains"
+    ValueEntry }o--|| Field : "references"
+    
+    View ||--o{ Filter : "has"
+    View ||--o{ SortField : "has"
+    
+    Comment }o--|| Comment : "replies to"
+    Comment ||--o{ Reaction : "has"
+    
+    Request ||--o{ Change : "contains"
+    Request ||--o| Approval : "requires"
+    Request ||--o| Revision : "generates"
+    
+    Revision ||--o{ ChangeOperation : "records"
+    
+    Document ||--o{ RelationEdge : "source"
+    Document ||--o{ RelationEdge : "target"
+    
+    Document ||--o{ Attachment : "has"</div>
+<hr>
+<h2>4. 七层模型详解</h2>
+<h3>4.1 Properties（文档属性）- 元信息层</h3>
+<h4>4.1.1 职责定位</h4>
+<p><strong>Properties 存储文档级别的元信息</strong>，而不是数据行的内容。</p>
+<p>类比：</p>
+<ul>
+<li>📄 <strong>文档</strong> = 一份完整的订货单</li>
+<li>🏷️ <strong>Properties</strong> = 订单编号、订单日期、门店、总金额</li>
+<li>📊 <strong>Data (行)</strong> = 每个产品的明细（产品名、数量、单价）</li>
+</ul>
+<h4>4.1.2 数据模型</h4>
+<pre><code class="language-typescript">model DocumentProperties {
+  id: string;                    // 属性记录ID
+  docId: string;                 // 所属文档ID
+  docType: string;               // 文档类型
+  organizationId?: string;       // 组织ID
+  workspaceId?: string;          // 工作区ID
+  
+  properties: ValueEntry[];      // 属性值集合
+  
+  version?: int64;               // 乐观锁版本号
+  createdAt?: string;
+  updatedAt?: string;
+  updatedBy?: UserRef;
+}
+
+// ValueEntry 是类型化的值
+model ValueEntry {
+  fieldId: string;               // 对应 Metadata.properties 中的字段ID
+  value: Value;                  // 类型化的值
+}
+
+model Value {
+  text?: string;
+  number?: number;
+  boolean?: boolean;
+  date?: string;
+  select?: string;
+  multiSelect?: string[];
+  user?: UserRef;
+  // ... 25+ 种类型
+}
+</code></pre>
+<h4>4.1.3 为什么需要 Metadata.properties？</h4>
+<p><strong>Metadata 包含两部分字段定义</strong>：</p>
+<ol>
+<li><strong>Metadata.fields</strong> - 定义数据行（Data）的字段结构</li>
+<li><strong>Metadata.properties</strong> - 定义文档属性（Properties）的字段结构</li>
+</ol>
+<pre><code class="language-typescript">{
+  &quot;fields&quot;: [
+    // 数据行的字段
+    { &quot;id&quot;: &quot;productName&quot;, &quot;type&quot;: &quot;text&quot;, &quot;name&quot;: &quot;产品名称&quot; },
+    { &quot;id&quot;: &quot;quantity&quot;, &quot;type&quot;: &quot;number&quot;, &quot;name&quot;: &quot;数量&quot; }
+  ],
+  &quot;properties&quot;: [
+    // 文档属性的字段
+    { &quot;id&quot;: &quot;orderDate&quot;, &quot;type&quot;: &quot;date&quot;, &quot;name&quot;: &quot;订单日期&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;store&quot;, &quot;type&quot;: &quot;text&quot;, &quot;name&quot;: &quot;门店&quot; },
+    { &quot;id&quot;: &quot;totalAmount&quot;, &quot;type&quot;: &quot;currency&quot;, &quot;name&quot;: &quot;总金额&quot; }
+  ]
+}
+</code></pre>
+<p><strong>为什么这样设计？</strong></p>
+<ol>
+<li><p><strong>类型安全</strong>: Properties 的值也需要类型验证</p>
+<pre><code class="language-typescript">// ✅ 正确：totalAmount 是 currency 类型
+{ &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 5000.00 } }
+
+// ❌ 错误：类型不匹配
+{ &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;five thousand&quot; } }
+</code></pre>
+</li>
+<li><p><strong>动态表单生成</strong>: 前端可以根据 Metadata.properties 自动生成属性编辑表单</p>
+</li>
+<li><p><strong>验证规则</strong>: 可以定义属性的必填、唯一、格式等规则</p>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;invoiceNumber&quot;,
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;required&quot;: true,
+  &quot;unique&quot;: true,
+  &quot;validations&quot;: [{
+    &quot;ruleType&quot;: &quot;pattern&quot;,
+    &quot;config&quot;: { &quot;pattern&quot;: &quot;^INV-\\d{4}-\\d{3}$&quot; }
+  }]
+}
+</code></pre>
+</li>
+<li><p><strong>计算字段</strong>: Properties 也可以包含公式字段</p>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;totalAmount&quot;,
+  &quot;type&quot;: &quot;formula&quot;,
+  &quot;formula&quot;: &quot;SUM(data.*.total)&quot;  // 汇总所有数据行的小计
+}
+</code></pre>
+</li>
+</ol>
+<h4>4.1.4 API 操作</h4>
+<pre><code class="language-bash"># 1. 创建/初始化属性
+POST /doc/purchaseOrder/order-123/properties
+{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;orderDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2024-12-01&quot; } },
+    { &quot;fieldId&quot;: &quot;store&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Beijing Branch&quot; } },
+    { &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 0 } }
+  ]
+}
+
+# 2. 全量替换属性
+PUT /doc/purchaseOrder/order-123/properties?requestId=req-1
+{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;orderDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2024-12-02&quot; } },
+    { &quot;fieldId&quot;: &quot;store&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Shanghai Branch&quot; } },
+    { &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 5000.00 } }
+  ]
+}
+
+# 3. 部分更新属性 (merge=true)
+PATCH /doc/purchaseOrder/order-123/properties?requestId=req-1&amp;merge=true
+{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 6000.00 } },
+    { &quot;fieldId&quot;: &quot;status&quot;, &quot;value&quot;: { &quot;select&quot;: &quot;approved&quot; } }
+  ]
+}
+
+# 4. 查看属性变更历史
+GET /doc/purchaseOrder/order-123/properties/history
+</code></pre>
+<h4>4.1.5 使用场景</h4>
+<p><strong>场景1：订货单</strong></p>
+<pre><code class="language-json">{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;orderDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2024-12-01T10:00:00Z&quot; } },
+    { &quot;fieldId&quot;: &quot;store&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Beijing Branch&quot; } },
+    { &quot;fieldId&quot;: &quot;supplier&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Apple Inc.&quot; } },
+    { &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 50000.00 } },
+    { &quot;fieldId&quot;: &quot;status&quot;, &quot;value&quot;: { &quot;select&quot;: &quot;pending&quot; } },
+    { &quot;fieldId&quot;: &quot;priority&quot;, &quot;value&quot;: { &quot;select&quot;: &quot;high&quot; } },
+    { &quot;fieldId&quot;: &quot;notes&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Urgent delivery required&quot; } }
+  ]
+}
+</code></pre>
+<p><strong>场景2：发票</strong></p>
+<pre><code class="language-json">{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;invoiceNumber&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;INV-2024-001&quot; } },
+    { &quot;fieldId&quot;: &quot;issueDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2024-12-01&quot; } },
+    { &quot;fieldId&quot;: &quot;dueDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2025-01-01&quot; } },
+    { &quot;fieldId&quot;: &quot;taxRate&quot;, &quot;value&quot;: { &quot;number&quot;: 0.13 } },
+    { &quot;fieldId&quot;: &quot;taxAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 6500.00 } },
+    { &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 56500.00 } },
+    { &quot;fieldId&quot;: &quot;paymentStatus&quot;, &quot;value&quot;: { &quot;select&quot;: &quot;pending&quot; } }
+  ]
+}
+</code></pre>
+<hr>
+<h3>4.2 Metadata（元数据）- 字段定义层</h3>
+<h4>4.2.1 职责定位</h4>
+<p><strong>Metadata 是整个文档的&quot;Schema&quot;</strong>，定义：</p>
+<ul>
+<li>数据行有哪些字段（fields）</li>
+<li>文档属性有哪些字段（properties）</li>
+<li>每个字段的类型、验证规则、计算逻辑</li>
+</ul>
+<h4>4.2.2 字段类型体系</h4>
+<p><strong>NexusBook 支持 25+ 种字段类型</strong>：</p>
+<pre><code class="language-typescript">enum FieldType {
+  // 基础文本类型
+  text,              // 单行文本
+  long_text,         // 多行文本
+  
+  // 数值类型
+  number,            // 数字
+  currency,          // 货币
+  percent,           // 百分比
+  
+  // 日期时间类型
+  date,              // 日期
+  datetime,          // 日期时间
+  
+  // 布尔类型
+  boolean,           // 是/否
+  
+  // 选择类型
+  single_select,     // 单选
+  multi_select,      // 多选
+  
+  // 附件和用户
+  attachment,        // 附件
+  user,              // 用户
+  collaborator,      // 协作者
+  
+  // 关联类型
+  relation,          // 关联其他文档/行
+  lookup,            // 查找（从关联记录获取值）
+  rollup,            // 汇总（聚合关联记录）
+  
+  // 计算类型
+  formula,           // 公式字段
+  
+  // 系统字段
+  auto_number,       // 自动编号
+  created_time,      // 创建时间
+  updated_time,      // 更新时间
+  created_by,        // 创建人
+  updated_by,        // 更新人
+}
+</code></pre>
+<h4>4.2.3 计算字段详解</h4>
+<p><strong>1. Formula 字段 - 公式计算</strong></p>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;total&quot;,
+  &quot;name&quot;: &quot;小计&quot;,
+  &quot;type&quot;: &quot;formula&quot;,
+  &quot;formula&quot;: &quot;quantity * price&quot;
+}
+</code></pre>
+<p>支持的函数：</p>
+<ul>
+<li>数学：SUM, AVG, MIN, MAX, ROUND, CEIL, FLOOR</li>
+<li>文本：CONCAT, UPPER, LOWER, TRIM, SUBSTRING</li>
+<li>日期：NOW, YEAR, MONTH, DAY, DATEDIFF</li>
+<li>逻辑：IF, AND, OR, NOT</li>
+</ul>
+<p><strong>2. Lookup 字段 - 跨文档查找</strong></p>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;supplierName&quot;,
+  &quot;name&quot;: &quot;供应商名称&quot;,
+  &quot;type&quot;: &quot;lookup&quot;,
+  &quot;lookup&quot;: {
+    &quot;relationFieldId&quot;: &quot;supplier&quot;,      // 关联字段
+    &quot;targetFieldId&quot;: &quot;name&quot;              // 目标字段
+  }
+}
+
+// 工作原理：
+// 1. 当前行的 supplier 字段关联到 supplier 文档的某一行
+// 2. 从那一行取出 name 字段的值
+// 3. 显示在当前行的 supplierName 字段中
+</code></pre>
+<p><strong>3. Rollup 字段 - 聚合计算</strong></p>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;totalOrderAmount&quot;,
+  &quot;name&quot;: &quot;订单总额&quot;,
+  &quot;type&quot;: &quot;rollup&quot;,
+  &quot;rollup&quot;: {
+    &quot;relationFieldId&quot;: &quot;orderItems&quot;,    // 关联字段（一对多）
+    &quot;targetFieldId&quot;: &quot;total&quot;,           // 目标字段
+    &quot;agg&quot;: &quot;sum&quot;                        // 聚合函数
+  }
+}
+
+// 支持的聚合函数：
+// - sum: 求和
+// - avg: 平均值
+// - min: 最小值
+// - max: 最大值
+// - count: 计数
+</code></pre>
+<h4>4.2.4 验证规则</h4>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;email&quot;,
+  &quot;name&quot;: &quot;邮箱&quot;,
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;required&quot;: true,
+  &quot;unique&quot;: true,
+  &quot;validations&quot;: [
+    {
+      &quot;ruleType&quot;: &quot;pattern&quot;,
+      &quot;config&quot;: {
+        &quot;pattern&quot;: &quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$&quot;
+      },
+      &quot;message&quot;: {
+        &quot;zh&quot;: &quot;请输入有效的邮箱地址&quot;,
+        &quot;en&quot;: &quot;Please enter a valid email address&quot;
+      }
+    }
+  ]
+}
+</code></pre>
+<p><strong>内置验证规则类型</strong>：</p>
+<ul>
+<li><code>pattern</code> - 正则表达式</li>
+<li><code>min</code> / <code>max</code> - 数值范围</li>
+<li><code>minLength</code> / <code>maxLength</code> - 文本长度</li>
+<li><code>enum</code> - 枚举值</li>
+<li><code>custom</code> - 自定义验证逻辑</li>
+</ul>
+<h4>4.2.5 选项管理</h4>
+<pre><code class="language-typescript">{
+  &quot;id&quot;: &quot;status&quot;,
+  &quot;name&quot;: &quot;状态&quot;,
+  &quot;type&quot;: &quot;single_select&quot;,
+  &quot;selectOptions&quot;: [
+    {
+      &quot;id&quot;: &quot;opt-1&quot;,
+      &quot;name&quot;: { &quot;zh&quot;: &quot;待处理&quot;, &quot;en&quot;: &quot;Pending&quot; },
+      &quot;color&quot;: &quot;yellow&quot;
+    },
+    {
+      &quot;id&quot;: &quot;opt-2&quot;,
+      &quot;name&quot;: { &quot;zh&quot;: &quot;进行中&quot;, &quot;en&quot;: &quot;In Progress&quot; },
+      &quot;color&quot;: &quot;blue&quot;
+    },
+    {
+      &quot;id&quot;: &quot;opt-3&quot;,
+      &quot;name&quot;: { &quot;zh&quot;: &quot;已完成&quot;, &quot;en&quot;: &quot;Completed&quot; },
+      &quot;color&quot;: &quot;green&quot;
+    },
+    {
+      &quot;id&quot;: &quot;opt-4&quot;,
+      &quot;name&quot;: { &quot;zh&quot;: &quot;已取消&quot;, &quot;en&quot;: &quot;Cancelled&quot; },
+      &quot;color&quot;: &quot;red&quot;
+    }
+  ]
+}
+</code></pre>
+<hr>
+<h3>4.3 Data（数据行）- 内容层</h3>
+<h4>4.3.1 数据模型</h4>
+<pre><code class="language-typescript">model Row {
+  id: string;                    // 行ID
+  values: ValueEntry[];          // 字段值集合
+  
+  version?: int64;               // 乐观锁版本号
+  createdAt?: string;
+  createdBy?: UserRef;
+  updatedAt?: string;
+  updatedBy?: UserRef;
+}
+</code></pre>
+<h4>4.3.2 CRUD 操作</h4>
+<pre><code class="language-bash"># 1. 创建行（必须携带 requestId）
+POST /doc/purchaseOrder/order-123/rows?requestId=req-1
+{
+  &quot;values&quot;: [
+    { &quot;fieldId&quot;: &quot;productName&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;iPhone 15&quot; } },
+    { &quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: { &quot;number&quot;: 10 } },
+    { &quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: { &quot;number&quot;: 799.99 } }
+  ]
+}
+
+# 2. 更新行
+PUT /doc/purchaseOrder/order-123/rows/row-1?requestId=req-1
+{
+  &quot;values&quot;: [
+    { &quot;fieldId&quot;: &quot;productName&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;iPhone 15 Pro&quot; } },
+    { &quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: { &quot;number&quot;: 15 } },
+    { &quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: { &quot;number&quot;: 999.99 } }
+  ],
+  &quot;version&quot;: 2
+}
+
+# 3. 删除行
+DELETE /doc/purchaseOrder/order-123/rows/row-1?requestId=req-1
+
+# 4. 查询行（支持分页、过滤、排序）
+GET /doc/purchaseOrder/order-123/rows?page=1&amp;pageSize=20
+POST /doc/purchaseOrder/order-123/rows/query
+{
+  &quot;filters&quot;: {
+    &quot;logic&quot;: &quot;and&quot;,
+    &quot;conditions&quot;: [
+      { &quot;field&quot;: &quot;quantity&quot;, &quot;operator&quot;: &quot;gte&quot;, &quot;value&quot;: 10 }
+    ]
+  },
+  &quot;sorts&quot;: [
+    { &quot;field&quot;: &quot;createdAt&quot;, &quot;direction&quot;: &quot;desc&quot; }
+  ],
+  &quot;page&quot;: 1,
+  &quot;pageSize&quot;: 20
+}
+</code></pre>
+<h4>4.3.3 批量更新（BulkUpdate）</h4>
+<p><strong>统一的批量更新格式</strong>：</p>
+<pre><code class="language-typescript">// 批量更新支持灵活的 target 定位
+POST /doc/purchaseOrder/order-123/rows/batch-update?requestId=req-1
+[
+  // 1. 更新单个单元格
+  {
+    &quot;target&quot;: { &quot;row&quot;: &quot;row-1&quot;, &quot;field&quot;: &quot;price&quot; },
+    &quot;value&quot;: 99.99
+  },
+  
+  // 2. 更新整行（多个字段）
+  {
+    &quot;target&quot;: { &quot;row&quot;: &quot;row-2&quot; },
+    &quot;value&quot;: {
+      &quot;productName&quot;: &quot;iPad Pro&quot;,
+      &quot;quantity&quot;: 5,
+      &quot;price&quot;: 1099.99
+    }
+  },
+  
+  // 3. 批量更新多行的同一字段
+  {
+    &quot;target&quot;: { &quot;rows&quot;: [&quot;row-3&quot;, &quot;row-4&quot;, &quot;row-5&quot;], &quot;field&quot;: &quot;status&quot; },
+    &quot;value&quot;: &quot;active&quot;
+  },
+  
+  // 4. 更新文档属性
+  {
+    &quot;target&quot;: { &quot;property&quot;: &quot;totalAmount&quot; },
+    &quot;value&quot;: 50000.00
+  },
+  
+  // 5. 批量更新多个属性
+  {
+    &quot;target&quot;: { &quot;properties&quot;: true },
+    &quot;value&quot;: {
+      &quot;totalAmount&quot;: 50000.00,
+      &quot;itemCount&quot;: 100
+    }
+  }
+]
+</code></pre>
+<p><strong>服务端自动处理</strong>：</p>
+<ol>
+<li>根据 <code>target</code> 定位要更新的位置</li>
+<li>根据 Metadata 解析 <code>value</code> 的类型</li>
+<li>执行类型验证</li>
+<li>记录到 Request 的 Changes 中</li>
+</ol>
+<hr>
+<h3>4.4 Views（视图）- 展示层</h3>
+<h4>4.4.1 视图类型</h4>
+<pre><code class="language-typescript">enum ViewType {
+  table,      // 表格视图 - 最常用，类似 Excel
+  gallery,    // 画廊视图 - 卡片展示，适合图片类内容
+  kanban,     // 看板视图 - 按状态分组，适合任务管理
+  calendar,   // 日历视图 - 按日期展示，适合事件管理
+  chart,      // 图表视图 - 数据可视化
+  form,       // 表单视图 - 单条记录编辑
+  map,        // 地图视图 - 地理位置展示
+  timeline,   // 时间线视图 - 按时间轴展示
+}
+</code></pre>
+<h4>4.4.2 视图配置</h4>
+<pre><code class="language-typescript">model View {
+  id: string;
+  name: string;
+  type: ViewType;
+  
+  config: {
+    // 显示哪些字段
+    columns?: string[];
+    
+    // 过滤条件
+    filters?: Filter;
+    
+    // 排序规则
+    sorts?: SortField[];
+    
+    // 分组字段
+    groupBy?: string;
+    
+    // 视图特定配置
+    kanbanConfig?: {
+      groupByField: string;       // 按哪个字段分组（如 status）
+      cardFields: string[];       // 卡片显示哪些字段
+    };
+    
+    calendarConfig?: {
+      dateField: string;          // 日期字段
+      titleField: string;         // 标题字段
+    };
+    
+    chartConfig?: {
+      xField: string;             // X轴字段
+      yField: string;             // Y轴字段
+      chartType: &quot;bar&quot; | &quot;line&quot; | &quot;pie&quot;;
+    };
+  };
+}
+</code></pre>
+<h4>4.4.3 过滤器示例</h4>
+<pre><code class="language-typescript">// 复杂过滤条件
+{
+  &quot;logic&quot;: &quot;and&quot;,
+  &quot;conditions&quot;: [
+    {
+      &quot;field&quot;: &quot;status&quot;,
+      &quot;operator&quot;: &quot;eq&quot;,
+      &quot;value&quot;: &quot;pending&quot;
+    },
+    {
+      &quot;logic&quot;: &quot;or&quot;,
+      &quot;conditions&quot;: [
+        {
+          &quot;field&quot;: &quot;priority&quot;,
+          &quot;operator&quot;: &quot;eq&quot;,
+          &quot;value&quot;: &quot;high&quot;
+        },
+        {
+          &quot;field&quot;: &quot;amount&quot;,
+          &quot;operator&quot;: &quot;gte&quot;,
+          &quot;value&quot;: 10000
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p><strong>支持的操作符</strong>：</p>
+<ul>
+<li><code>eq</code> / <code>ne</code> - 等于/不等于</li>
+<li><code>gt</code> / <code>gte</code> / <code>lt</code> / <code>lte</code> - 大于/大于等于/小于/小于等于</li>
+<li><code>in</code> / <code>notIn</code> - 包含于/不包含于</li>
+<li><code>contains</code> / <code>startsWith</code> / <code>endsWith</code> - 文本包含/开头/结尾</li>
+<li><code>isEmpty</code> / <code>isNotEmpty</code> - 为空/不为空</li>
+</ul>
+<hr>
+<h3>4.5 Comments（评论）- 协作层</h3>
+<h4>4.5.1 精确位置评论</h4>
+<p><strong>支持四级定位</strong>：</p>
+<pre><code class="language-typescript">// 1. 文档级评论
+{
+  &quot;content&quot;: &quot;这个订单需要尽快处理&quot;,
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;document&quot;
+  }
+}
+
+// 2. 字段级评论
+{
+  &quot;content&quot;: &quot;产品名称字段的格式需要统一&quot;,
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;field&quot;,
+    &quot;fieldId&quot;: &quot;productName&quot;
+  }
+}
+
+// 3. 行级评论
+{
+  &quot;content&quot;: &quot;这一行的数量有问题&quot;,
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;row&quot;,
+    &quot;rowId&quot;: &quot;row-123&quot;
+  }
+}
+
+// 4. 单元格级评论
+{
+  &quot;content&quot;: &quot;这个单价需要确认&quot;,
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;cell&quot;,
+    &quot;rowId&quot;: &quot;row-123&quot;,
+    &quot;fieldId&quot;: &quot;price&quot;
+  }
+}
+</code></pre>
+<h4>4.5.2 评论线程</h4>
+<pre><code class="language-typescript">// 1. 创建顶层评论
+POST /doc/order/123/comments
+{
+  &quot;content&quot;: &quot;请检查第3行的数量&quot;,
+  &quot;target&quot;: { &quot;scope&quot;: &quot;row&quot;, &quot;rowId&quot;: &quot;row-3&quot; }
+}
+// 返回: { &quot;id&quot;: &quot;comment-1&quot; }
+
+// 2. 回复评论（形成线程）
+POST /doc/order/123/comments
+{
+  &quot;content&quot;: &quot;已经检查过了，数量正确&quot;,
+  &quot;parentId&quot;: &quot;comment-1&quot;
+}
+
+// 3. 继续回复
+POST /doc/order/123/comments
+{
+  &quot;content&quot;: &quot;好的，那我通过审批&quot;,
+  &quot;parentId&quot;: &quot;comment-1&quot;
+}
+</code></pre>
+<h4>4.5.3 @提及和通知</h4>
+<pre><code class="language-typescript">{
+  &quot;content&quot;: &quot;@user-456 请帮忙确认这个订单的单价&quot;,
+  &quot;mentions&quot;: [&quot;user-456&quot;],
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;cell&quot;,
+    &quot;rowId&quot;: &quot;row-1&quot;,
+    &quot;fieldId&quot;: &quot;price&quot;
+  }
+}
+</code></pre>
+<h4>4.5.4 表情反应</h4>
+<pre><code class="language-typescript">// 添加表情反应
+POST /doc/order/123/comments/comment-1/reactions
+{
+  &quot;emoji&quot;: &quot;👍&quot;
+}
+
+// 评论对象包含反应统计
+{
+  &quot;id&quot;: &quot;comment-1&quot;,
+  &quot;content&quot;: &quot;这个方案不错&quot;,
+  &quot;reactions&quot;: [
+    {
+      &quot;emoji&quot;: &quot;👍&quot;,
+      &quot;users&quot;: [&quot;user-1&quot;, &quot;user-2&quot;, &quot;user-3&quot;],
+      &quot;count&quot;: 3
+    },
+    {
+      &quot;emoji&quot;: &quot;❤️&quot;,
+      &quot;users&quot;: [&quot;user-4&quot;],
+      &quot;count&quot;: 1
+    }
+  ]
+}
+</code></pre>
+<h4>4.5.5 解决状态</h4>
+<pre><code class="language-typescript">// 标记评论已解决
+POST /doc/order/123/comments/comment-1/resolve
+
+// 查询未解决的评论
+GET /doc/order/123/comments?resolved=false
+</code></pre>
+<hr>
+<h3>4.6 Requests &amp; Revisions - 工作流层</h3>
+<h4>4.6.1 Request（变更请求）模型</h4>
+<pre><code class="language-typescript">model Request {
+  id: string;
+  docType: string;
+  docId: string;
+  
+  title?: string;
+  description?: string;
+  
+  status: &quot;open&quot; | &quot;merged&quot; | &quot;closed&quot;;
+  
+  author: UserRef;
+  reviewers?: UserRef[];
+  contributors?: UserRef[];         // 所有编辑过这个 Request 的人
+  
+  changes: Change[];                // 待合并的变更
+  
+  generatedRevisionId?: string;     // 合并后生成的 Revision ID
+  
+  createdAt: string;
+  updatedAt: string;
+  mergedAt?: string;
+  mergedBy?: UserRef;
+}
+
+model Change {
+  id: string;
+  type: string;                     // row-create, row-update, property-update...
+  operation: &quot;create&quot; | &quot;update&quot; | &quot;delete&quot;;
+  targetId?: string;                // 目标行/属性ID
+  data: unknown;                    // 变更数据
+  changedAt: string;
+  changedBy: UserRef;
+}
+</code></pre>
+<h4>4.6.2 Revision（修订历史）模型</h4>
+<pre><code class="language-typescript">model Revision {
+  id: string;
+  version: int64;
+  
+  requestId?: string;               // 源 Request ID
+  title?: string;
+  description?: string;
+  
+  contributors: UserRef[];          // 所有贡献者
+  mergedBy: UserRef;
+  
+  changes: ChangeOperation[];       // 具体的变更操作
+  
+  stats: {                          // 统计信息
+    rowsCreated: int32;
+    rowsUpdated: int32;
+    rowsDeleted: int32;
+    fieldsCreated: int32;
+    fieldsUpdated: int32;
+    fieldsDeleted: int32;
+  };
+  
+  previousRevisionId?: string;      // 前一个 Revision ID
+  createdAt: string;
+  updatedAt: string;
+}
+
+model ChangeOperation {
+  id: string;
+  type: string;
+  
+  target: {
+    kind: string;                   // row, property, field...
+    rowId?: string;
+    fieldId?: string;
+  };
+  
+  oldValue?: unknown;               // 修改前的值
+  newValue?: unknown;               // 修改后的值
+  
+  operator: string;                 // 操作人
+  timestamp: string;
+  note?: string;
+}
+</code></pre>
+<h4>4.6.3 完整工作流</h4>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Step 1: 创建 Request                                         │
+└─────────────────────────────────────────────────────────────┘
+POST /doc/purchaseOrder/order-123/requests
+{
+  &quot;title&quot;: &quot;更新12月采购订单&quot;,
+  &quot;description&quot;: &quot;调整数量和价格&quot;
+}
+返回: { &quot;id&quot;: &quot;req-1&quot; }
+
+┌─────────────────────────────────────────────────────────────┐
+│ Step 2: 多人协同编辑 (所有操作携带 requestId=req-1)           │
+└─────────────────────────────────────────────────────────────┘
+
+// 用户A: 创建新行
+POST /doc/purchaseOrder/order-123/rows?requestId=req-1
+{ &quot;values&quot;: [...] }
+→ Request.changes 新增 Change { type: &quot;row-create&quot; }
+→ Request.contributors 新增 用户A
+
+// 用户B: 更新行
+PUT /doc/purchaseOrder/order-123/rows/row-1?requestId=req-1
+{ &quot;values&quot;: [...] }
+→ Request.changes 新增 Change { type: &quot;row-update&quot; }
+→ Request.contributors 新增 用户B
+
+// 用户C: 更新属性
+PATCH /doc/purchaseOrder/order-123/properties?requestId=req-1
+{ &quot;properties&quot;: [...] }
+→ Request.changes 新增 Change { type: &quot;property-update&quot; }
+→ Request.contributors 新增 用户C
+
+┌─────────────────────────────────────────────────────────────┐
+│ Step 3: 查看 Request 状态                                    │
+└─────────────────────────────────────────────────────────────┘
+GET /doc/purchaseOrder/order-123/requests/req-1
+{
+  &quot;id&quot;: &quot;req-1&quot;,
+  &quot;title&quot;: &quot;更新12月采购订单&quot;,
+  &quot;status&quot;: &quot;open&quot;,
+  &quot;author&quot;: { &quot;id&quot;: &quot;user-A&quot; },
+  &quot;contributors&quot;: [&quot;user-A&quot;, &quot;user-B&quot;, &quot;user-C&quot;],
+  &quot;changes&quot;: [
+    { &quot;type&quot;: &quot;row-create&quot;, &quot;changedBy&quot;: &quot;user-A&quot; },
+    { &quot;type&quot;: &quot;row-update&quot;, &quot;changedBy&quot;: &quot;user-B&quot; },
+    { &quot;type&quot;: &quot;property-update&quot;, &quot;changedBy&quot;: &quot;user-C&quot; }
+  ]
+}
+
+┌─────────────────────────────────────────────────────────────┐
+│ Step 4: 查看 Diff                                            │
+└─────────────────────────────────────────────────────────────┘
+GET /doc/purchaseOrder/order-123/requests/req-1/diff
+{
+  &quot;added&quot;: [
+    { &quot;rowId&quot;: &quot;row-10&quot;, &quot;values&quot;: [...] }
+  ],
+  &quot;updated&quot;: [
+    {
+      &quot;rowId&quot;: &quot;row-1&quot;,
+      &quot;fieldId&quot;: &quot;quantity&quot;,
+      &quot;oldValue&quot;: 10,
+      &quot;newValue&quot;: 15
+    }
+  ],
+  &quot;properties&quot;: {
+    &quot;totalAmount&quot;: {
+      &quot;oldValue&quot;: 50000,
+      &quot;newValue&quot;: 55000
+    }
+  }
+}
+
+┌─────────────────────────────────────────────────────────────┐
+│ Step 5: 提交审批 (可选)                                      │
+└─────────────────────────────────────────────────────────────┘
+POST /doc/purchaseOrder/order-123/requests/req-1/submit-approval
+{
+  &quot;approvers&quot;: [&quot;user-manager&quot;]
+}
+
+// 审批者查看并批准
+POST /doc/purchaseOrder/order-123/approvals/approval-1/approve
+{
+  &quot;decision&quot;: &quot;approved&quot;,
+  &quot;comment&quot;: &quot;采购单价合理，批准&quot;
+}
+
+┌─────────────────────────────────────────────────────────────┐
+│ Step 6: 合并 Request                                         │
+└─────────────────────────────────────────────────────────────┘
+POST /doc/purchaseOrder/order-123/requests/req-1/merge
+
+// 系统自动执行:
+1. 将所有 Changes 转换为 ChangeOperations
+2. 创建 Revision
+   {
+     &quot;id&quot;: &quot;rev-001&quot;,
+     &quot;version&quot;: 1,
+     &quot;requestId&quot;: &quot;req-1&quot;,
+     &quot;contributors&quot;: [&quot;user-A&quot;, &quot;user-B&quot;, &quot;user-C&quot;],
+     &quot;mergedBy&quot;: &quot;user-manager&quot;,
+     &quot;changes&quot;: [
+       {
+         &quot;type&quot;: &quot;row-create&quot;,
+         &quot;target&quot;: { &quot;kind&quot;: &quot;row&quot;, &quot;rowId&quot;: &quot;row-10&quot; },
+         &quot;newValue&quot;: {...},
+         &quot;operator&quot;: &quot;user-A&quot;
+       },
+       {
+         &quot;type&quot;: &quot;row-update&quot;,
+         &quot;target&quot;: { &quot;kind&quot;: &quot;row&quot;, &quot;rowId&quot;: &quot;row-1&quot;, &quot;fieldId&quot;: &quot;quantity&quot; },
+         &quot;oldValue&quot;: 10,
+         &quot;newValue&quot;: 15,
+         &quot;operator&quot;: &quot;user-B&quot;
+       },
+       {
+         &quot;type&quot;: &quot;property-update&quot;,
+         &quot;target&quot;: { &quot;kind&quot;: &quot;property&quot;, &quot;fieldId&quot;: &quot;totalAmount&quot; },
+         &quot;oldValue&quot;: 50000,
+         &quot;newValue&quot;: 55000,
+         &quot;operator&quot;: &quot;user-C&quot;
+       }
+     ],
+     &quot;stats&quot;: {
+       &quot;rowsCreated&quot;: 1,
+       &quot;rowsUpdated&quot;: 1,
+       &quot;rowsDeleted&quot;: 0
+     }
+   }
+3. 更新 Request
+   {
+     &quot;status&quot;: &quot;merged&quot;,
+     &quot;generatedRevisionId&quot;: &quot;rev-001&quot;,
+     &quot;mergedAt&quot;: &quot;2024-12-01T14:00:00Z&quot;,
+     &quot;mergedBy&quot;: &quot;user-manager&quot;
+   }
+4. 实际写入数据库
+
+┌─────────────────────────────────────────────────────────────┐
+│ Step 7: 查看历史和对比                                       │
+└─────────────────────────────────────────────────────────────┘
+
+// 查看所有修订
+GET /doc/purchaseOrder/order-123/revisions
+[
+  {
+    &quot;id&quot;: &quot;rev-001&quot;,
+    &quot;version&quot;: 1,
+    &quot;title&quot;: &quot;更新12月采购订单&quot;,
+    &quot;contributors&quot;: [&quot;user-A&quot;, &quot;user-B&quot;, &quot;user-C&quot;],
+    &quot;stats&quot;: { &quot;rowsCreated&quot;: 1, &quot;rowsUpdated&quot;: 1 }
+  }
+]
+
+// 查看修订详情
+GET /doc/purchaseOrder/order-123/revisions/rev-001
+{
+  &quot;changes&quot;: [...],  // 所有 ChangeOperations
+  &quot;stats&quot;: {...}
+}
+
+// 对比两个修订
+GET /doc/purchaseOrder/order-123/revisions/rev-002/diff?base=rev-001
+
+// 查询某行的完整变更历史
+GET /doc/purchaseOrder/order-123/revisions/history?targetKind=row&amp;rowId=row-1
+</code></pre>
+<hr>
+<h3>4.7 Settings（设置）- 配置层</h3>
+<pre><code class="language-typescript">model DocumentSettings {
+  permissions: {
+    view: string[];                 // 谁可以查看
+    edit: string[];                 // 谁可以编辑
+    delete: string[];               // 谁可以删除
+    share: string[];                // 谁可以分享
+  };
+  
+  notifications: {
+    onCommentAdd: boolean;          // 新评论时通知
+    onDataChange: boolean;          // 数据变更时通知
+    onMerge: boolean;               // Request 合并时通知
+  };
+  
+  workflow: {
+    requiresApproval: boolean;      // 是否需要审批
+    approvers: string[];            // 审批者列表
+    autoMerge: boolean;             // 审批通过后自动合并
+  };
+}
+
+model DocumentTypeSettings {
+  // 文档类型级别的设置
+  defaultMetadata: Metadata;        // 默认字段定义
+  defaultViews: View[];             // 默认视图
+  permissions: {...};               // 默认权限
+}
+</code></pre>
+<hr>
+<h2>5. 变更工作流</h2>
+<h3>5.1 为什么需要 Request/Revision 机制？</h3>
+<p><strong>问题场景</strong>：</p>
+<ul>
+<li>多人同时编辑一个订单，如何避免冲突？</li>
+<li>如何知道谁在什么时候改了什么？</li>
+<li>重要变更需要经理审批，如何实现？</li>
+<li>发现错误需要回滚，如何安全回退？</li>
+</ul>
+<p><strong>传统方案的问题</strong>：</p>
+<pre><code>直接修改数据库
+  ↓
+数据立即生效
+  ↓
+❌ 无法协同：多人同时改会冲突
+❌ 无法追溯：不知道谁改的
+❌ 无法审批：改完就生效了
+❌ 难以回滚：不知道改了什么
+</code></pre>
+<p><strong>NexusBook 方案</strong>：</p>
+<pre><code>用户修改 → Request (草稿)
+  ↓
+多人协同编辑同一个 Request
+  ↓
+审批流程 (可选)
+  ↓
+合并 Request → Revision (永久记录)
+  ↓
+数据库写入生效
+</code></pre>
+<h3>5.2 类比：Git 工作流</h3>
+<table>
+<thead>
+<tr>
+<th>Git</th>
+<th>NexusBook</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Working Directory</td>
+<td>用户本地编辑</td>
+<td>临时修改</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td>Request</td>
+<td>变更集合</td>
+</tr>
+<tr>
+<td>Commit</td>
+<td>Change</td>
+<td>单个变更</td>
+</tr>
+<tr>
+<td>Pull Request</td>
+<td>Request + Approval</td>
+<td>审批流程</td>
+</tr>
+<tr>
+<td>Merge</td>
+<td>Merge Request</td>
+<td>合并到主分支</td>
+</tr>
+<tr>
+<td>Commit History</td>
+<td>Revision</td>
+<td>不可变历史</td>
+</tr>
+<tr>
+<td>Revert</td>
+<td>Revert Revision</td>
+<td>基于历史创建新的回滚变更</td>
+</tr>
+</tbody></table>
+<h3>5.3 并发控制</h3>
+<p><strong>乐观锁机制</strong>：</p>
+<pre><code class="language-typescript">// 1. 读取行（获取版本号）
+GET /doc/order/123/rows/row-1
+{
+  &quot;id&quot;: &quot;row-1&quot;,
+  &quot;values&quot;: [...],
+  &quot;version&quot;: 5
+}
+
+// 2. 更新时携带版本号
+PUT /doc/order/123/rows/row-1?requestId=req-1
+{
+  &quot;values&quot;: [...],
+  &quot;version&quot;: 5        // 必须匹配当前版本
+}
+
+// 3. 如果版本不匹配，返回冲突错误
+{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;VERSION_CONFLICT&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;数据已被其他用户修改，请刷新后重试&quot;,
+    &quot;en&quot;: &quot;Data has been modified by another user&quot;
+  },
+  &quot;payload&quot;: {
+    &quot;currentVersion&quot;: 6,
+    &quot;yourVersion&quot;: 5
+  }
+}
+</code></pre>
+<h3>5.4 Approval（审批）工作流</h3>
+<pre><code class="language-typescript">// 1. 提交审批
+POST /doc/order/123/requests/req-1/submit-approval
+{
+  &quot;approvers&quot;: [&quot;manager-1&quot;, &quot;manager-2&quot;],
+  &quot;strategy&quot;: &quot;sequential&quot;          // sequential: 串签, parallel: 并签
+}
+
+// 2. 审批者查看 Request
+GET /doc/order/123/requests/req-1
+GET /doc/order/123/requests/req-1/diff
+
+// 3. 审批者做出决策
+POST /doc/order/123/approvals/approval-1/approve
+{
+  &quot;decision&quot;: &quot;approved&quot;,           // approved, rejected, request_changes
+  &quot;comment&quot;: &quot;采购价格合理，批准&quot;
+}
+
+// 4. 所有审批通过后，可以合并
+POST /doc/order/123/requests/req-1/merge
+</code></pre>
+<p><strong>审批策略</strong>：</p>
+<ul>
+<li><strong>串签</strong> (sequential): 按顺序逐个审批，前一个通过才能到下一个</li>
+<li><strong>并签</strong> (parallel): 所有审批者同时审批，全部通过才算通过</li>
+<li><strong>条件签</strong>: 根据条件选择审批者（如金额&gt;10万需要总监审批）</li>
+</ul>
+<hr>
+<h2>6. 实现原理</h2>
+<h3>6.1 TypeSpec 定义到 OpenAPI</h3>
+<p>NexusBook 使用 <strong>TypeSpec</strong> 定义 API，自动生成 OpenAPI 规范：</p>
+<pre><code class="language-typescript">// api/document/core/data.tsp
+@route(&quot;/doc/{docType}/{docId}/rows&quot;)
+@tag(&quot;Document - Core&quot;)
+interface DataApi {
+  @post
+  @summary(&quot;创建数据行&quot;)
+  createRow(
+    @path docType: string,
+    @path docId: string,
+    @query requestId: string,
+    @body row: CreateRowRequest,
+  ): ApiResponse&lt;Row&gt;;
+}
+</code></pre>
+<p><strong>编译流程</strong>：</p>
+<pre><code>TypeSpec (.tsp)
+  ↓ tsp compile
+OpenAPI 3.0 (openapi.yaml)
+  ↓ openapi-generator
+服务端代码 (Go/Java/...)
+客户端SDK (TypeScript/Python/...)
+API文档 (Redocly)
+</code></pre>
+<h3>6.2 存储模型</h3>
+<p><strong>逻辑模型 vs 物理模型</strong>：</p>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ 逻辑模型 (用户视角)                                           │
+├─────────────────────────────────────────────────────────────┤
+│ Document                                                      │
+│ ├─ Properties                                                │
+│ ├─ Metadata                                                  │
+│ ├─ Data (Rows)                                               │
+│ ├─ Views                                                     │
+│ ├─ Comments                                                  │
+│ ├─ Requests                                                  │
+│ └─ Revisions                                                 │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 物理模型 (数据库)                                             │
+├─────────────────────────────────────────────────────────────┤
+│ documents (文档基本信息)                                      │
+│ document_properties (属性值，JSON 列)                         │
+│ document_metadata (元数据定义，JSON 列)                       │
+│ document_rows (数据行，JSON 列存储 values)                    │
+│ document_views (视图配置，JSON 列)                            │
+│ document_comments (评论)                                      │
+│ document_requests (变更请求，JSON 列存储 changes)             │
+│ document_revisions (修订历史，JSON 列存储 changes)            │
+│ document_settings (设置)                                      │
+│ relation_edges (关系边)                                       │
+│ attachments (附件元数据)                                      │
+└─────────────────────────────────────────────────────────────┘
+</code></pre>
+<p><strong>为什么用 JSON 列？</strong></p>
+<ul>
+<li>灵活的 Schema：每个文档类型可以有不同的字段</li>
+<li>减少表数量：不需要为每种文档类型创建表</li>
+<li>查询优化：现代数据库（PostgreSQL, MySQL 8.0+）对 JSON 查询有良好支持</li>
+<li>索引支持：可以对 JSON 中的特定字段建立索引</li>
+</ul>
+<h3>6.3 查询引擎实现</h3>
+<p><strong>Filter 翻译为 SQL</strong>：</p>
+<pre><code class="language-typescript">// API 请求
+{
+  &quot;filters&quot;: {
+    &quot;logic&quot;: &quot;and&quot;,
+    &quot;conditions&quot;: [
+      { &quot;field&quot;: &quot;status&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;pending&quot; },
+      { &quot;field&quot;: &quot;amount&quot;, &quot;operator&quot;: &quot;gte&quot;, &quot;value&quot;: 10000 }
+    ]
+  }
+}
+
+// 翻译为 SQL (PostgreSQL)
+SELECT *
+FROM document_rows
+WHERE doc_id = &#39;order-123&#39;
+  AND values-&gt;&gt;&#39;status&#39; = &#39;pending&#39;
+  AND CAST(values-&gt;&gt;&#39;amount&#39; AS DECIMAL) &gt;= 10000
+</code></pre>
+<p><strong>性能优化</strong>：</p>
+<ul>
+<li><strong>JSON索引</strong>: <code>CREATE INDEX idx_status ON document_rows ((values-&gt;&gt;&#39;status&#39;))</code></li>
+<li><strong>函数索引</strong>: <code>CREATE INDEX idx_amount ON document_rows (CAST(values-&gt;&gt;&#39;amount&#39; AS DECIMAL))</code></li>
+<li><strong>分区表</strong>: 按 docType 或时间分区</li>
+<li><strong>缓存</strong>: Metadata 和 Settings 长期缓存</li>
+</ul>
+<hr>
+<h2>7. 完整业务流程</h2>
+<h3>7.1 场景：创建并管理一个采购订单</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ Day 1: 采购员A创建订单                                        │
+└─────────────────────────────────────────────────────────────┘
+
+1. 创建文档
+POST /doc/purchaseOrder
+{
+  &quot;id&quot;: &quot;order-2024-12-001&quot;,
+  &quot;organizationId&quot;: &quot;org-1&quot;,
+  &quot;workspaceId&quot;: &quot;ws-1&quot;
+}
+
+2. 初始化 Properties
+POST /doc/purchaseOrder/order-2024-12-001/properties
+{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;orderDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2024-12-01&quot; } },
+    { &quot;fieldId&quot;: &quot;store&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Beijing Branch&quot; } },
+    { &quot;fieldId&quot;: &quot;status&quot;, &quot;value&quot;: { &quot;select&quot;: &quot;draft&quot; } }
+  ]
+}
+
+3. 创建 Metadata (定义字段)
+POST /doc/purchaseOrder/order-2024-12-001/metadata
+{
+  &quot;fields&quot;: [
+    { &quot;id&quot;: &quot;productName&quot;, &quot;name&quot;: &quot;产品名称&quot;, &quot;type&quot;: &quot;text&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;quantity&quot;, &quot;name&quot;: &quot;数量&quot;, &quot;type&quot;: &quot;number&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;price&quot;, &quot;name&quot;: &quot;单价&quot;, &quot;type&quot;: &quot;currency&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;total&quot;, &quot;name&quot;: &quot;小计&quot;, &quot;type&quot;: &quot;formula&quot;, &quot;formula&quot;: &quot;quantity * price&quot; }
+  ],
+  &quot;properties&quot;: [
+    { &quot;id&quot;: &quot;orderDate&quot;, &quot;name&quot;: &quot;订单日期&quot;, &quot;type&quot;: &quot;date&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;store&quot;, &quot;name&quot;: &quot;门店&quot;, &quot;type&quot;: &quot;text&quot;, &quot;required&quot;: true },
+    { &quot;id&quot;: &quot;totalAmount&quot;, &quot;name&quot;: &quot;总金额&quot;, &quot;type&quot;: &quot;currency&quot; },
+    { &quot;id&quot;: &quot;status&quot;, &quot;name&quot;: &quot;状态&quot;, &quot;type&quot;: &quot;single_select&quot; }
+  ]
+}
+
+4. 创建默认视图
+POST /doc/purchaseOrder/order-2024-12-001/views
+{
+  &quot;name&quot;: &quot;全部产品&quot;,
+  &quot;type&quot;: &quot;table&quot;,
+  &quot;config&quot;: {
+    &quot;columns&quot;: [&quot;productName&quot;, &quot;quantity&quot;, &quot;price&quot;, &quot;total&quot;],
+    &quot;sorts&quot;: [{ &quot;field&quot;: &quot;createdAt&quot;, &quot;direction&quot;: &quot;desc&quot; }]
+  }
+}
+
+┌─────────────────────────────────────────────────────────────┐
+│ Day 1 下午: 采购员A添加产品                                   │
+└─────────────────────────────────────────────────────────────┘
+
+5. 创建 Request
+POST /doc/purchaseOrder/order-2024-12-001/requests
+{
+  &quot;title&quot;: &quot;添加初始产品清单&quot;
+}
+返回: { &quot;id&quot;: &quot;req-1&quot; }
+
+6. 添加产品行 (携带 requestId)
+POST /doc/purchaseOrder/order-2024-12-001/rows?requestId=req-1
+{
+  &quot;values&quot;: [
+    { &quot;fieldId&quot;: &quot;productName&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;iPhone 15&quot; } },
+    { &quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: { &quot;number&quot;: 10 } },
+    { &quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: { &quot;number&quot;: 799.99 } }
+  ]
+}
+
+POST /doc/purchaseOrder/order-2024-12-001/rows?requestId=req-1
+{
+  &quot;values&quot;: [
+    { &quot;fieldId&quot;: &quot;productName&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;iPad Pro&quot; } },
+    { &quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: { &quot;number&quot;: 5 } },
+    { &quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: { &quot;number&quot;: 1099.99 } }
+  ]
+}
+
+7. 合并 Request (无需审批)
+POST /doc/purchaseOrder/order-2024-12-001/requests/req-1/merge
+→ 生成 Revision rev-001
+→ 数据正式写入
+
+┌─────────────────────────────────────────────────────────────┐
+│ Day 2: 采购员B发现价格有误，提出评论                          │
+└─────────────────────────────────────────────────────────────┘
+
+8. 添加评论
+POST /doc/purchaseOrder/order-2024-12-001/comments
+{
+  &quot;content&quot;: &quot;@user-A iPad Pro 的单价应该是 999.99，不是 1099.99&quot;,
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;cell&quot;,
+    &quot;rowId&quot;: &quot;row-2&quot;,
+    &quot;fieldId&quot;: &quot;price&quot;
+  },
+  &quot;mentions&quot;: [&quot;user-A&quot;]
+}
+
+9. 采购员A回复
+POST /doc/purchaseOrder/order-2024-12-001/comments
+{
+  &quot;content&quot;: &quot;好的，我来修改&quot;,
+  &quot;parentId&quot;: &quot;comment-1&quot;
+}
+
+┌─────────────────────────────────────────────────────────────┐
+│ Day 2: 采购员A修正价格，提交审批                              │
+└─────────────────────────────────────────────────────────────┘
+
+10. 创建新的 Request
+POST /doc/purchaseOrder/order-2024-12-001/requests
+{
+  &quot;title&quot;: &quot;修正 iPad Pro 价格&quot;
+}
+返回: { &quot;id&quot;: &quot;req-2&quot; }
+
+11. 更新价格
+PUT /doc/purchaseOrder/order-2024-12-001/rows/row-2?requestId=req-2
+{
+  &quot;values&quot;: [
+    { &quot;fieldId&quot;: &quot;productName&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;iPad Pro&quot; } },
+    { &quot;fieldId&quot;: &quot;quantity&quot;, &quot;value&quot;: { &quot;number&quot;: 5 } },
+    { &quot;fieldId&quot;: &quot;price&quot;, &quot;value&quot;: { &quot;number&quot;: 999.99 } }  // 修正
+  ],
+  &quot;version&quot;: 1
+}
+
+12. 提交审批
+POST /doc/purchaseOrder/order-2024-12-001/requests/req-2/submit-approval
+{
+  &quot;approvers&quot;: [&quot;manager-1&quot;]
+}
+
+13. 经理审批通过
+POST /doc/purchaseOrder/order-2024-12-001/approvals/approval-1/approve
+{
+  &quot;decision&quot;: &quot;approved&quot;,
+  &quot;comment&quot;: &quot;价格修正正确&quot;
+}
+
+14. 合并 Request
+POST /doc/purchaseOrder/order-2024-12-001/requests/req-2/merge
+→ 生成 Revision rev-002
+→ 价格更新生效
+
+15. 标记评论已解决
+POST /doc/purchaseOrder/order-2024-12-001/comments/comment-1/resolve
+
+┌─────────────────────────────────────────────────────────────┐
+│ Day 3: 查看变更历史和审计                                     │
+└─────────────────────────────────────────────────────────────┘
+
+16. 查看所有修订
+GET /doc/purchaseOrder/order-2024-12-001/revisions
+[
+  {
+    &quot;id&quot;: &quot;rev-001&quot;,
+    &quot;version&quot;: 1,
+    &quot;title&quot;: &quot;添加初始产品清单&quot;,
+    &quot;contributors&quot;: [&quot;user-A&quot;],
+    &quot;stats&quot;: { &quot;rowsCreated&quot;: 2 }
+  },
+  {
+    &quot;id&quot;: &quot;rev-002&quot;,
+    &quot;version&quot;: 2,
+    &quot;title&quot;: &quot;修正 iPad Pro 价格&quot;,
+    &quot;contributors&quot;: [&quot;user-A&quot;],
+    &quot;mergedBy&quot;: &quot;manager-1&quot;,
+    &quot;stats&quot;: { &quot;rowsUpdated&quot;: 1 }
+  }
+]
+
+17. 对比两个版本
+GET /doc/purchaseOrder/order-2024-12-001/revisions/rev-002/diff?base=rev-001
+{
+  &quot;updated&quot;: [
+    {
+      &quot;rowId&quot;: &quot;row-2&quot;,
+      &quot;fieldId&quot;: &quot;price&quot;,
+      &quot;oldValue&quot;: 1099.99,
+      &quot;newValue&quot;: 999.99
+    },
+    {
+      &quot;rowId&quot;: &quot;row-2&quot;,
+      &quot;fieldId&quot;: &quot;total&quot;,  // 公式字段自动更新
+      &quot;oldValue&quot;: 5499.95,
+      &quot;newValue&quot;: 4999.95
+    }
+  ]
+}
+
+18. 查看某行的完整变更历史
+GET /doc/purchaseOrder/order-2024-12-001/revisions/history?targetKind=row&amp;rowId=row-2
+[
+  {
+    &quot;revisionId&quot;: &quot;rev-001&quot;,
+    &quot;operation&quot;: &quot;create&quot;,
+    &quot;operator&quot;: &quot;user-A&quot;,
+    &quot;timestamp&quot;: &quot;2024-12-01T10:00:00Z&quot;
+  },
+  {
+    &quot;revisionId&quot;: &quot;rev-002&quot;,
+    &quot;operation&quot;: &quot;update&quot;,
+    &quot;operator&quot;: &quot;user-A&quot;,
+    &quot;timestamp&quot;: &quot;2024-12-02T14:30:00Z&quot;,
+    &quot;changes&quot;: [
+      { &quot;fieldId&quot;: &quot;price&quot;, &quot;oldValue&quot;: 1099.99, &quot;newValue&quot;: 999.99 }
+    ]
+  }
+]
+</code></pre>
+<h3>7.2 场景：跨文档关联</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ 场景：发票引用采购订单                                        │
+└─────────────────────────────────────────────────────────────┘
+
+1. 创建发票文档
+POST /doc/invoice
+{
+  &quot;id&quot;: &quot;inv-2024-12-001&quot;
+}
+
+2. 创建关联关系 (在 Request 中)
+POST /relations?requestId=req-inv-1
+{
+  &quot;type&quot;: &quot;references&quot;,
+  &quot;direction&quot;: &quot;uni&quot;,
+  &quot;source&quot;: {
+    &quot;docType&quot;: &quot;invoice&quot;,
+    &quot;docId&quot;: &quot;inv-2024-12-001&quot;,
+    &quot;rowId&quot;: &quot;inv-row-1&quot;
+  },
+  &quot;target&quot;: {
+    &quot;docType&quot;: &quot;purchaseOrder&quot;,
+    &quot;docId&quot;: &quot;order-2024-12-001&quot;,
+    &quot;rowId&quot;: &quot;row-1&quot;
+  },
+  &quot;metadata&quot;: {
+    &quot;note&quot;: &quot;发票第1行引用采购订单第1行&quot;
+  }
+}
+
+3. 查询出边 (从发票出发)
+GET /doc/invoice/inv-2024-12-001/relations
+[
+  {
+    &quot;id&quot;: &quot;rel-001&quot;,
+    &quot;type&quot;: &quot;references&quot;,
+    &quot;target&quot;: {
+      &quot;docType&quot;: &quot;purchaseOrder&quot;,
+      &quot;docId&quot;: &quot;order-2024-12-001&quot;,
+      &quot;rowId&quot;: &quot;row-1&quot;
+    }
+  }
+]
+
+4. 查询入边 (指向采购订单)
+GET /doc/purchaseOrder/order-2024-12-001/relations/inbound
+[
+  {
+    &quot;id&quot;: &quot;rel-001&quot;,
+    &quot;type&quot;: &quot;references&quot;,
+    &quot;source&quot;: {
+      &quot;docType&quot;: &quot;invoice&quot;,
+      &quot;docId&quot;: &quot;inv-2024-12-001&quot;,
+      &quot;rowId&quot;: &quot;inv-row-1&quot;
+    }
+  }
+]
+
+5. 删除保护 (尝试删除被引用的行)
+DELETE /doc/purchaseOrder/order-2024-12-001/rows/row-1?requestId=req-3
+→ 返回错误
+{
+  &quot;success&quot;: false,
+  &quot;code&quot;: &quot;RELATION_CONFLICT&quot;,
+  &quot;message&quot;: {
+    &quot;zh&quot;: &quot;该行被其他文档引用，无法删除&quot;,
+    &quot;en&quot;: &quot;This row is referenced by other documents and cannot be deleted&quot;
+  },
+  &quot;payload&quot;: {
+    &quot;inboundRelations&quot;: [
+      {
+        &quot;id&quot;: &quot;rel-001&quot;,
+        &quot;source&quot;: { &quot;docType&quot;: &quot;invoice&quot;, &quot;docId&quot;: &quot;inv-2024-12-001&quot; }
+      }
+    ]
+  }
+}
+</code></pre>
+<h3>7.3 场景：数据同步</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│ 场景：将产品数据同步到外部系统                                 │
+└─────────────────────────────────────────────────────────────┘
+
+1. 配置同步
+POST /doc/product/prod-catalog/sync/configs
+{
+  &quot;name&quot;: &quot;同步到 ERP 系统&quot;,
+  &quot;targetType&quot;: &quot;webhook&quot;,
+  &quot;targetConfig&quot;: {
+    &quot;url&quot;: &quot;https://erp.example.com/api/products&quot;,
+    &quot;method&quot;: &quot;POST&quot;,
+    &quot;headers&quot;: {
+      &quot;Authorization&quot;: &quot;Bearer xxx&quot;
+    }
+  },
+  &quot;schedule&quot;: &quot;0 0 * * *&quot;,  // 每天凌晨同步
+  &quot;enabled&quot;: true
+}
+
+2. 手动触发同步
+POST /doc/product/prod-catalog/sync/configs/sync-1/execute
+{
+  &quot;filters&quot;: {
+    &quot;logic&quot;: &quot;and&quot;,
+    &quot;conditions&quot;: [
+      { &quot;field&quot;: &quot;status&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: &quot;active&quot; }
+    ]
+  }
+}
+
+3. 查看同步日志
+GET /doc/product/prod-catalog/sync/configs/sync-1/logs
+[
+  {
+    &quot;id&quot;: &quot;log-1&quot;,
+    &quot;status&quot;: &quot;success&quot;,
+    &quot;recordsSynced&quot;: 150,
+    &quot;startedAt&quot;: &quot;2024-12-01T00:00:00Z&quot;,
+    &quot;completedAt&quot;: &quot;2024-12-01T00:05:30Z&quot;
+  }
+]
+</code></pre>
+<hr>
+<h2>8. 最佳实践</h2>
+<h3>8.1 Properties 设计</h3>
+<p><strong>✅ 推荐</strong>：</p>
+<pre><code class="language-typescript">{
+  &quot;properties&quot;: [
+    { &quot;fieldId&quot;: &quot;orderDate&quot;, &quot;value&quot;: { &quot;date&quot;: &quot;2024-12-01&quot; } },
+    { &quot;fieldId&quot;: &quot;store&quot;, &quot;value&quot;: { &quot;text&quot;: &quot;Beijing Branch&quot; } },
+    { &quot;fieldId&quot;: &quot;totalAmount&quot;, &quot;value&quot;: { &quot;number&quot;: 50000.00 } }
+  ]
+}
+</code></pre>
+<p><strong>❌ 避免</strong>：</p>
+<pre><code class="language-typescript">// ❌ 不要在 Properties 中存储列表数据
+{
+  &quot;properties&quot;: [
+    {
+      &quot;fieldId&quot;: &quot;products&quot;,
+      &quot;value&quot;: {
+        &quot;text&quot;: &quot;iPhone 15, iPad Pro, MacBook Air&quot;  // 应该用 Data 行
+      }
+    }
+  ]
+}
+
+// ❌ 不要过度嵌套
+{
+  &quot;properties&quot;: [
+    {
+      &quot;fieldId&quot;: &quot;address&quot;,
+      &quot;value&quot;: {
+        &quot;text&quot;: JSON.stringify({
+          &quot;country&quot;: &quot;China&quot;,
+          &quot;province&quot;: &quot;Beijing&quot;,
+          &quot;city&quot;: &quot;Beijing&quot;,
+          &quot;district&quot;: &quot;Chaoyang&quot;
+        })
+      }
+    }
+  ]
+}
+// ✅ 应该拆分为多个属性字段
+</code></pre>
+<h3>8.2 Metadata 设计</h3>
+<p><strong>✅ 推荐</strong>：</p>
+<pre><code class="language-typescript">// 使用清晰的字段 ID
+{
+  &quot;id&quot;: &quot;customerEmail&quot;,       // ✅ 自描述
+  &quot;name&quot;: &quot;客户邮箱&quot;,
+  &quot;type&quot;: &quot;text&quot;
+}
+
+// 提供验证规则
+{
+  &quot;id&quot;: &quot;phone&quot;,
+  &quot;name&quot;: &quot;手机号&quot;,
+  &quot;type&quot;: &quot;text&quot;,
+  &quot;required&quot;: true,
+  &quot;validations&quot;: [
+    {
+      &quot;ruleType&quot;: &quot;pattern&quot;,
+      &quot;config&quot;: { &quot;pattern&quot;: &quot;^1[3-9]\\d{9}$&quot; },
+      &quot;message&quot;: {
+        &quot;zh&quot;: &quot;请输入有效的手机号&quot;,
+        &quot;en&quot;: &quot;Please enter a valid phone number&quot;
+      }
+    }
+  ]
+}
+</code></pre>
+<p><strong>❌ 避免</strong>：</p>
+<pre><code class="language-typescript">// ❌ 字段 ID 不明确
+{
+  &quot;id&quot;: &quot;field1&quot;,              // 难以理解
+  &quot;name&quot;: &quot;邮箱&quot;,
+  &quot;type&quot;: &quot;text&quot;
+}
+
+// ❌ 缺少必要的验证
+{
+  &quot;id&quot;: &quot;amount&quot;,
+  &quot;name&quot;: &quot;金额&quot;,
+  &quot;type&quot;: &quot;number&quot;             // 缺少 min/max 验证
+}
+</code></pre>
+<h3>8.3 批量操作优化</h3>
+<p><strong>✅ 推荐</strong>：</p>
+<pre><code class="language-typescript">// 使用批量更新
+POST /doc/order/123/rows/batch-update?requestId=req-1
+[
+  { &quot;target&quot;: { &quot;row&quot;: &quot;row-1&quot;, &quot;field&quot;: &quot;status&quot; }, &quot;value&quot;: &quot;active&quot; },
+  { &quot;target&quot;: { &quot;row&quot;: &quot;row-2&quot;, &quot;field&quot;: &quot;status&quot; }, &quot;value&quot;: &quot;active&quot; },
+  { &quot;target&quot;: { &quot;row&quot;: &quot;row-3&quot;, &quot;field&quot;: &quot;status&quot; }, &quot;value&quot;: &quot;active&quot; }
+]
+</code></pre>
+<p><strong>❌ 避免</strong>：</p>
+<pre><code class="language-typescript">// ❌ 逐个更新
+for (const rowId of rowIds) {
+  await PUT(`/doc/order/123/rows/${rowId}?requestId=req-1`, {...})
+}
+// 性能差，产生大量网络请求
+</code></pre>
+<h3>8.4 Request 管理</h3>
+<p><strong>✅ 推荐</strong>：</p>
+<pre><code class="language-typescript">// 相关的变更放在同一个 Request 中
+const requestId = &quot;req-1&quot;;
+
+// 1. 更新多行
+await bulkUpdate(requestId, [...]);
+
+// 2. 更新属性
+await updateProperties(requestId, {...});
+
+// 3. 一次性合并
+await mergeRequest(requestId);
+</code></pre>
+<p><strong>❌ 避免</strong>：</p>
+<pre><code class="language-typescript">// ❌ 为每个操作创建单独的 Request
+const req1 = await createRequest();  // 更新行1
+const req2 = await createRequest();  // 更新行2
+const req3 = await createRequest();  // 更新属性
+
+// 产生过多的 Revision，难以追溯
+</code></pre>
+<h3>8.5 评论使用</h3>
+<p><strong>✅ 推荐</strong>：</p>
+<pre><code class="language-typescript">// 精确定位到问题位置
+{
+  &quot;content&quot;: &quot;这个单价需要确认&quot;,
+  &quot;target&quot;: {
+    &quot;scope&quot;: &quot;cell&quot;,
+    &quot;rowId&quot;: &quot;row-1&quot;,
+    &quot;fieldId&quot;: &quot;price&quot;
+  }
+}
+
+// 使用 @提及
+{
+  &quot;content&quot;: &quot;@manager 请审核这个订单&quot;,
+  &quot;mentions&quot;: [&quot;manager-1&quot;],
+  &quot;target&quot;: { &quot;scope&quot;: &quot;document&quot; }
+}
+
+// 及时标记已解决
+POST /doc/order/123/comments/comment-1/resolve
+</code></pre>
+<p><strong>❌ 避免</strong>：</p>
+<pre><code class="language-typescript">// ❌ 在评论中存储结构化数据
+{
+  &quot;content&quot;: &quot;更新后的数据：{productName: &#39;iPhone&#39;, price: 999}&quot;
+}
+// 应该直接修改数据，评论只用于讨论
+
+// ❌ 过度评论
+// 每个小修改都评论，导致噪音过多
+// 应该合并相关讨论，问题解决后清理
+</code></pre>
+<h3>8.6 性能优化</h3>
+<p><strong>1. 分页查询</strong>：</p>
+<pre><code class="language-typescript">// ✅ 使用分页
+GET /doc/order/123/rows?page=1&amp;pageSize=100
+
+// ❌ 一次性获取所有数据
+GET /doc/order/123/rows?pageSize=10000
+</code></pre>
+<p><strong>2. 选择性查询</strong>：</p>
+<pre><code class="language-typescript">// ✅ 只获取需要的部分
+GET /doc/order/123?include=properties,metadata
+
+// ❌ 获取整个文档
+GET /doc/order/123?include=properties,metadata,data,comments,revisions
+</code></pre>
+<p><strong>3. 缓存策略</strong>：</p>
+<pre><code class="language-typescript">// Metadata 和 Settings 变化少，可以长期缓存
+const metadata = await cache.get(`metadata:${docType}:${docId}`, async () =&gt; {
+  return await fetchMetadata(docType, docId);
+}, { ttl: 3600 });
+
+// Data 变化频繁，短期缓存或不缓存
+const rows = await fetchRows(docType, docId);
+
+// Revisions 不可变，可以永久缓存
+const revision = await cache.get(`revision:${revId}`, async () =&gt; {
+  return await fetchRevision(revId);
+}, { ttl: Infinity });
+</code></pre>
+<h3>8.7 安全实践</h3>
+<p><strong>1. 权限检查</strong>：</p>
+<pre><code class="language-typescript">// 在每个操作前检查权限
+if (!hasPermission(user, doc, &#39;write&#39;)) {
+  throw new ForbiddenError();
+}
+</code></pre>
+<p><strong>2. 输入验证</strong>：</p>
+<pre><code class="language-typescript">// 服务端严格验证
+- 字段类型是否匹配 Metadata
+- 必填字段是否存在
+- 验证规则是否通过
+- 关联关系是否有效
+</code></pre>
+<p><strong>3. 审计日志</strong>：</p>
+<pre><code class="language-typescript">// 所有敏感操作记录审计日志
+await auditLog({
+  action: &#39;document.delete&#39;,
+  userId: currentUser.id,
+  docType,
+  docId,
+  metadata: { reason: &#39;cleanup&#39; }
+});
+</code></pre>
+<h3>8.8 错误处理</h3>
+<p><strong>✅ 推荐</strong>：</p>
+<pre><code class="language-typescript">try {
+  await updateRow(docType, docId, rowId, data, requestId);
+} catch (error) {
+  if (error.code === &#39;VERSION_CONFLICT&#39;) {
+    // 版本冲突，提示用户刷新
+    await refreshData();
+    showMessage(&#39;数据已被其他用户修改，请重新编辑&#39;);
+  } else if (error.code === &#39;FIELD_TYPE_MISMATCH&#39;) {
+    // 类型不匹配，显示具体错误
+    showValidationError(error.payload.field, error.message);
+  } else {
+    // 其他错误
+    showError(&#39;操作失败，请稍后重试&#39;);
+  }
+}
+</code></pre>
+<hr>
+<h2>9. 总结</h2>
+<h3>9.1 核心价值</h3>
+<p>NexusBook 文档模型通过<strong>七层架构</strong>提供了：</p>
+<ol>
+<li><strong>Properties</strong> - 文档级元信息，清晰分离文档属性和数据内容</li>
+<li><strong>Metadata</strong> - 元数据驱动，25+ 种字段类型，支持计算字段和验证规则</li>
+<li><strong>Data</strong> - 结构化数据行，支持灵活查询和批量操作</li>
+<li><strong>Views</strong> - 8 种视图类型，同一数据多种展示方式</li>
+<li><strong>Comments</strong> - 四级精确定位，完整的协作讨论能力</li>
+<li><strong>Requests</strong> - 类 Git 的变更工作流，支持多人协同和审批</li>
+<li><strong>Revisions</strong> - 不可变历史，完整的变更追踪和审计能力</li>
+</ol>
+<h3>9.2 设计优势</h3>
+<p>✅ <strong>一次开发，无限复用</strong> - 同一套模型支持订单、发票、库存等所有文档类型</p>
+<p>✅ <strong>开箱即用的协作</strong> - 评论、@提及、讨论线程、表情反应</p>
+<p>✅ <strong>Git 级别的版本控制</strong> - Request → Revision 机制确保数据安全和可追溯</p>
+<p>✅ <strong>灵活的审批流程</strong> - 串签、并签、条件审批，满足各种审批需求</p>
+<p>✅ <strong>强大的查询能力</strong> - 过滤、排序、分组、聚合，支持复杂业务查询</p>
+<p>✅ <strong>关系是一等公民</strong> - 跨文档关联、附件管理、数据同步</p>
+
+                </article>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <p>&copy; 2024 NexusBook. 基于 TypeSpec 定义并生成 OpenAPI 3.0 规范。</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
