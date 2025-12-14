@@ -8,13 +8,15 @@ deps:
 	npm i -D @typespec/compiler @typespec/http @typespec/openapi3 @redocly/cli
 
 openapi: deps
-	$(TSP) compile api/main.tsp --emit @typespec/openapi3 --output-dir dist/openapi
-	@echo "Adding x-tagGroups to OpenAPI..."
-	@node scripts/add-tag-groups.js
+	$(TSP) compile api/main.tsp --emit @typespec/openapi3 --output-dir tsp-output
+	@echo "✅ OpenAPI 规范已生成"
+	@echo "Enhancing OpenAPI files..."
+	@node scripts/enhance-openapi.js
+	@echo "✅ OpenAPI 文件增强完成"
 
 build-docs: openapi
 	mkdir -p dist/redoc
-	OPENAPI_DIR=dist/openapi/@typespec/openapi3; \
+	OPENAPI_DIR=tsp-output/@typespec/openapi3; \
 	FILES=$$(ls $$OPENAPI_DIR/*.yaml); \
 	COUNT=$$(echo $$FILES | wc -w); \
 	if [ $$COUNT -eq 1 ]; then \
@@ -22,8 +24,9 @@ build-docs: openapi
 			--config=redocly.yaml \
 			--output dist/redoc/index.html; \
 	else \
+		mkdir -p dist/openapi; \
 		npx redocly join $$FILES --without-x-tag-groups -o dist/openapi/openapi.yaml && \
-		node scripts/add-tag-groups.js dist/openapi/openapi.yaml && \
+		node scripts/enhance-openapi.js dist/openapi/openapi.yaml && \
 		npx @redocly/cli build-docs dist/openapi/openapi.yaml \
 			--config=redocly.yaml \
 			--output dist/redoc/index.html; \

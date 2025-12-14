@@ -9,6 +9,8 @@ theme:
     expandResponses: '200,201'
     jsonSampleExpandLevel: 2
     hideSchemaPattern: false
+    # 启用 x-tagGroups 支持
+    sortTagsAlphabetically: false
     generateCodeSamples:
       languages:
         - lang: 'curl'

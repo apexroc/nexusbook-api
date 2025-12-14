@@ -100,7 +100,7 @@ async function generateHomePage() {
                 <a href="${resolvePath('index.html')}">首页</a>
                 <a href="${resolvePath('api/')}">API 参考</a>
                 <a href="${resolvePath('guides/getting-started.html')}">开发指南</a>
-                <a href="${resolvePath('advanced/')}">高级手册</a>
+                <a href="${resolvePath('advanced/index.html')}">高级手册</a>
                 <a href="${resolvePath('references/error-codes.html')}">参考文档</a>
                 <a href="https://github.com/NexusBook/nexusbook-api" target="_blank">GitHub</a>
             </nav>
@@ -143,7 +143,7 @@ async function generateHomePage() {
                         <div class="feature-icon">📖</div>
                         <h3>高级手册</h3>
                         <p>深入的架构设计、最佳实践、故障排除等高级主题，帮助你更好地使用 API。</p>
-                        <a href="${resolvePath('advanced/')}" class="feature-link">查看手册 →</a>
+                        <a href="${resolvePath('advanced/index.html')}" class="feature-link">查看手册 →</a>
                     </div>
 
                     <div class="feature-card">
@@ -192,7 +192,7 @@ async function generateHomePage() {
                 <div class="doc-section">
                     <h3>📖 高级手册</h3>
                     <p>高级手册使用 Docsify 构建，提供完整的目录树导航和全文搜索功能。</p>
-                    <a href="${resolvePath('advanced/')}" class="btn btn-primary">打开高级手册</a>
+                    <a href="${resolvePath('advanced/index.html')}" class="btn btn-primary">打开高级手册</a>
                 </div>
                 <div class="doc-section">
                     <h3>📖 参考文档</h3>
